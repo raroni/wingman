@@ -1,17 +1,14 @@
 Janitor = require('janitor')
 Module = require('../lib/module')
 
-module.exports = class extends Janitor.TestCase
-  setup: ->
-    @test_module = {
-      testMethod: ->
-        'result'
-    }
+test_module =
+  testMethod: ->
+    'result'
 
+module.exports = class extends Janitor.TestCase
   'test include': ->
-    a = @test_module
     klass = class extends Module
-      @include a
+      @include test_module
 
     instance = new klass
 
@@ -19,9 +16,8 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'function', typeof(instance.testMethod)
   
   'test extend': ->
-    a = @test_module
     klass = class extends Module
-      @extend a
+      @extend test_module
 
     @assert klass.testMethod
     @assert_equal 'function', typeof(klass.testMethod)
