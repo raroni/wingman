@@ -12,10 +12,11 @@ module.exports = class extends Module
       @setProperty property_name, value
 
   setProperty: (property_name, value) ->
-    @getProperties()[property_name] = value
-
-  getProperties: ->
-    @properties ||= {}
+    @[property_name] = value
 
   get: (property_name) ->
-    @getProperties()[property_name]
+    property = @[property_name]
+    if typeof(property) == 'function'
+      property.apply @
+    else
+      property
