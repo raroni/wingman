@@ -1,0 +1,12 @@
+{
+  "name": "rango",
+  "description": "TODO.",
+  "author": "Rasmus Rønn Nielsen <rasmusrnielsen@gmail.com>",
+  "version": "0.1.0",
+  "dependencies": {
+    
+  },
+  "devDependencies": {
+    "janitor": "0.1.1"
+  }
+}
