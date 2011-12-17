@@ -1,6 +1,5 @@
 Module = require './module'
 Events = require './events'
-Property = require './property'
 
 module.exports = class extends Module
   @include Events
