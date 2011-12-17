@@ -1,5 +1,6 @@
 Module = require './module'
 Events = require './events'
+Property = require './property'
 
 module.exports = class extends Module
   @include Events
@@ -11,12 +12,15 @@ module.exports = class extends Module
     for property_name, value of hash
       @setProperty property_name, value
 
+  observe: (property_name, callback) ->
+    @bind "change:#{property_name}", callback
+
   setProperty: (property_name, value) ->
     @[property_name] = value
+    @trigger "change:#{property_name}", value
 
   get: (property_name) ->
-    property = @[property_name]
-    if typeof(property) == 'function'
-      property.apply @
+    if typeof(@[property_name]) == 'function'
+      @[property_name].apply @
     else
-      property
+      @[property_name]
