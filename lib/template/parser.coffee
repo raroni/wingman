@@ -1,4 +1,5 @@
 {StringScanner} = require "strscan"
+Value = require "./parser/value"
 
 module.exports = class
   @parse: (source) ->
@@ -40,6 +41,6 @@ module.exports = class
 
   scanForText: ->
     result = @scanner.scanUntil /</
-    @current_scope.value = result.substr 0, result.length-1
+    @current_scope.value = new Value(result.substr 0, result.length-1)
     @scanner.head -= 1
     result
