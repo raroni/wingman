@@ -27,34 +27,46 @@ module.exports = class extends Module
   triggerPropertyChange: (property_name) ->
     @trigger "change:#{property_name}", @get(property_name)
 
-  observe: (chain_as_string, callback) ->
+  observe: (chain_as_string, args...) ->
+    callback = args.pop()
+    type = args.pop() || 'change'
+
     chain = chain_as_string.split '.'
     chain_except_first = chain.slice 1, chain.length
     chain_except_first_as_string = chain_except_first.join '.'
 
-    get_and_send_to_callback = =>
-      callback @get(chain_as_string)
+    get_and_send_to_callback = (new_value) =>
+      if type == 'change'
+        callback @get(chain_as_string)
+      else
+        callback new_value
 
     if chain_except_first.length != 0
       property = @get chain[0]
-      property.observe chain_except_first_as_string, get_and_send_to_callback
+      property.observe chain_except_first_as_string, type, get_and_send_to_callback
 
-    @observeProperty chain[0], (new_value) ->
-      get_and_send_to_callback()
+    @observeProperty chain[0], type, (new_value) ->
+      get_and_send_to_callback new_value
       if chain_except_first.length != 0
-        property.unobserve chain_except_first_as_string, get_and_send_to_callback
-        new_value.observeProperty chain_except_first_as_string, get_and_send_to_callback
+        property.unobserve chain_except_first_as_string, type, get_and_send_to_callback
+        new_value.observeProperty chain_except_first_as_string, type, get_and_send_to_callback
   
-  observeProperty: (property_name, callback) ->
-    @bind "change:#{property_name}", callback
+  observeProperty: (property_name, type, callback) ->
+    @bind "#{type}:#{property_name}", callback
 
-  unobserve: (property_name, callback) ->
-    @unbind "change:#{property_name}", callback
+  unobserve: (property_name, args...) ->
+    callback = args.pop()
+    type = args.pop() || 'change'
+    @unbind "#{type}:#{property_name}", callback
 
   setProperty: (property_name, value) ->
     @[property_name] = value
     @triggerPropertyChange property_name, value
     @triggerPropertyChangesForDependingProperties property_name
+
+    parent = @
+    if Array.isArray @[property_name]
+      @addTriggersToArray property_name
 
   get: (chain_as_string) ->
     chain = chain_as_string.split '.'
@@ -69,3 +81,10 @@ module.exports = class extends Module
       @[property_name].apply @
     else
       @[property_name]
+
+  addTriggersToArray: (property_name) ->
+    parent = @
+    array = @[property_name]
+    array.push = ->
+      Array.prototype.push.apply @, arguments
+      parent.trigger "add:#{property_name}", arguments['0']

@@ -101,7 +101,6 @@ module.exports = class extends Janitor.TestCase
 
     denmark = new Country
     denmark.set code: 'DK'
-    console.log denmark.get('name')
     england = new Country
     england.set code: 'UK'
     sweden = new Country
@@ -124,3 +123,26 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'Sweden', names[0]
     @assert_equal 'England', names[1]
     @assert_equal 'Sweden', names[2]
+
+  'test observe array property': ->
+    instance = new Rango.Object
+    added = []
+    instance.observe 'users', 'add', (new_value) -> added.push(new_value)
+    instance.set users: []
+    instance.get('users').push 'Rasmus'
+    instance.get('users').push 'John'
+
+    @assert_equal 'Rasmus', added[0]
+    @assert_equal 'John', added[1]
+
+  'test observe nested array property': ->
+      country = new Rango.Object
+      country.set cities: ['London', 'Manchester']
+      user = new Rango.Object
+      user.set {country}
+  
+      result = ''
+      user.observe 'country.cities', 'add', (new_value) -> result = new_value
+      country.get('cities').push 'Liverpool'
+  
+      @assert_equal 'Liverpool', result
