@@ -34,6 +34,20 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'span', last_element.tag
     @assert_equal 'two', last_element.value.get()
 
+  'test nested tags': ->
+    tree = @parse '<ol><li>One</li><li>Two</li></ol>'
+
+    @assert_equal 1, tree.children.length
+
+    first_element = tree.children[0]
+    @assert_equal 'ol', first_element.tag
+
+    for value, i in ['One', 'Two']
+      element = first_element.children[i]
+      @assert_equal 'li', element.tag
+      @assert_equal value, element.value.get()
+
+
   'test tag with dynamic text': ->
     tree = @parse '<div>{greeting}</div>'
 
