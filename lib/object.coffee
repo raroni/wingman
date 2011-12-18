@@ -88,3 +88,10 @@ module.exports = class extends Module
     array.push = ->
       Array.prototype.push.apply @, arguments
       parent.trigger "add:#{property_name}", arguments['0']
+    
+    array.remove = (value) ->
+      index = @indexOf value
+      if index != -1
+        @splice index, 1
+        parent.trigger "remove:#{property_name}", value
+

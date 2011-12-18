@@ -124,7 +124,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'England', names[1]
     @assert_equal 'Sweden', names[2]
 
-  'test observe array property': ->
+  'test observe array property add': ->
     instance = new Rango.Object
     added = []
     instance.observe 'users', 'add', (new_value) -> added.push(new_value)
@@ -138,6 +138,17 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'John', added[1]
     @assert_equal 'Jack', added[2]
     @assert_equal 1, instance.get('users').length
+
+  'test observe array property remove': ->
+    country = new Rango.Object
+    country.set cities: ['London', 'Manchester']
+    removed_value_from_callback = ''
+    country.observe 'cities', 'remove', (removed_value) -> removed_value_from_callback = removed_value
+    country.get('cities').remove 'London'
+
+    @assert_equal 'London', removed_value_from_callback
+    @assert_equal 'Manchester', country.get('cities')[0]
+    @assert_equal 1, country.get('cities').length
 
   'test observe nested array property': ->
       country = new Rango.Object
