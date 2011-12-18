@@ -21,6 +21,19 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'hi', tree.children[0].value.get()
     @assert !tree.children[0].is_dynamic
 
+  'test multiple tags': ->
+    tree = @parse '<div>one</div><span>two</span>'
+
+    @assert_equal 2, tree.children.length
+
+    first_element = tree.children[0]
+    @assert_equal 'div', first_element.tag
+    @assert_equal 'one', first_element.value.get()
+
+    last_element = tree.children[1]
+    @assert_equal 'span', last_element.tag
+    @assert_equal 'two', last_element.value.get()
+
   'test tag with dynamic text': ->
     tree = @parse '<div>{greeting}</div>'
 
