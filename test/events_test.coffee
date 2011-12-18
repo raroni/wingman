@@ -29,3 +29,15 @@ module.exports = class extends Janitor.TestCase
       instance.trigger 'something', 'works?'
   
       @assert_equal 'works?', received_arg
+
+  'test unbind': ->
+    klass = class extends Module
+      @include Events
+    
+    instance = new klass
+    triggered = false
+    callback = -> triggered = true
+    instance.bind 'something', callback
+    instance.unbind 'something', callback
+    instance.trigger 'something'
+    @assert !triggered
