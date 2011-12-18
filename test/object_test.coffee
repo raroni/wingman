@@ -131,9 +131,13 @@ module.exports = class extends Janitor.TestCase
     instance.set users: []
     instance.get('users').push 'Rasmus'
     instance.get('users').push 'John'
+    instance.set users: []
+    instance.get('users').push 'Jack'
 
     @assert_equal 'Rasmus', added[0]
     @assert_equal 'John', added[1]
+    @assert_equal 'Jack', added[2]
+    @assert_equal 1, instance.get('users').length
 
   'test observe nested array property': ->
       country = new Rango.Object
