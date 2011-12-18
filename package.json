@@ -7,6 +7,7 @@
     "strscan": ">=1.0.1"
   },
   "devDependencies": {
-    "janitor": "0.1.1"
+    "janitor": "0.1.1",
+    "jsdom": "0.2.10"
   }
 }
