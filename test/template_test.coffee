@@ -15,3 +15,13 @@ module.exports = class extends Janitor.TestCase
     elements = template context
     @assert_equal 1, elements.length
     @assert_equal 'hello', elements[0].innerHTML
+
+  'test template with dynamic value after updating context': ->
+    template = Rango.Template.compile '<div>{greeting}</div>'
+    context = new Rango.Object
+    context.set greeting: 'hello'
+    elements = template context
+    context.set greeting: 'hi'
+
+    @assert_equal 1, elements.length
+    @assert_equal 'hi', elements[0].innerHTML
