@@ -10,11 +10,11 @@ module.exports = class extends Janitor.TestCase
 
     @assert_equal 1, tree.children.length
     @assert_equal 'div', tree.children[0].tag
-    @assert_equal undefined, tree.children[0].inner_html
+    @assert_equal undefined, tree.children[0].value
 
   'test tag with static text': ->
     tree = @parse '<div>hi</div>'
 
     @assert_equal 1, tree.children.length
     @assert_equal 'div', tree.children[0].tag
-    @assert_equal 'hi', tree.children[0].inner_html
+    @assert_equal 'hi', tree.children[0].value

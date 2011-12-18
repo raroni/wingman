@@ -40,6 +40,6 @@ module.exports = class
 
   scanForText: ->
     result = @scanner.scanUntil /</
-    @current_scope.inner_html = result.substr 0, result.length-1
+    @current_scope.value = result.substr 0, result.length-1
     @scanner.head -= 1
     result
