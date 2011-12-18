@@ -19,7 +19,7 @@ module.exports = class
         @scan()
   
   scan: ->
-    @scanForEndTag() || @scanForStartTag()
+    @scanForEndTag() || @scanForStartTag() || @scanForText()
 
   scanForEndTag: ->
     result = @scanner.scan /<\/(.*?)>/
@@ -36,4 +36,10 @@ module.exports = class
         parent: @current_scope
       @current_scope.children.push new_element
       @current_scope = new_element
+    result
+
+  scanForText: ->
+    result = @scanner.scanUntil /</
+    @current_scope.inner_html = result.substr 0, result.length-1
+    @scanner.head -= 1
     result
