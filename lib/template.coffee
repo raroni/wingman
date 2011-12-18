@@ -18,5 +18,8 @@ module.exports = class
 
   buildElement: (element_data, context) ->
     element = document.createElement element_data.tag
-    element.innerHTML = element_data.value.get()
+    element.innerHTML = if element_data.value.is_dynamic
+      context.get(element_data.value.get())
+    else
+      element_data.value.get()
     element
