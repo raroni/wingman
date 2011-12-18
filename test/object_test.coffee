@@ -71,3 +71,17 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'Denmark test', names[0]
     @assert_equal 'England', names[1]
     @assert_equal 'Sweden', names[2]
+
+  'test property dependencies': ->
+    Person = class extends Rango.Object
+      @addPropertyDependencies
+        fullName: ['firstName', 'lastName']
+      
+      fullName: -> "#{@get('firstName')} #{@get('lastName')}"
+
+    person = new Person
+    result = ''
+    person.observe 'fullName', (new_value) -> result = new_value
+    person.set firstName: 'Rasmus', lastName: 'Nielsen'
+
+    @assert_equal result, 'Rasmus Nielsen'

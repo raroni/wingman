@@ -4,12 +4,28 @@ Events = require './events'
 module.exports = class extends Module
   @include Events
 
+  @addPropertyDependencies: (hash) ->
+    @_property_dependencies ||= {}
+    for property_name, dependent_properties of hash
+      @_property_dependencies[property_name] ||= []
+      @_property_dependencies[property_name].concat dependent_properties
+
   set: (hash) ->
     @setProperties hash
 
   setProperties: (hash) ->
     for property_name, value of hash
       @setProperty property_name, value
+
+  triggerPropertyChangesForDependingProperties: (property) ->
+    # This implementation should probably be cleaned up.
+    triggered = {}
+    for property_name, dependent_properties of @constructor._property_dependencies
+      @triggerPropertyChange property_name if !triggered[property_name]
+      triggered[property_name] = true
+
+  triggerPropertyChange: (property_name) ->
+    @trigger "change:#{property_name}", @get(property_name)
 
   observe: (chain_as_string, callback) ->
     chain = chain_as_string.split '.'
@@ -37,7 +53,8 @@ module.exports = class extends Module
 
   setProperty: (property_name, value) ->
     @[property_name] = value
-    @trigger "change:#{property_name}", value
+    @triggerPropertyChange property_name, value
+    @triggerPropertyChangesForDependingProperties property_name
 
   get: (chain_as_string) ->
     chain = chain_as_string.split '.'
