@@ -85,3 +85,42 @@ module.exports = class extends Janitor.TestCase
     person.set firstName: 'Rasmus', lastName: 'Nielsen'
 
     @assert_equal result, 'Rasmus Nielsen'
+
+  'test nested observe combined with property dependencies': ->
+    Country = class extends Rango.Object
+      @CODES = 
+        DK: 'Denmark'
+        UK: 'England'
+        SE: 'Sweden'
+
+      @addPropertyDependencies
+        name: ['code']
+
+      name: ->
+        @constructor.CODES[@get('code')]
+
+    denmark = new Country
+    denmark.set code: 'DK'
+    console.log denmark.get('name')
+    england = new Country
+    england.set code: 'UK'
+    sweden = new Country
+    sweden.set code: 'SE'
+    region1 = new Rango.Object
+    region1.set {country: denmark}
+    region2 = new Rango.Object
+    region2.set {country: sweden}
+    city = new Rango.Object
+    city.set {region: region1}
+
+    names = []
+    city.observe 'region.country.name', (new_name) -> names.push(new_name)
+    denmark.set code: 'SE'
+    region1.set country: england
+    denmark.set code: 'UK'
+    city.set region: region2
+
+    @assert_equal 3, names.length
+    @assert_equal 'Sweden', names[0]
+    @assert_equal 'England', names[1]
+    @assert_equal 'Sweden', names[2]
