@@ -4,7 +4,8 @@
   "author": "Rasmus Rønn Nielsen <rasmusrnielsen@gmail.com>",
   "version": "0.1.0",
   "dependencies": {
-    "strscan": ">=1.0.1"
+    "strscan": ">=1.0.1",
+    "fleck": ">=0.5.1"
   },
   "devDependencies": {
     "janitor": "0.1.1",

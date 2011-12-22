@@ -48,3 +48,17 @@ module.exports = class extends Janitor.TestCase
     
     user.set name: 'John'
     @assert_equal 'John', elements[0].innerHTML
+
+  'test for token': ->
+    template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
+
+    context = new Rango.Object
+    context.set users: ['Rasmus', 'John']
+    elements = template context
+
+    @assert_equal 1, elements.length
+
+    ol_elm = elements[0]
+    @assert_equal 2, ol_elm.childNodes.length
+    @assert_equal 'Rasmus', ol_elm.childNodes[0].innerHTML
+    @assert_equal 'John', ol_elm.childNodes[1].innerHTML
