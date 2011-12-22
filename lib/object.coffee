@@ -49,7 +49,7 @@ module.exports = class extends Module
       get_and_send_to_callback new_value
       if chain_except_first.length != 0
         property.unobserve chain_except_first_as_string, type, get_and_send_to_callback
-        new_value.observeProperty chain_except_first_as_string, type, get_and_send_to_callback
+        new_value.observeProperty chain_except_first_as_string, type, get_and_send_to_callback # <- recursive??
   
   observeProperty: (property_name, type, callback) ->
     @bind "#{type}:#{property_name}", callback
