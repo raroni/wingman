@@ -20,7 +20,7 @@ module.exports = class
         @scan()
   
   scan: ->
-    @scanForEndTag() || @scanForStartTag() || @scanForText()
+    @scanForEndTag() || @scanForStartTag() || @scanForForToken() || @scanForEndToken() || @scanForText()
 
   scanForEndTag: ->
     result = @scanner.scan /<\/(.*?)>/
@@ -31,12 +31,31 @@ module.exports = class
   scanForStartTag: ->
     result = @scanner.scan /<([a-zA-Z]+)>/
     if result
-      new_element =
+      new_node =
         tag: @scanner.getCapture(0)
         children: []
         parent: @current_scope
-      @current_scope.children.push new_element
-      @current_scope = new_element
+        type: 'element'
+      @current_scope.children.push new_node
+      @current_scope = new_node
+    result
+    
+  scanForForToken: ->
+    result = @scanner.scan /\{for (.*?)\}/
+    if result
+      new_node =
+        source: @scanner.getCapture(0)
+        children: []
+        parent: @current_scope
+        type: 'for'
+      @current_scope.children.push new_node
+      @current_scope = new_node
+    result
+    
+  scanForEndToken: ->
+    result = @scanner.scan /\{end\}/
+    if result
+      @current_scope = @current_scope.parent
     result
 
   scanForText: ->

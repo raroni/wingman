@@ -10,6 +10,7 @@ module.exports = class extends Janitor.TestCase
 
     @assert_equal 1, tree.children.length
     @assert_equal 'div', tree.children[0].tag
+    @assert_equal 'element', tree.children[0].type
     @assert_equal undefined, tree.children[0].value
     @assert !tree.children[0].is_dynamic
 
@@ -54,3 +55,18 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'div', tree.children[0].tag
     @assert_equal 'greeting', tree.children[0].value.get()
     @assert tree.children[0].value.is_dynamic
+
+  'test for token': ->
+    tree = @parse '<ol>{for users}<li>{user}</li>{end}</ol>'
+
+    @assert_equal 1, tree.children.length
+    
+    ol_node = tree.children[0]
+    for_node = ol_node.children[0]
+    @assert_equal 'for', for_node.type
+    @assert_equal 'users', for_node.source
+    
+    li_elm = for_node.children[0]
+    @assert_equal 'li', li_elm.tag
+    @assert_equal 'user', li_elm.value.get()
+    @assert li_elm.value.is_dynamic
