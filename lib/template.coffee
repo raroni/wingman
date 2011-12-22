@@ -23,13 +23,18 @@ module.exports = class
   handleNode: (node_data, context, scope) ->
     if node_data.type == 'for'
       for new_node_data in node_data.children
-        for value in context.get(node_data.source)
+        add_x = (value) =>
           new_context = new RangoObject
           key = Fleck.singularize node_data.source
           hash = {}
           hash[key] = value
           new_context.set hash
           @handleNode new_node_data, new_context, scope
+        
+        for value in context.get(node_data.source)
+          add_x value
+        
+        context.observe node_data.source, 'add', add_x
     else
       element = document.createElement node_data.tag
       

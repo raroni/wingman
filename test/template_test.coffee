@@ -62,3 +62,16 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 2, ol_elm.childNodes.length
     @assert_equal 'Rasmus', ol_elm.childNodes[0].innerHTML
     @assert_equal 'John', ol_elm.childNodes[1].innerHTML
+
+  'test for token with defered push': ->
+    template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
+
+    context = new Rango.Object
+    context.set users: ['Rasmus', 'John']
+    elements = template context
+
+    ol_elm = elements[0]
+    @assert_equal 2, ol_elm.childNodes.length
+
+    context.get('users').push 'John'
+    @assert_equal 3, ol_elm.childNodes.length
