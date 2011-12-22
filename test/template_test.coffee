@@ -8,6 +8,15 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 1, elements.length
     @assert_equal 'hello', elements[0].innerHTML
 
+  'test template with nested tags': ->
+    template = Rango.Template.compile '<ol><li>hello</li></ol>'
+    elements = template()
+
+    @assert_equal 1, elements.length
+    ol_elm = elements[0]
+    @assert_equal 1, ol_elm.childNodes.length
+    @assert_equal 'hello', ol_elm.childNodes[0].innerHTML
+
   'test basic template with dynamic content': ->
     template = Rango.Template.compile '<div>{greeting}</div>'
     context = new Rango.Object

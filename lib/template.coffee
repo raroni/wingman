@@ -16,12 +16,18 @@ module.exports = class
   evaluate: (context) ->
     (@buildElement(element_data, context) for element_data in @tree.children)
 
-  buildElement: (element_data, context) ->
+  buildElement: (element_data, context, parent) ->
     element = document.createElement element_data.tag
-    element.innerHTML = if element_data.value.is_dynamic
-      context.observe element_data.value.get(), (new_value) ->
-        element.innerHTML = new_value
-      context.get element_data.value.get()
-    else
-      element_data.value.get()
+    parent.appendChild element if parent
+    if element_data.value
+      element.innerHTML = if element_data.value.is_dynamic
+        context.observe element_data.value.get(), (new_value) ->
+          element.innerHTML = new_value
+        context.get element_data.value.get()
+      else
+        element_data.value.get()
+    else if element_data.children
+      for child in element_data.children
+        @buildElement child, context, element
+    
     element
