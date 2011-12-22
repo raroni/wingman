@@ -73,5 +73,19 @@ module.exports = class extends Janitor.TestCase
     ol_elm = elements[0]
     @assert_equal 2, ol_elm.childNodes.length
 
-    context.get('users').push 'John'
+    context.get('users').push 'Oliver'
     @assert_equal 3, ol_elm.childNodes.length
+    @assert_equal 'Oliver', ol_elm.childNodes[2].innerHTML
+
+  'test for token with defered remove': ->
+    template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
+
+    context = new Rango.Object
+    context.set users: ['Rasmus', 'John']
+    elements = template context
+
+    ol_elm = elements[0]
+    @assert_equal 2, ol_elm.childNodes.length
+
+    context.get('users').remove 'John'
+    @assert_equal 1, ol_elm.childNodes.length

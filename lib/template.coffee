@@ -23,18 +23,28 @@ module.exports = class
   handleNode: (node_data, context, scope) ->
     if node_data.type == 'for'
       for new_node_data in node_data.children
+
+        # add_x should be renamed ... entire handleNode should probably be refactored!
+
+        added_elements = {}
+
         add_x = (value) =>
           new_context = new RangoObject
           key = Fleck.singularize node_data.source
           hash = {}
           hash[key] = value
           new_context.set hash
-          @handleNode new_node_data, new_context, scope
+          element = @handleNode new_node_data, new_context, scope
+          added_elements[value] = element
         
         for value in context.get(node_data.source)
           add_x value
         
         context.observe node_data.source, 'add', add_x
+        context.observe node_data.source, 'remove', (value) ->
+          added_elements[value].parentNode.removeChild added_elements[value]
+          delete added_elements[value]
+
     else
       element = document.createElement node_data.tag
       
@@ -53,3 +63,4 @@ module.exports = class
       else if node_data.children
         for child in node_data.children
           @handleNode child, context, element
+      element
