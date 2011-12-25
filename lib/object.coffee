@@ -94,4 +94,3 @@ module.exports = class extends Module
       if index != -1
         @splice index, 1
         parent.trigger "remove:#{property_name}", value
-
