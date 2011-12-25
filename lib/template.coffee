@@ -36,14 +36,23 @@ module.exports = class
           new_context.set hash
           element = @handleNode new_node_data, new_context, scope
           added_elements[value] = element
-        
-        for value in context.get(node_data.source)
-          add_x value
-        
-        context.observe node_data.source, 'add', add_x
-        context.observe node_data.source, 'remove', (value) ->
+
+        remove_x = (value) ->
           added_elements[value].parentNode.removeChild added_elements[value]
           delete added_elements[value]
+        
+        add_all = ->
+          for value in context.get(node_data.source)
+            add_x value
+
+        add_all()
+        
+        context.observe node_data.source, ->
+          remove_x value for value, element of added_elements
+          add_all()
+
+        context.observe node_data.source, 'add', add_x
+        context.observe node_data.source, 'remove', remove_x
 
     else
       element = document.createElement node_data.tag

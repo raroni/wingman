@@ -89,3 +89,14 @@ module.exports = class extends Janitor.TestCase
 
     context.get('users').remove 'John'
     @assert_equal 1, ol_elm.childNodes.length
+
+  'test for token with defered reset': ->
+    template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
+
+    context = new Rango.Object
+    context.set users: ['Rasmus', 'John']
+    elements = template context
+    ol_elm = elements[0]
+    context.set users: ['Oliver']
+    @assert_equal 1, ol_elm.childNodes.length
+    @assert_equal 'Oliver', ol_elm.childNodes[0].innerHTML
