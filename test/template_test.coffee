@@ -63,7 +63,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'Rasmus', ol_elm.childNodes[0].innerHTML
     @assert_equal 'John', ol_elm.childNodes[1].innerHTML
 
-  'test for token with defered push': ->
+  'test for token with deferred push': ->
     template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
     context = new Rango.Object
@@ -77,7 +77,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 3, ol_elm.childNodes.length
     @assert_equal 'Oliver', ol_elm.childNodes[2].innerHTML
 
-  'test for token with defered remove': ->
+  'test for token with deferred remove': ->
     template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
     context = new Rango.Object
@@ -90,7 +90,7 @@ module.exports = class extends Janitor.TestCase
     context.get('users').remove 'John'
     @assert_equal 1, ol_elm.childNodes.length
 
-  'test for token with defered reset': ->
+  'test for token with deferred reset': ->
     template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
     context = new Rango.Object
