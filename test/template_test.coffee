@@ -100,3 +100,9 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Oliver']
     @assert_equal 1, ol_elm.childNodes.length
     @assert_equal 'Oliver', ol_elm.childNodes[0].innerHTML
+  
+  'test simple style': ->
+    template = Rango.Template.compile '<div style="color:red">yo</div>'
+    elements = template()
+
+    @assert_equal 'red', elements[0].style.color

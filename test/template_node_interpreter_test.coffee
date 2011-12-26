@@ -177,3 +177,15 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Oliver']
     @assert_equal 1, element.childNodes.length
     @assert_equal 'Oliver', element.childNodes[0].innerHTML
+
+  'test for element node with single static style': ->
+    node_data = 
+      type: 'element'
+      tag: 'div'
+      value: new Value('test')
+      styles:
+        color: new Value('red')
+    
+    ni = new NodeInterpreter node_data, []
+    
+    @assert_equal 'red', ni.element.style.color

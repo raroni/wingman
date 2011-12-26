@@ -42,6 +42,10 @@ module.exports = class
       else
         @scope.push element
       
+      if @node_data.styles
+        for key, value of @node_data.styles
+          element.style[key] = value.get()
+
       if @node_data.value
         element.innerHTML = if @node_data.value.is_dynamic
           @context.observe @node_data.value.get(), (new_value) ->
