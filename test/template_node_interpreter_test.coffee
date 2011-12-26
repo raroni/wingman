@@ -189,3 +189,17 @@ module.exports = class extends Janitor.TestCase
     ni = new NodeInterpreter node_data, []
     
     @assert_equal 'red', ni.element.style.color
+
+  'test for element node with single dynamic style': ->
+    node_data = 
+      type: 'element'
+      tag: 'div'
+      value: new Value('test')
+      styles:
+        color: new Value('{color}')
+    
+    context = new Rango.Object
+    context.set color: 'red'
+    ni = new NodeInterpreter node_data, [], context
+    
+    @assert_equal 'red', ni.element.style.color
