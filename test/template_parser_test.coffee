@@ -70,3 +70,18 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'li', li_elm.tag
     @assert_equal 'user', li_elm.value.get()
     @assert li_elm.value.is_dynamic
+  
+  'test static style': ->
+    tree = @parse '<div style="color: red">funky text</div>'
+
+    @assert_equal 1, tree.children.length
+    @assert tree.children[0].styles
+    @assert_equal 'red', tree.children[0].styles.color.get()
+
+  'test dynamic style': ->
+    tree = @parse '<div style="color: {color}">funky text</div>'
+
+    @assert_equal 1, tree.children.length
+    @assert tree.children[0].styles
+    @assert_equal 'color', tree.children[0].styles.color.get()
+    @assert tree.children[0].styles.color.is_dynamic
