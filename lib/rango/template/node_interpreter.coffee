@@ -45,6 +45,8 @@ module.exports = class
       if @node_data.styles
         for key, value of @node_data.styles
           element.style[key] = if value.is_dynamic
+            context.observe value.get(), (new_value) ->
+              element.style[key] = new_value
             context.get value.get()
           else
             value.get()

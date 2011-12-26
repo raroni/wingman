@@ -178,7 +178,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 1, element.childNodes.length
     @assert_equal 'Oliver', element.childNodes[0].innerHTML
 
-  'test for element node with single static style': ->
+  'test element node with single static style': ->
     node_data = 
       type: 'element'
       tag: 'div'
@@ -190,7 +190,7 @@ module.exports = class extends Janitor.TestCase
     
     @assert_equal 'red', ni.element.style.color
 
-  'test for element node with single dynamic style': ->
+  'test element node with single dynamic style': ->
     node_data = 
       type: 'element'
       tag: 'div'
@@ -203,3 +203,17 @@ module.exports = class extends Janitor.TestCase
     ni = new NodeInterpreter node_data, [], context
     
     @assert_equal 'red', ni.element.style.color
+
+  'test deferred reset with element node with single dynamic style': ->
+    node_data = 
+      type: 'element'
+      tag: 'div'
+      value: new Value('test')
+      styles:
+        color: new Value('{color}')
+    
+    context = new Rango.Object
+    context.set color: 'red'
+    ni = new NodeInterpreter node_data, [], context
+    context.set color: 'blue'
+    @assert_equal 'blue', ni.element.style.color

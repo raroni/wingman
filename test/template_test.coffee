@@ -114,3 +114,11 @@ module.exports = class extends Janitor.TestCase
     elements = template context
 
     @assert_equal 'red', elements[0].style.color
+
+  'test deferred reset for element with single dynamic style': ->
+    template = Rango.Template.compile '<div style="color:{color}">yo</div>'
+    context = new Rango.Object
+    context.set color: 'red'
+    elements = template context
+    context.set color: 'blue'
+    @assert_equal 'blue', elements[0].style.color
