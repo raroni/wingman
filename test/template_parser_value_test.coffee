@@ -1,6 +1,6 @@
 Janitor = require 'janitor'
-Value = require '../lib/template/parser/value'
-Rango = require '../rango'
+Value = require '../lib/rango/template/parser/value'
+Rango = require '..'
 
 module.exports = class extends Janitor.TestCase
   'test static': ->

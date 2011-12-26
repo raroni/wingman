@@ -1,6 +1,6 @@
 Janitor = require('janitor')
-Module = require('../lib/module')
-Events = require('../lib/events')
+Module = require('../lib/rango/module')
+Events = require('../lib/rango/events')
 
 module.exports = class extends Janitor.TestCase
   'test trigger': ->

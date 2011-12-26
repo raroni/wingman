@@ -1,5 +1,5 @@
 Janitor = require('janitor')
-Module = require('../lib/module')
+Module = require('../lib/rango/module')
 
 test_module =
   testMethod: ->

@@ -1,5 +1,5 @@
 Janitor = require 'janitor'
-Rango = require '../rango'
+Rango = require '..'
 
 module.exports = class extends Janitor.TestCase
   'test basic template with static value': ->

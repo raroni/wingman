@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
-NodeInterpreter = require '../lib/template/node_interpreter'
-Value = require '../lib/template/parser/value'
-Rango = require '../rango'
+NodeInterpreter = require '../lib/rango/template/node_interpreter'
+Value = require '../lib/rango/template/parser/value'
+Rango = require '..'
 document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
