@@ -6,12 +6,19 @@ module.exports = class
     parser = new @ source
     parser.execute()
     parser.tree
-
+  
+  @trimSource: (source) ->
+    lines = []
+    for line in source.split "\n"
+      lines.push line.replace(/^ +/, '')
+    lines.join('').replace /[\n\r\t]/g, ''
+  
   constructor: (source) ->
-    @scanner = new StringScanner source
+    @scanner = new StringScanner @constructor.trimSource(source)
+
     @tree = { children: [] }
     @current_scope = @tree
-
+  
   execute: ->
     while !@done
       if @scanner.hasTerminated()

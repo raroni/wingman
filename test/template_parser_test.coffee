@@ -22,6 +22,20 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'hi', tree.children[0].value.get()
     @assert !tree.children[0].is_dynamic
 
+  'test use of newlines and tabs': ->
+    template_source = """
+      <div>
+        Raz to the mouse!
+      </div>
+    """
+
+    tree = @parse template_source
+
+    @assert_equal 1, tree.children.length
+    @assert_equal 'div', tree.children[0].tag
+    @assert_equal 'Raz to the mouse!', tree.children[0].value.get()
+    @assert !tree.children[0].is_dynamic
+
   'test multiple tags': ->
     tree = @parse '<div>one</div><span>two</span>'
 
