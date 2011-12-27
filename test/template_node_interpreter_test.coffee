@@ -1,6 +1,6 @@
 Janitor = require 'janitor'
-NodeInterpreter = require '../lib/rango/template/node_interpreter'
-Value = require '../lib/rango/template/parser/value'
+NodeInterpreter = require '../lib/wingman/template/node_interpreter'
+Value = require '../lib/wingman/template/parser/value'
 Rango = require '..'
 document = require('jsdom').jsdom()
 

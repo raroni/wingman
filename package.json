@@ -1,9 +1,9 @@
 {
-  "name": "rango",
+  "name": "wingman",
   "description": "TODO.",
   "author": "Rasmus Rønn Nielsen <rasmusrnielsen@gmail.com>",
   "version": "0.1.0",
-  "main": "lib/rango",
+  "main": "lib/wingman",
   "dependencies": {
     "strscan": ">=1.0.1",
     "fleck": ">=0.5.1"

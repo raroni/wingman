@@ -13,7 +13,7 @@ task 'build', 'Build dist file', ->
     source = """
       (function(window) {
         #{source}
-        window.Rango = require('rango');
+        window.Wingman = require('wingman');
       })(window);
     """
-    fs.writeFileSync __dirname + '/playground/rango.js', source
+    fs.writeFileSync __dirname + '/playground/wingman.js', source

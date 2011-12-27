@@ -1,5 +1,5 @@
 Janitor = require 'janitor'
-Value = require '../lib/rango/template/parser/value'
+Value = require '../lib/wingman/template/parser/value'
 Rango = require '..'
 
 module.exports = class extends Janitor.TestCase
