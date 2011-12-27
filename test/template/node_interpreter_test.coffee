@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
-NodeInterpreter = require '../lib/wingman/template/node_interpreter'
-Value = require '../lib/wingman/template/parser/value'
-Rango = require '..'
+NodeInterpreter = require '../../lib/wingman/template/node_interpreter'
+Value = require '../../lib/wingman/template/parser/value'
+Rango = require '../..'
 document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
