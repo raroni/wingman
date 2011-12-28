@@ -1,19 +1,19 @@
 Janitor = require 'janitor'
-Rango = require '..'
+Wingman = require '..'
 document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
   setup: ->
-    Rango.Template.document = document
+    Wingman.Template.document = document
   
   'test basic template with static value': ->
-    template = Rango.Template.compile '<div>hello</div>'
+    template = Wingman.Template.compile '<div>hello</div>'
     elements = template()
     @assert_equal 1, elements.length
     @assert_equal 'hello', elements[0].innerHTML
 
   'test template with nested tags': ->
-    template = Rango.Template.compile '<ol><li>hello</li></ol>'
+    template = Wingman.Template.compile '<ol><li>hello</li></ol>'
     elements = template()
 
     @assert_equal 1, elements.length
@@ -22,16 +22,16 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'hello', ol_elm.childNodes[0].innerHTML
 
   'test basic template with dynamic content': ->
-    template = Rango.Template.compile '<div>{greeting}</div>'
-    context = new Rango.Object
+    template = Wingman.Template.compile '<div>{greeting}</div>'
+    context = new Wingman.Object
     context.set greeting: 'hello'
     elements = template context
     @assert_equal 1, elements.length
     @assert_equal 'hello', elements[0].innerHTML
 
   'test template with dynamic value after updating context': ->
-    template = Rango.Template.compile '<div>{greeting}</div>'
-    context = new Rango.Object
+    template = Wingman.Template.compile '<div>{greeting}</div>'
+    context = new Wingman.Object
     context.set greeting: 'hello'
     elements = template context
     context.set greeting: 'hi'
@@ -40,10 +40,10 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'hi', elements[0].innerHTML
 
   'test template with nested dynamic value after updating context': ->
-    template = Rango.Template.compile '<div>{user.name}</div>'
-    user = new Rango.Object
+    template = Wingman.Template.compile '<div>{user.name}</div>'
+    user = new Wingman.Object
     user.set name: 'Rasmus'
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set {user}
     elements = template context
     
@@ -54,9 +54,9 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'John', elements[0].innerHTML
 
   'test for token': ->
-    template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
+    template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     elements = template context
 
@@ -68,9 +68,9 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'John', ol_elm.childNodes[1].innerHTML
 
   'test for token with deferred push': ->
-    template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
+    template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     elements = template context
 
@@ -82,9 +82,9 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'Oliver', ol_elm.childNodes[2].innerHTML
 
   'test for token with deferred remove': ->
-    template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
+    template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     elements = template context
 
@@ -95,9 +95,9 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 1, ol_elm.childNodes.length
 
   'test for token with deferred reset': ->
-    template = Rango.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
+    template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     elements = template context
     ol_elm = elements[0]
@@ -106,22 +106,22 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'Oliver', ol_elm.childNodes[0].innerHTML
   
   'test element with single static style': ->
-    template = Rango.Template.compile '<div style="color:red">yo</div>'
+    template = Wingman.Template.compile '<div style="color:red">yo</div>'
     elements = template()
 
     @assert_equal 'red', elements[0].style.color
 
   'test element with single dynamic style': ->
-    template = Rango.Template.compile '<div style="color:{color}">yo</div>'
-    context = new Rango.Object
+    template = Wingman.Template.compile '<div style="color:{color}">yo</div>'
+    context = new Wingman.Object
     context.set color: 'red'
     elements = template context
 
     @assert_equal 'red', elements[0].style.color
 
   'test deferred reset for element with single dynamic style': ->
-    template = Rango.Template.compile '<div style="color:{color}">yo</div>'
-    context = new Rango.Object
+    template = Wingman.Template.compile '<div style="color:{color}">yo</div>'
+    context = new Wingman.Object
     context.set color: 'red'
     elements = template context
     context.set color: 'blue'

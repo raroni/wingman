@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
 NodeInterpreter = require '../../lib/wingman/template/node_interpreter'
 Value = require '../../lib/wingman/template/parser/value'
-Rango = require '../..'
+Wingman = require '../..'
 document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
@@ -54,7 +54,7 @@ module.exports = class extends Janitor.TestCase
       tag: 'div'
       value: new Value('{name}')
 
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set name: 'Rasmus'
     ni = new NodeInterpreter node_data, [], context, document
 
@@ -66,7 +66,7 @@ module.exports = class extends Janitor.TestCase
       tag: 'div'
       value: new Value('{name}')
 
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set name: 'John'
     ni = new NodeInterpreter node_data, [], context, document
     @assert_equal 'John', ni.element.innerHTML
@@ -80,9 +80,9 @@ module.exports = class extends Janitor.TestCase
       tag: 'div'
       value: new Value('{user.name}')
 
-    user = new Rango.Object
+    user = new Wingman.Object
     user.set name: 'John'
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set {user}
     ni = new NodeInterpreter node_data, [], context, document
     @assert_equal 'John', ni.element.innerHTML
@@ -100,7 +100,7 @@ module.exports = class extends Janitor.TestCase
         value: new Value('{user}')
       ]
     
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
@@ -121,7 +121,7 @@ module.exports = class extends Janitor.TestCase
         value: new Value('{user}')
       ]
     
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
@@ -142,7 +142,7 @@ module.exports = class extends Janitor.TestCase
         value: new Value('{user}')
       ]
     
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
@@ -162,7 +162,7 @@ module.exports = class extends Janitor.TestCase
         value: new Value('{user}')
       ]
     
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
@@ -193,7 +193,7 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('{color}')
     
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set color: 'red'
     ni = new NodeInterpreter node_data, [], context, document
     
@@ -207,7 +207,7 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('{color}')
     
-    context = new Rango.Object
+    context = new Wingman.Object
     context.set color: 'red'
     ni = new NodeInterpreter node_data, [], context, document
     context.set color: 'blue'

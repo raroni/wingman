@@ -1,15 +1,15 @@
 Janitor = require 'janitor'
-Rango = require '..'
+Wingman = require '..'
 
 module.exports = class extends Janitor.TestCase
   'test simple set/get': ->
-    klass = class extends Rango.Object
+    klass = class extends Wingman.Object
     instance = new klass
     instance.set name: 'rasmus'
     @assert_equal 'rasmus', instance.get('name')
   
   'test get method property': ->
-    Person = class extends Rango.Object
+    Person = class extends Wingman.Object
       fullName: -> "#{@get('firstName')} #{@get('lastName')}"
     
     person = new Person
@@ -17,7 +17,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'Rasmus Nielsen', person.get('fullName')
   
   'test observe': ->
-    Person = class extends Rango.Object
+    Person = class extends Wingman.Object
     person = new Person
     name_from_callback = ''
     person.observe 'name', (new_name) ->
@@ -26,7 +26,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal name_from_callback, 'Rasmus'
 
   'test unobserve': ->
-    Person = class extends Rango.Object
+    Person = class extends Wingman.Object
     person = new Person
     callback_run = false
     callback = ->
@@ -37,8 +37,8 @@ module.exports = class extends Janitor.TestCase
     @assert !callback_run
 
   'test nested get': ->
-    Car = class extends Rango.Object
-    CarType = class extends Rango.Object
+    Car = class extends Wingman.Object
+    CarType = class extends Wingman.Object
     
     slow_car = new CarType
     slow_car.set name: 'Toyota'
@@ -47,17 +47,17 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'Toyota', car.get('type.name')
   
   'test nested observe': ->
-    denmark = new Rango.Object
+    denmark = new Wingman.Object
     denmark.set name: 'Denmark'
-    england = new Rango.Object
+    england = new Wingman.Object
     england.set name: 'England'
-    sweden = new Rango.Object
+    sweden = new Wingman.Object
     sweden.set name: 'Sweden'
-    region1 = new Rango.Object
+    region1 = new Wingman.Object
     region1.set {country: denmark}
-    region2 = new Rango.Object
+    region2 = new Wingman.Object
     region2.set {country: sweden}
-    city = new Rango.Object
+    city = new Wingman.Object
     city.set {region: region1}
 
     names = []
@@ -73,7 +73,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'Sweden', names[2]
 
   'test property dependencies': ->
-    Person = class extends Rango.Object
+    Person = class extends Wingman.Object
       @addPropertyDependencies
         fullName: ['firstName', 'lastName']
       
@@ -87,7 +87,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal result, 'Rasmus Nielsen'
 
   'test nested observe combined with property dependencies': ->
-    Country = class extends Rango.Object
+    Country = class extends Wingman.Object
       @CODES = 
         DK: 'Denmark'
         UK: 'England'
@@ -105,11 +105,11 @@ module.exports = class extends Janitor.TestCase
     england.set code: 'UK'
     sweden = new Country
     sweden.set code: 'SE'
-    region1 = new Rango.Object
+    region1 = new Wingman.Object
     region1.set {country: denmark}
-    region2 = new Rango.Object
+    region2 = new Wingman.Object
     region2.set {country: sweden}
-    city = new Rango.Object
+    city = new Wingman.Object
     city.set {region: region1}
 
     names = []
@@ -125,7 +125,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'Sweden', names[2]
 
   'test observe array property add': ->
-    instance = new Rango.Object
+    instance = new Wingman.Object
     added = []
     instance.observe 'users', 'add', (new_value) -> added.push(new_value)
     instance.set users: []
@@ -140,7 +140,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 1, instance.get('users').length
 
   'test observe array property remove': ->
-    country = new Rango.Object
+    country = new Wingman.Object
     country.set cities: ['London', 'Manchester']
     removed_value_from_callback = ''
     country.observe 'cities', 'remove', (removed_value) -> removed_value_from_callback = removed_value
@@ -151,9 +151,9 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 1, country.get('cities').length
 
   'test observe nested array property': ->
-      country = new Rango.Object
+      country = new Wingman.Object
       country.set cities: ['London', 'Manchester']
-      user = new Rango.Object
+      user = new Wingman.Object
       user.set {country}
   
       result = ''

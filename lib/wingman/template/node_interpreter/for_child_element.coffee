@@ -1,4 +1,4 @@
-RangoObject = require '../../object'
+WingmanObject = require '../../object'
 Fleck = require 'fleck'
 NodeInterpreter = require '../node_interpreter'
 
@@ -11,7 +11,7 @@ module.exports = class
     @context.observe @source_path, 'remove', @remove
   
   add: (value) =>
-    new_context = new RangoObject
+    new_context = new WingmanObject
     key = Fleck.singularize @source_path
     hash = {}
     hash[key] = value
