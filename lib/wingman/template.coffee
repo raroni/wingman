@@ -3,11 +3,9 @@ NodeInterpreter = require './template/node_interpreter'
 RangoObject = require './object'
 Fleck = require 'fleck'
 
-unless window?
-  jsdom = require('jsdom').jsdom
-  document = jsdom()
-
 module.exports = class
+  @document: document if window?
+
   @compile = (source) ->
     template = new @ source
     (context) ->
@@ -19,5 +17,5 @@ module.exports = class
   evaluate: (context) ->
     @elements = []
     for node_data in @tree.children
-      new NodeInterpreter(node_data, @elements, context)
+      new NodeInterpreter node_data, @elements, context, @constructor.document
     @elements

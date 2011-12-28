@@ -5,9 +5,6 @@ Rango = require '../..'
 document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
-  setup: ->
-    NodeInterpreter.document = document
-
   'test simple element node': ->
     node_data = 
       type: 'element'
@@ -15,8 +12,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('test')
 
     scope = []
-
-    ni = new NodeInterpreter node_data, scope
+    ni = new NodeInterpreter node_data, scope, null, document
     @assert ni.element
     @assert_equal 'DIV', ni.element.tagName
 
@@ -27,7 +23,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('test')
 
     scope = document.createElement 'li'
-    ni = new NodeInterpreter node_data, scope
+    ni = new NodeInterpreter node_data, scope, null, document
 
     @assert ni.element
     @assert_equal 'DIV', ni.element.tagName
@@ -45,7 +41,7 @@ module.exports = class extends Janitor.TestCase
 
     scope = []
 
-    ni = new NodeInterpreter node_data, scope
+    ni = new NodeInterpreter node_data, scope, null, document
     @assert ni.element
     @assert_equal 'DIV', ni.element.tagName
     @assert_equal 1, ni.element.childNodes.length
@@ -60,7 +56,7 @@ module.exports = class extends Janitor.TestCase
 
     context = new Rango.Object
     context.set name: 'Rasmus'
-    ni = new NodeInterpreter node_data, [], context
+    ni = new NodeInterpreter node_data, [], context, document
 
     @assert_equal 'Rasmus', ni.element.innerHTML
 
@@ -72,7 +68,7 @@ module.exports = class extends Janitor.TestCase
 
     context = new Rango.Object
     context.set name: 'John'
-    ni = new NodeInterpreter node_data, [], context
+    ni = new NodeInterpreter node_data, [], context, document
     @assert_equal 'John', ni.element.innerHTML
     context.set name: 'Rasmus'
 
@@ -88,7 +84,7 @@ module.exports = class extends Janitor.TestCase
     user.set name: 'John'
     context = new Rango.Object
     context.set {user}
-    ni = new NodeInterpreter node_data, [], context
+    ni = new NodeInterpreter node_data, [], context, document
     @assert_equal 'John', ni.element.innerHTML
     user.set name: 'Rasmus'
 
@@ -108,13 +104,12 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
-    ni = new NodeInterpreter node_data, element, context
+    ni = new NodeInterpreter node_data, element, context, document
     
     @assert !ni.element
     @assert_equal 2, element.childNodes.length
     @assert_equal 'Rasmus', element.childNodes[0].innerHTML
     @assert_equal 'John', element.childNodes[1].innerHTML
-
 
   'test for node with deferred push': ->
     node_data =
@@ -130,7 +125,7 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
-    new NodeInterpreter node_data, element, context
+    new NodeInterpreter node_data, element, context, document
     
     @assert_equal 2, element.childNodes.length
     context.get('users').push 'Joe'
@@ -151,7 +146,7 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
-    new NodeInterpreter node_data, element, context
+    new NodeInterpreter node_data, element, context, document
     
     @assert_equal 2, element.childNodes.length
     context.get('users').remove 'John'
@@ -171,7 +166,7 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
-    new NodeInterpreter node_data, element, context
+    new NodeInterpreter node_data, element, context, document
     
     @assert_equal 2, element.childNodes.length
     context.set users: ['Oliver']
@@ -186,7 +181,7 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('red')
     
-    ni = new NodeInterpreter node_data, []
+    ni = new NodeInterpreter node_data, [], null, document
     
     @assert_equal 'red', ni.element.style.color
 
@@ -200,7 +195,7 @@ module.exports = class extends Janitor.TestCase
     
     context = new Rango.Object
     context.set color: 'red'
-    ni = new NodeInterpreter node_data, [], context
+    ni = new NodeInterpreter node_data, [], context, document
     
     @assert_equal 'red', ni.element.style.color
 
@@ -214,6 +209,6 @@ module.exports = class extends Janitor.TestCase
     
     context = new Rango.Object
     context.set color: 'red'
-    ni = new NodeInterpreter node_data, [], context
+    ni = new NodeInterpreter node_data, [], context, document
     context.set color: 'blue'
     @assert_equal 'blue', ni.element.style.color

@@ -1,7 +1,11 @@
 Janitor = require 'janitor'
 Rango = require '..'
+document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
+  setup: ->
+    Rango.Template.document = document
+  
   'test basic template with static value': ->
     template = Rango.Template.compile '<div>hello</div>'
     elements = template()
