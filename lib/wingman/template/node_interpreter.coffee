@@ -1,6 +1,3 @@
-RangoObject = require '../object'
-# More requires at the bottom
-
 module.exports = class
   constructor: (@node_data, @scope, @context, @document) ->
     if @node_data.type == 'for'
