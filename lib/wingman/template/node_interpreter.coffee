@@ -18,4 +18,4 @@ module.exports = class
 
   interpretElement: ->
     e = new Element @node_data, @scope, @context, @constructor, @document
-    @element = e.element
+    @element = e.dom_element
