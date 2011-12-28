@@ -1,6 +1,6 @@
 RangoObject = require '../object'
-ForChildElement = require './node_interpreter/for_child_element'
 Element = require './node_interpreter/element'
+# More requires at the bottom
 
 module.exports = class
   constructor: (@node_data, @scope, @context, @document) ->
@@ -14,8 +14,12 @@ module.exports = class
       # Had to send @constructor because I could not require NodeInterpreter from within ForChildElement.
       # Perhaps the requirement dependency then would be cyclic?
       # Should be cleaned up at some point.
-      new ForChildElement new_node_data, @scope, @context, @node_data.source, @constructor, @document
+      new ForChildElement new_node_data, @scope, @context, @node_data.source, @document
 
   interpretElement: ->
     e = new Element @node_data, @scope, @context, @constructor, @document
     @element = e.dom_element
+
+# By requiring this after module.exports, node can handle the cyclic
+# dependency between node_interpreter and node_interpreter/for_child_element
+ForChildElement = require './node_interpreter/for_child_element'
