@@ -1,5 +1,7 @@
+NodeInterpreter = require '../node_interpreter'
+
 module.exports = class
-  constructor: (@element_data, @scope, @context, @NodeInterpreter, @document) ->
+  constructor: (@element_data, @scope, @context, @document) ->
     @dom_element = @document.createElement @element_data.tag
     @addToScope()
     @setupStyles() if @element_data.styles
@@ -34,4 +36,4 @@ module.exports = class
   
   setupChildren: ->
     for child in @element_data.children
-      new @NodeInterpreter child, @dom_element, @context, @document
+      new NodeInterpreter child, @dom_element, @context, @document
