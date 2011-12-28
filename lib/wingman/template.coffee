@@ -1,6 +1,5 @@
 Parser = require './template/parser'
 NodeInterpreter = require './template/node_interpreter'
-RangoObject = require './object'
 Fleck = require 'fleck'
 
 module.exports = class
