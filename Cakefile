@@ -17,3 +17,8 @@ task 'build', 'Build dist file', ->
       })(window);
     """
     fs.writeFileSync __dirname + '/playground/wingman.js', source
+
+task 'test', 'Run test suite', ->
+  Janitor = require 'janitor'
+  runner = new Janitor.NodeRunner { dir: __dirname + '/test' }
+  runner.run()

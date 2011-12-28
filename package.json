@@ -9,7 +9,7 @@
     "fleck": ">=0.5.1"
   },
   "devDependencies": {
-    "janitor": "0.1.2",
+    "janitor": "0.1.3",
     "jsdom": "0.2.10",
     "stitch": "0.3.2",
     "coffee-script" : "1.2.0"
