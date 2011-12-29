@@ -1,5 +1,5 @@
 module.exports = class
-  constructor: (@node_data, @scope, @context, @document) ->
+  constructor: (@node_data, @scope, @context) ->
     if @node_data.type == 'for'
       @interpretFor()
     else
@@ -10,10 +10,10 @@ module.exports = class
       # Had to send @constructor because I could not require NodeInterpreter from within ForChildElement.
       # Perhaps the requirement dependency then would be cyclic?
       # Should be cleaned up at some point.
-      new ForChildElement new_node_data, @scope, @context, @node_data.source, @document
+      new ForChildElement new_node_data, @scope, @context, @node_data.source
 
   interpretElement: ->
-    e = new Element @node_data, @scope, @context, @document
+    e = new Element @node_data, @scope, @context
     @element = e.dom_element
 
 # By requiring these after module.exports, node can handle the cyclic

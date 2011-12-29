@@ -5,6 +5,9 @@ Wingman = require '../..'
 document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
+  setup: ->
+    Wingman.Template.document = document
+
   'test simple element node': ->
     node_data = 
       type: 'element'

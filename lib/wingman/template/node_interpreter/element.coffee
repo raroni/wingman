@@ -1,8 +1,9 @@
+Template = require '../../template'
 NodeInterpreter = require '../node_interpreter'
 
 module.exports = class
-  constructor: (@element_data, @scope, @context, @document) ->
-    @dom_element = @document.createElement @element_data.tag
+  constructor: (@element_data, @scope, @context) ->
+    @dom_element = Template.document.createElement @element_data.tag
     @addToScope()
     @setupStyles() if @element_data.styles
 

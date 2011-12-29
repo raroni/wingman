@@ -3,7 +3,7 @@ Fleck = require 'fleck'
 NodeInterpreter = require '../node_interpreter'
 
 module.exports = class
-  constructor: (@element_data, @scope, @context, @source_path, @document) ->
+  constructor: (@element_data, @scope, @context, @source_path) ->
     @elements = {}
     @addAll()
     @context.observe @source_path, @rebuild
@@ -16,7 +16,7 @@ module.exports = class
     hash = {}
     hash[key] = value
     new_context.set hash
-    element = new NodeInterpreter(@element_data, @scope, new_context, @document).element
+    element = new NodeInterpreter(@element_data, @scope, new_context).element
     @elements[value] = element
   
   remove: (value) =>

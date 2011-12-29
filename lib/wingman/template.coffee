@@ -1,7 +1,3 @@
-Parser = require './template/parser'
-NodeInterpreter = require './template/node_interpreter'
-Fleck = require 'fleck'
-
 module.exports = class
   @document: document if window?
 
@@ -16,5 +12,9 @@ module.exports = class
   evaluate: (context) ->
     @elements = []
     for node_data in @tree.children
-      new NodeInterpreter node_data, @elements, context, @constructor.document
+      new NodeInterpreter node_data, @elements, context
     @elements
+
+Parser = require './template/parser'
+NodeInterpreter = require './template/node_interpreter'
+Fleck = require 'fleck'

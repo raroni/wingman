@@ -1,10 +1,13 @@
+document = require('jsdom').jsdom()
+Janitor = require 'janitor'
 Value = require '../../../lib/wingman/template/parser/value'
 Element = require '../../../lib/wingman/template/node_interpreter/element'
 Wingman = require '../../../.'
-Janitor = require 'janitor'
-document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
+  setup: ->
+    Wingman.Template.document = document
+
   'test simple element node': ->
     node_data =
       type: 'element'
@@ -129,3 +132,4 @@ module.exports = class extends Janitor.TestCase
     ni = new Element node_data, [], context, document
     context.set color: 'blue'
     @assert_equal 'blue', ni.dom_element.style.color
+
