@@ -15,7 +15,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('test')
 
     scope = []
-    ni = new NodeInterpreter node_data, scope, null, document
+    ni = new NodeInterpreter node_data, scope
     @assert ni.element
     @assert_equal 'DIV', ni.element.tagName
 
@@ -26,7 +26,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('test')
 
     scope = document.createElement 'li'
-    ni = new NodeInterpreter node_data, scope, null, document
+    ni = new NodeInterpreter node_data, scope
 
     @assert ni.element
     @assert_equal 'DIV', ni.element.tagName
@@ -44,7 +44,7 @@ module.exports = class extends Janitor.TestCase
 
     scope = []
 
-    ni = new NodeInterpreter node_data, scope, null, document
+    ni = new NodeInterpreter node_data, scope
     @assert ni.element
     @assert_equal 'DIV', ni.element.tagName
     @assert_equal 1, ni.element.childNodes.length
@@ -59,7 +59,7 @@ module.exports = class extends Janitor.TestCase
 
     context = new Wingman.Object
     context.set name: 'Rasmus'
-    ni = new NodeInterpreter node_data, [], context, document
+    ni = new NodeInterpreter node_data, [], context
 
     @assert_equal 'Rasmus', ni.element.innerHTML
 
@@ -71,7 +71,7 @@ module.exports = class extends Janitor.TestCase
 
     context = new Wingman.Object
     context.set name: 'John'
-    ni = new NodeInterpreter node_data, [], context, document
+    ni = new NodeInterpreter node_data, [], context
     @assert_equal 'John', ni.element.innerHTML
     context.set name: 'Rasmus'
 
@@ -87,7 +87,7 @@ module.exports = class extends Janitor.TestCase
     user.set name: 'John'
     context = new Wingman.Object
     context.set {user}
-    ni = new NodeInterpreter node_data, [], context, document
+    ni = new NodeInterpreter node_data, [], context
     @assert_equal 'John', ni.element.innerHTML
     user.set name: 'Rasmus'
 
@@ -107,7 +107,7 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
-    ni = new NodeInterpreter node_data, element, context, document
+    ni = new NodeInterpreter node_data, element, context
     
     @assert !ni.element
     @assert_equal 2, element.childNodes.length
@@ -128,7 +128,7 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
-    new NodeInterpreter node_data, element, context, document
+    new NodeInterpreter node_data, element, context
     
     @assert_equal 2, element.childNodes.length
     context.get('users').push 'Joe'
@@ -149,7 +149,7 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
-    new NodeInterpreter node_data, element, context, document
+    new NodeInterpreter node_data, element, context
     
     @assert_equal 2, element.childNodes.length
     context.get('users').remove 'John'
@@ -169,7 +169,7 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
-    new NodeInterpreter node_data, element, context, document
+    new NodeInterpreter node_data, element, context
     
     @assert_equal 2, element.childNodes.length
     context.set users: ['Oliver']
@@ -184,7 +184,7 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('red')
     
-    ni = new NodeInterpreter node_data, [], null, document
+    ni = new NodeInterpreter node_data, [], null
     
     @assert_equal 'red', ni.element.style.color
 
@@ -198,7 +198,7 @@ module.exports = class extends Janitor.TestCase
     
     context = new Wingman.Object
     context.set color: 'red'
-    ni = new NodeInterpreter node_data, [], context, document
+    ni = new NodeInterpreter node_data, [], context
     
     @assert_equal 'red', ni.element.style.color
 
@@ -212,6 +212,6 @@ module.exports = class extends Janitor.TestCase
     
     context = new Wingman.Object
     context.set color: 'red'
-    ni = new NodeInterpreter node_data, [], context, document
+    ni = new NodeInterpreter node_data, [], context
     context.set color: 'blue'
     @assert_equal 'blue', ni.element.style.color
