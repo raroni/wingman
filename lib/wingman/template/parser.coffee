@@ -87,8 +87,9 @@ module.exports = class
     properties
   
   parseStyle: (styles_as_string) ->
+    re = new RegExp(' ', 'g')
     styles = {}
-    for style_as_string in styles_as_string.replace(' ', '').split(';')
+    for style_as_string in styles_as_string.replace(re, '').split(';')
       split = style_as_string.split ':'
       styles[split[0]] = new Value split[1]
     styles

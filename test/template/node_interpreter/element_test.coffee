@@ -7,6 +7,11 @@ Wingman = require '../../../.'
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.Template.document = document
+  
+  'test css property name convertion from dom to css notation': ->
+    @assert_equal 'fontSize', Element.convertCssPropertyFromDomToCssNotation 'font-size'
+    @assert_equal 'marginTop', Element.convertCssPropertyFromDomToCssNotation 'margin-top'
+    @assert_equal 'borderTopColor', Element.convertCssPropertyFromDomToCssNotation 'border-top-color'
 
   'test simple element node': ->
     node_data =
@@ -132,3 +137,17 @@ module.exports = class extends Janitor.TestCase
     ni = new Element node_data, [], context, document
     context.set color: 'blue'
     @assert_equal 'blue', ni.dom_element.style.color
+  
+  'test element node with several static styles': ->
+    node_data = 
+      type: 'element'
+      tag: 'div'
+      value: new Value('test')
+      styles:
+        color: new Value('red')
+        'font-size': new Value('15px')
+    
+    ni = new Element node_data, [], null, document
+    
+    @assert_equal 'red', ni.dom_element.style.color
+    @assert_equal '15px', ni.dom_element.style.fontSize

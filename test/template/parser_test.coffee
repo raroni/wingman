@@ -85,17 +85,37 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'user', li_elm.value.get()
     @assert li_elm.value.is_dynamic
   
-  'test static style': ->
+  'test element with single static style': ->
     tree = @parse '<div style="color: red">funky text</div>'
 
     @assert_equal 1, tree.children.length
     @assert tree.children[0].styles
     @assert_equal 'red', tree.children[0].styles.color.get()
 
-  'test dynamic style': ->
+  'test element with single dynamic style': ->
     tree = @parse '<div style="color: {color}">funky text</div>'
 
     @assert_equal 1, tree.children.length
     @assert tree.children[0].styles
     @assert_equal 'color', tree.children[0].styles.color.get()
     @assert tree.children[0].styles.color.is_dynamic
+  
+  'test element with several static styles': ->
+    tree = @parse '<div style="color: blue; font-size: 14px">funky text</div>'
+
+    @assert_equal 1, tree.children.length
+    element = tree.children[0]
+    @assert element.styles
+    @assert_equal 'blue', element.styles.color.get()
+    @assert_equal '14px', element.styles['font-size'].get()
+
+  'test element with static and dynamic styles': ->
+    tree = @parse '<div style="color: blue; font-size: {someFontSize}">funky text</div>'
+
+    @assert_equal 1, tree.children.length
+    styles = tree.children[0].styles
+    @assert styles
+    @assert_equal 'blue', styles.color.get()
+    @assert !styles.color.is_dynamic
+    @assert_equal 'someFontSize', styles['font-size'].get()
+    @assert styles['font-size'].is_dynamic

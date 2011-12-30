@@ -5,7 +5,7 @@ document = require('jsdom').jsdom()
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.Template.document = document
-  
+    
   'test basic template with static value': ->
     template = Wingman.Template.compile '<div>hello</div>'
     elements = template()
@@ -126,3 +126,12 @@ module.exports = class extends Janitor.TestCase
     elements = template context
     context.set color: 'blue'
     @assert_equal 'blue', elements[0].style.color
+
+  'test element with several static styles': ->
+    template = Wingman.Template.compile '<div style="color:{color}; font-size: 15px">yo</div>'
+    context = new Wingman.Object
+    context.set color: 'red'
+    elements = template context
+
+    @assert_equal 'red', elements[0].style.color
+    @assert_equal '15px', elements[0].style.fontSize

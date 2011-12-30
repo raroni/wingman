@@ -215,3 +215,16 @@ module.exports = class extends Janitor.TestCase
     ni = new NodeInterpreter node_data, [], context
     context.set color: 'blue'
     @assert_equal 'blue', ni.element.style.color
+
+  'test element node with several static style': ->
+    node_data = 
+      type: 'element'
+      tag: 'div'
+      value: new Value('test')
+      styles:
+        color: new Value('red')
+        'font-size': new Value('15px')
+    
+    ni = new NodeInterpreter node_data, [], null
+    @assert_equal 'red', ni.element.style.color
+    @assert_equal '15px', ni.element.style.fontSize

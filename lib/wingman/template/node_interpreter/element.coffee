@@ -1,4 +1,8 @@
 module.exports = class
+  @convertCssPropertyFromDomToCssNotation: (property_name) ->
+    property_name.replace /(-[a-z]{1})/g, (s) ->
+      s[1].toUpperCase()
+
   constructor: (@element_data, @scope, @context) ->
     @dom_element = Template.document.createElement @element_data.tag
     @addToScope()
@@ -15,14 +19,18 @@ module.exports = class
     else
       @scope.push @dom_element
 
+  setStyle: (key, value) ->
+    key_css_notation = @constructor.convertCssPropertyFromDomToCssNotation key
+    @dom_element.style[key_css_notation] = value
+
   setupStyles: -> 
     for key, value of @element_data.styles
-      @dom_element.style[key] = if value.is_dynamic
-        @context.observe value.get(), (new_value) =>
-          @dom_element.style[key] = new_value
+      value = if value.is_dynamic
+        @context.observe value.get(), (new_value) => @setStyle key, new_value
         @context.get value.get()
       else
         value.get()
+      @setStyle key, value
   
   setupInnerHTML: ->
     @dom_element.innerHTML = if @element_data.value.is_dynamic
