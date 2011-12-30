@@ -132,4 +132,3 @@ module.exports = class extends Janitor.TestCase
     ni = new Element node_data, [], context, document
     context.set color: 'blue'
     @assert_equal 'blue', ni.dom_element.style.color
-

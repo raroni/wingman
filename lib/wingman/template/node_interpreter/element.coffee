@@ -1,6 +1,3 @@
-Template = require '../../template'
-NodeInterpreter = require '../node_interpreter'
-
 module.exports = class
   constructor: (@element_data, @scope, @context) ->
     @dom_element = Template.document.createElement @element_data.tag
@@ -38,3 +35,6 @@ module.exports = class
   setupChildren: ->
     for child in @element_data.children
       new NodeInterpreter child, @dom_element, @context, @document
+
+Template = require '../../template'
+NodeInterpreter = require '../node_interpreter'
