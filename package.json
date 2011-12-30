@@ -11,7 +11,7 @@
   "devDependencies": {
     "janitor": "0.1.3",
     "jsdom": "0.2.10",
-    "stitch": "0.3.2",
+    "stitch": "0.3.3",
     "coffee-script" : "1.2.0"
   }
 }
