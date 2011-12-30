@@ -20,7 +20,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('test')
 
     scope = []
-    ni = new Element node_data, scope, null, document
+    ni = new Element node_data, scope
     @assert ni.dom_element
     @assert_equal 'DIV', ni.dom_element.tagName
   
@@ -31,7 +31,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('test')
 
     scope = document.createElement 'li'
-    ni = new Element node_data, scope, null, document
+    ni = new Element node_data, scope
 
     @assert ni.dom_element
     @assert_equal 'DIV', ni.dom_element.tagName
@@ -49,7 +49,7 @@ module.exports = class extends Janitor.TestCase
 
     scope = []
 
-    ni = new Element node_data, scope, null, document
+    ni = new Element node_data, scope
     @assert ni.dom_element
     @assert_equal 'DIV', ni.dom_element.tagName
     @assert_equal 1, ni.dom_element.childNodes.length
@@ -64,7 +64,7 @@ module.exports = class extends Janitor.TestCase
 
     context = new Wingman.Object
     context.set name: 'Rasmus'
-    ni = new Element node_data, [], context, document
+    ni = new Element node_data, [], context
 
     @assert_equal 'Rasmus', ni.dom_element.innerHTML
   
@@ -76,7 +76,7 @@ module.exports = class extends Janitor.TestCase
 
     context = new Wingman.Object
     context.set name: 'John'
-    ni = new Element node_data, [], context, document
+    ni = new Element node_data, [], context
     @assert_equal 'John', ni.dom_element.innerHTML
     context.set name: 'Rasmus'
 
@@ -92,7 +92,7 @@ module.exports = class extends Janitor.TestCase
     user.set name: 'John'
     context = new Wingman.Object
     context.set {user}
-    ni = new Element node_data, [], context, document
+    ni = new Element node_data, [], context
     @assert_equal 'John', ni.dom_element.innerHTML
     user.set name: 'Rasmus'
 
@@ -106,7 +106,7 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('red')
     
-    ni = new Element node_data, [], null, document
+    ni = new Element node_data, []
     
     @assert_equal 'red', ni.dom_element.style.color
   
@@ -120,7 +120,7 @@ module.exports = class extends Janitor.TestCase
     
     context = new Wingman.Object
     context.set color: 'red'
-    ni = new Element node_data, [], context, document
+    ni = new Element node_data, [], context
     
     @assert_equal 'red', ni.dom_element.style.color
   
@@ -134,7 +134,7 @@ module.exports = class extends Janitor.TestCase
     
     context = new Wingman.Object
     context.set color: 'red'
-    ni = new Element node_data, [], context, document
+    ni = new Element node_data, [], context
     context.set color: 'blue'
     @assert_equal 'blue', ni.dom_element.style.color
   
@@ -147,7 +147,7 @@ module.exports = class extends Janitor.TestCase
         color: new Value('red')
         'font-size': new Value('15px')
     
-    ni = new Element node_data, [], null, document
+    ni = new Element node_data, []
     
     @assert_equal 'red', ni.dom_element.style.color
     @assert_equal '15px', ni.dom_element.style.fontSize
