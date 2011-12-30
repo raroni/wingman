@@ -120,18 +120,31 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'red', elements[0].style.color
 
   'test deferred reset for element with single dynamic style': ->
-    template = Wingman.Template.compile '<div style="color:{color}">yo</div>'
+    template = Wingman.Template.compile '<div style="color:{myColor}">yo</div>'
     context = new Wingman.Object
-    context.set color: 'red'
+    context.set myColor: 'red'
     elements = template context
-    context.set color: 'blue'
+    context.set myColor: 'blue'
     @assert_equal 'blue', elements[0].style.color
 
   'test element with several static styles': ->
-    template = Wingman.Template.compile '<div style="color:{color}; font-size: 15px">yo</div>'
+    template = Wingman.Template.compile '<div style="color:{myColor}; font-size: 15px">yo</div>'
     context = new Wingman.Object
-    context.set color: 'red'
+    context.set myColor: 'red'
     elements = template context
 
     @assert_equal 'red', elements[0].style.color
     @assert_equal '15px', elements[0].style.fontSize
+  
+  'test element with several dynamic styles': ->
+    template = Wingman.Template.compile '<div style="color:{myColor}; font-size: {myFontSize}">yo</div>'
+    context = new Wingman.Object
+    context.set myColor: 'red', myFontSize: '15px'
+    elements = template context
+
+    @assert_equal 'red', elements[0].style.color
+    @assert_equal '15px', elements[0].style.fontSize
+
+    context.set myColor: 'blue', myFontSize: '13px'
+    @assert_equal 'blue', elements[0].style.color
+    @assert_equal '13px', elements[0].style.fontSize

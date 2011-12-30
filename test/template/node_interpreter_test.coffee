@@ -184,7 +184,7 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('red')
     
-    ni = new NodeInterpreter node_data, [], null
+    ni = new NodeInterpreter node_data, []
     
     @assert_equal 'red', ni.element.style.color
 
@@ -216,7 +216,7 @@ module.exports = class extends Janitor.TestCase
     context.set color: 'blue'
     @assert_equal 'blue', ni.element.style.color
 
-  'test element node with several static style': ->
+  'test element node with two static styles': ->
     node_data = 
       type: 'element'
       tag: 'div'
@@ -225,6 +225,27 @@ module.exports = class extends Janitor.TestCase
         color: new Value('red')
         'font-size': new Value('15px')
     
-    ni = new NodeInterpreter node_data, [], null
+    ni = new NodeInterpreter node_data, []
     @assert_equal 'red', ni.element.style.color
     @assert_equal '15px', ni.element.style.fontSize
+
+  'test element node with two static styles': ->
+    node_data = 
+      type: 'element'
+      tag: 'div'
+      value: new Value('test')
+      styles:
+        color: new Value('{myColor}')
+        'font-size': new Value('{myFontSize}')
+    
+    context = new Wingman.Object
+
+    context.set myColor: 'red', myFontSize: '15px'
+    ni = new NodeInterpreter node_data, [], context
+    style = ni.element.style
+    @assert_equal 'red', style.color
+    @assert_equal '15px', style.fontSize
+
+    context.set myColor: 'blue', myFontSize: '13px'
+    @assert_equal 'blue', style.color
+    @assert_equal '13px', style.fontSize

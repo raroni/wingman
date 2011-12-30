@@ -26,7 +26,8 @@ module.exports = class
   setupStyles: -> 
     for key, value of @element_data.styles
       value = if value.is_dynamic
-        @context.observe value.get(), (new_value) => @setStyle key, new_value
+        do (key) =>
+          @context.observe value.get(), (new_value) => @setStyle key, new_value
         @context.get value.get()
       else
         value.get()
