@@ -119,3 +119,37 @@ module.exports = class extends Janitor.TestCase
     @assert !styles.color.is_dynamic
     @assert_equal 'someFontSize', styles['font-size'].get()
     @assert styles['font-size'].is_dynamic
+  
+  'test element with single static class': ->
+    tree = @parse '<div class="funny_class">funky text</div>'
+    classes = tree.children[0].classes
+    @assert classes
+    @assert_equal 1, classes.length
+    @assert_equal 'funny_class', classes[0].get()
+    @assert !classes[0].is_dynamic
+
+  'test element with two static classes': ->
+    tree = @parse '<div class="funny_class another_funny_class">funky text</div>'
+    classes = tree.children[0].classes
+    @assert classes
+    @assert_equal 2, classes.length
+    @assert_equal 'funny_class', classes[0].get()
+    @assert_equal 'another_funny_class', classes[1].get()
+    @assert !klass.is_dynamic for klass in classes
+
+  'test element with single dynamic class': ->
+    tree = @parse '<div class="{funny_class}">funky text</div>'
+    classes = tree.children[0].classes
+    @assert classes
+    @assert_equal 1, classes.length
+    @assert_equal 'funny_class', classes[0].get()
+    @assert classes[0].is_dynamic
+    
+  'test element with two dynamic classes': ->
+    tree = @parse '<div class="{funny_class} {another_funny_class}">funky text</div>'
+    classes = tree.children[0].classes
+    @assert classes
+    @assert_equal 2, classes.length
+    @assert_equal 'funny_class', classes[0].get()
+    @assert_equal 'another_funny_class', classes[1].get()
+    @assert klass.is_dynamic for klass in classes

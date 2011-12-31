@@ -48,6 +48,8 @@ module.exports = class
         properties = @parseProperties @scanner.getCapture(1)
         if properties.style
           new_node.styles = @parseStyle properties.style
+        if properties.class
+          new_node.classes = @parseClass properties.class
 
       @current_scope.children.push new_node
       @current_scope = new_node
@@ -93,3 +95,9 @@ module.exports = class
       split = style_as_string.split ':'
       styles[split[0]] = new Value split[1]
     styles
+
+  parseClass: (classes_as_string) ->
+    classes = []
+    for klass in classes_as_string.split(' ')
+      classes.push new Value(klass)
+    classes
