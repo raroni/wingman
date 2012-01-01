@@ -7,6 +7,7 @@ module.exports = class
     @dom_element = Template.document.createElement @element_data.tag
     @addToScope()
     @setupStyles() if @element_data.styles
+    @setupClasses() if @element_data.classes
 
     if @element_data.value
       @setupInnerHTML()
@@ -18,7 +19,16 @@ module.exports = class
       @scope.appendChild @dom_element
     else
       @scope.push @dom_element
+  
+  hasClass: (class_name) ->
+    @dom_element.className.split(' ').indexOf(class_name) != -1
 
+  addClass: (class_name) ->
+    @dom_element.className += " #{class_name}" unless @hasClass class_name
+
+  setupClasses: ->
+    @addClass klass for klass in @element_data.classes
+  
   setStyle: (key, value) ->
     key_css_notation = @constructor.convertCssPropertyFromDomToCssNotation key
     @dom_element.style[key_css_notation] = value

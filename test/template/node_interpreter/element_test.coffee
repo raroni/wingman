@@ -7,6 +7,10 @@ Wingman = require '../../../.'
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.Template.document = document
+
+  assertDOMElementHasClass: (element, class_name) ->
+    # janitor should have a assertIncludes?
+    @assert element.className.split(' ').indexOf(class_name) != -1
   
   'test css property name convertion from dom to css notation': ->
     @assert_equal 'fontSize', Element.convertCssPropertyFromDomToCssNotation 'font-size'
@@ -171,3 +175,24 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'blue', myFontSize: '13px'
     @assert_equal 'blue', element.dom_element.style.color
     @assert_equal '13px', element.dom_element.style.fontSize
+  
+  'test element node with single static class': ->
+    node_data =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: ['user']
+    
+    element = new Element node_data, []
+    @assertDOMElementHasClass element.dom_element, 'user'
+
+  'test element node with several static classes': ->
+    node_data =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: ['user', 'premium']
+    
+    element = new Element node_data, []
+    @assertDOMElementHasClass element.dom_element, 'user'
+    @assertDOMElementHasClass element.dom_element, 'premium'
