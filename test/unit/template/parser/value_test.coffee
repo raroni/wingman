@@ -1,5 +1,5 @@
 Janitor = require 'janitor'
-Value = require '../../../lib/wingman/template/parser/value'
+Value = require '../../../../lib/wingman/template/parser/value'
 
 module.exports = class extends Janitor.TestCase
   'test static': ->

@@ -1,8 +1,8 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
-Value = require '../../../lib/wingman/template/parser/value'
-ForChildElement = require '../../../lib/wingman/template/node_interpreter/for_child_element'
-Wingman = require '../../../.'
+Value = require '../../../../lib/wingman/template/parser/value'
+ForChildElement = require '../../../../lib/wingman/template/node_interpreter/for_child_element'
+Wingman = require '../../../../.'
 
 module.exports = class extends Janitor.TestCase
   setup: ->

@@ -1,14 +1,13 @@
 Janitor = require 'janitor'
-Wingman = require '..'
+Wingman = require '../..'
 document = require('jsdom').jsdom()
+CustomAssertions = require '../custom_assertions'
 
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.Template.document = document
   
-  assertElementHasClass: (element, class_name) ->
-    # janitor should have a assertIncludes?
-    @assert element.className.split(' ').indexOf(class_name) != -1
+  assertElementHasClass: CustomAssertions.assertDOMElementHasClass
   
   'test basic template with static value': ->
     template = Wingman.Template.compile '<div>hello</div>'

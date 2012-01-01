@@ -1,16 +1,15 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
-Value = require '../../../lib/wingman/template/parser/value'
-Element = require '../../../lib/wingman/template/node_interpreter/element'
-Wingman = require '../../../.'
+Value = require '../../../../lib/wingman/template/parser/value'
+Element = require '../../../../lib/wingman/template/node_interpreter/element'
+Wingman = require '../../../../.'
+CustomAssertions = require '../../../custom_assertions'
 
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.Template.document = document
   
-  assertDOMElementHasClass: (element, class_name) ->
-    # janitor should have a assertIncludes?
-    @assert element.className.split(' ').indexOf(class_name) != -1
+  assertDOMElementHasClass: CustomAssertions.assertDOMElementHasClass
   
   'test css property name convertion from dom to css notation': ->
     @assert_equal 'fontSize', Element.convertCssPropertyFromDomToCssNotation 'font-size'

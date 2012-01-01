@@ -1,5 +1,5 @@
 Janitor = require 'janitor'
-Wingman = require '..'
+Wingman = require '../..'
 
 module.exports = class extends Janitor.TestCase
   'test simple set/get': ->

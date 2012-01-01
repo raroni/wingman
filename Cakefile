@@ -20,5 +20,5 @@ task 'build', 'Build dist file', ->
 
 task 'test', 'Run test suite', ->
   Janitor = require 'janitor'
-  runner = new Janitor.NodeRunner { dir: __dirname + '/test' }
+  runner = new Janitor.NodeRunner { dir: __dirname + '/test/unit' }
   runner.run()

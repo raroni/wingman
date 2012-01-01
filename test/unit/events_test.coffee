@@ -1,6 +1,6 @@
 Janitor = require('janitor')
-Module = require('../lib/wingman/module')
-Events = require('../lib/wingman/events')
+Module = require('../../lib/wingman/module')
+Events = require('../../lib/wingman/events')
 
 module.exports = class extends Janitor.TestCase
   'test trigger': ->
