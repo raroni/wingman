@@ -15,9 +15,9 @@ module.exports = class extends Janitor.TestCase
       value: new Value('test')
 
     scope = []
-    ni = new NodeInterpreter node_data, scope
-    @assert ni.element
-    @assert_equal 'DIV', ni.element.tagName
+    interpreter = new NodeInterpreter node_data, scope
+    @assert interpreter.element
+    @assert_equal 'DIV', interpreter.element.tagName
 
   'test simple element node in dom scope': ->
     node_data = 
@@ -26,11 +26,11 @@ module.exports = class extends Janitor.TestCase
       value: new Value('test')
 
     scope = document.createElement 'li'
-    ni = new NodeInterpreter node_data, scope
+    interpreter = new NodeInterpreter node_data, scope
 
-    @assert ni.element
-    @assert_equal 'DIV', ni.element.tagName
-    @assert_equal 'LI', ni.element.parentNode.tagName
+    @assert interpreter.element
+    @assert_equal 'DIV', interpreter.element.tagName
+    @assert_equal 'LI', interpreter.element.parentNode.tagName
 
   'test nested element nodes': ->
     node_data = 
@@ -44,12 +44,12 @@ module.exports = class extends Janitor.TestCase
 
     scope = []
 
-    ni = new NodeInterpreter node_data, scope
-    @assert ni.element
-    @assert_equal 'DIV', ni.element.tagName
-    @assert_equal 1, ni.element.childNodes.length
-    @assert_equal 'SPAN', ni.element.childNodes[0].tagName
-    @assert_equal 'test', ni.element.childNodes[0].innerHTML
+    interpreter = new NodeInterpreter node_data, scope
+    @assert interpreter.element
+    @assert_equal 'DIV', interpreter.element.tagName
+    @assert_equal 1, interpreter.element.childNodes.length
+    @assert_equal 'SPAN', interpreter.element.childNodes[0].tagName
+    @assert_equal 'test', interpreter.element.childNodes[0].innerHTML
 
   'test element node with dynamic value': ->
     node_data = 
@@ -59,9 +59,9 @@ module.exports = class extends Janitor.TestCase
 
     context = new Wingman.Object
     context.set name: 'Rasmus'
-    ni = new NodeInterpreter node_data, [], context
+    interpreter = new NodeInterpreter node_data, [], context
 
-    @assert_equal 'Rasmus', ni.element.innerHTML
+    @assert_equal 'Rasmus', interpreter.element.innerHTML
 
   'test element node with dynamic value and defered update': ->
     node_data = 
@@ -71,11 +71,11 @@ module.exports = class extends Janitor.TestCase
 
     context = new Wingman.Object
     context.set name: 'John'
-    ni = new NodeInterpreter node_data, [], context
-    @assert_equal 'John', ni.element.innerHTML
+    interpreter = new NodeInterpreter node_data, [], context
+    @assert_equal 'John', interpreter.element.innerHTML
     context.set name: 'Rasmus'
 
-    @assert_equal 'Rasmus', ni.element.innerHTML
+    @assert_equal 'Rasmus', interpreter.element.innerHTML
 
   'test element node with dynamic nested value and defered update': ->
     node_data = 
@@ -87,11 +87,11 @@ module.exports = class extends Janitor.TestCase
     user.set name: 'John'
     context = new Wingman.Object
     context.set {user}
-    ni = new NodeInterpreter node_data, [], context
-    @assert_equal 'John', ni.element.innerHTML
+    interpreter = new NodeInterpreter node_data, [], context
+    @assert_equal 'John', interpreter.element.innerHTML
     user.set name: 'Rasmus'
 
-    @assert_equal 'Rasmus', ni.element.innerHTML
+    @assert_equal 'Rasmus', interpreter.element.innerHTML
 
   'test for node': ->
     node_data =
@@ -107,9 +107,9 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
 
     element = document.createElement 'ol'
-    ni = new NodeInterpreter node_data, element, context
+    interpreter = new NodeInterpreter node_data, element, context
     
-    @assert !ni.element
+    @assert !interpreter.element
     @assert_equal 2, element.childNodes.length
     @assert_equal 'Rasmus', element.childNodes[0].innerHTML
     @assert_equal 'John', element.childNodes[1].innerHTML
@@ -184,9 +184,9 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('red')
     
-    ni = new NodeInterpreter node_data, []
+    interpreter = new NodeInterpreter node_data, []
     
-    @assert_equal 'red', ni.element.style.color
+    @assert_equal 'red', interpreter.element.style.color
 
   'test element node with single dynamic style': ->
     node_data = 
@@ -198,9 +198,9 @@ module.exports = class extends Janitor.TestCase
     
     context = new Wingman.Object
     context.set color: 'red'
-    ni = new NodeInterpreter node_data, [], context
+    interpreter = new NodeInterpreter node_data, [], context
     
-    @assert_equal 'red', ni.element.style.color
+    @assert_equal 'red', interpreter.element.style.color
 
   'test deferred reset with element node with single dynamic style': ->
     node_data = 
@@ -212,9 +212,9 @@ module.exports = class extends Janitor.TestCase
     
     context = new Wingman.Object
     context.set color: 'red'
-    ni = new NodeInterpreter node_data, [], context
+    interpreter = new NodeInterpreter node_data, [], context
     context.set color: 'blue'
-    @assert_equal 'blue', ni.element.style.color
+    @assert_equal 'blue', interpreter.element.style.color
 
   'test element node with two static styles': ->
     node_data = 
@@ -225,9 +225,9 @@ module.exports = class extends Janitor.TestCase
         color: new Value('red')
         'font-size': new Value('15px')
     
-    ni = new NodeInterpreter node_data, []
-    @assert_equal 'red', ni.element.style.color
-    @assert_equal '15px', ni.element.style.fontSize
+    interpreter = new NodeInterpreter node_data, []
+    @assert_equal 'red', interpreter.element.style.color
+    @assert_equal '15px', interpreter.element.style.fontSize
 
   'test element node with two static styles': ->
     node_data = 
@@ -241,8 +241,8 @@ module.exports = class extends Janitor.TestCase
     context = new Wingman.Object
 
     context.set myColor: 'red', myFontSize: '15px'
-    ni = new NodeInterpreter node_data, [], context
-    style = ni.element.style
+    interpreter = new NodeInterpreter node_data, [], context
+    style = interpreter.element.style
     @assert_equal 'red', style.color
     @assert_equal '15px', style.fontSize
 
