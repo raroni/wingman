@@ -181,7 +181,7 @@ module.exports = class extends Janitor.TestCase
       type: 'element'
       tag: 'div'
       value: new Value('Something')
-      classes: ['user']
+      classes: [new Value('user')]
     
     element = new Element node_data, []
     @assertDOMElementHasClass element.dom_element, 'user'
@@ -191,7 +191,7 @@ module.exports = class extends Janitor.TestCase
       type: 'element'
       tag: 'div'
       value: new Value('Something')
-      classes: ['user', 'premium']
+      classes: [new Value('user'), new Value('premium')]
     
     element = new Element node_data, []
     @assertDOMElementHasClass element.dom_element, 'user'

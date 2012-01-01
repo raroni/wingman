@@ -27,7 +27,7 @@ module.exports = class
     @dom_element.className += " #{class_name}" unless @hasClass class_name
 
   setupClasses: ->
-    @addClass klass for klass in @element_data.classes
+    @addClass klass.get() for klass in @element_data.classes
   
   setStyle: (key, value) ->
     key_css_notation = @constructor.convertCssPropertyFromDomToCssNotation key
