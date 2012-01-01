@@ -5,7 +5,11 @@ document = require('jsdom').jsdom()
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.Template.document = document
-    
+  
+  assertElementHasClass: (element, class_name) ->
+    # janitor should have a assertIncludes?
+    @assert element.className.split(' ').indexOf(class_name) != -1
+  
   'test basic template with static value': ->
     template = Wingman.Template.compile '<div>hello</div>'
     elements = template()
@@ -127,7 +131,7 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'blue'
     @assert_equal 'blue', elements[0].style.color
 
-  'test element with several static styles': ->
+  'test element with two static styles': ->
     template = Wingman.Template.compile '<div style="color:{myColor}; font-size: 15px">yo</div>'
     context = new Wingman.Object
     context.set myColor: 'red'
@@ -136,7 +140,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'red', elements[0].style.color
     @assert_equal '15px', elements[0].style.fontSize
   
-  'test element with several dynamic styles': ->
+  'test element with two dynamic styles': ->
     template = Wingman.Template.compile '<div style="color:{myColor}; font-size: {myFontSize}">yo</div>'
     context = new Wingman.Object
     context.set myColor: 'red', myFontSize: '15px'
@@ -148,3 +152,14 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'blue', myFontSize: '13px'
     @assert_equal 'blue', elements[0].style.color
     @assert_equal '13px', elements[0].style.fontSize
+
+  'test element with single static class': ->
+    template = Wingman.Template.compile '<div class="user">something</div>'
+    element = template()[0]
+    @assertElementHasClass element, 'user'
+
+  'test element with several static classes': ->
+    template = Wingman.Template.compile '<div class="premium user">something</div>'
+    element = template()[0]
+    @assertElementHasClass element, 'user'
+    @assertElementHasClass element, 'premium'

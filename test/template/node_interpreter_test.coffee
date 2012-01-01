@@ -8,6 +8,10 @@ module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.Template.document = document
 
+  assertDOMElementHasClass: (element, class_name) ->
+    # janitor should have a assertIncludes?
+    @assert element.className.split(' ').indexOf(class_name) != -1
+  
   'test simple element node': ->
     node_data = 
       type: 'element'
@@ -249,3 +253,44 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'blue', myFontSize: '13px'
     @assert_equal 'blue', style.color
     @assert_equal '13px', style.fontSize
+
+  'test element node with two dynamic styles': ->
+    node_data = 
+      type: 'element'
+      tag: 'div'
+      value: new Value('test')
+      styles:
+        color: new Value('{myColor}')
+        'font-size': new Value('{myFontSize}')
+    
+    context = new Wingman.Object
+    context.set myColor: 'red', myFontSize: '15px'
+    interpreter = new NodeInterpreter node_data, [], context
+
+    @assert_equal 'red', interpreter.element.style.color
+    @assert_equal '15px', interpreter.element.style.fontSize
+
+    context.set myColor: 'blue', myFontSize: '13px'
+    @assert_equal 'blue', interpreter.element.style.color
+    @assert_equal '13px', interpreter.element.style.fontSize
+  
+  'test element node with single static class': ->
+    node_data =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: [new Value('user')]
+    
+    interpreter = new NodeInterpreter node_data, []
+    @assertDOMElementHasClass interpreter.element, 'user'
+
+  'test element node with two static classes': ->
+    node_data =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: [new Value('user'), new Value('premium')]
+    
+    interpreter = new NodeInterpreter node_data, []
+    @assertDOMElementHasClass interpreter.element, 'user'
+    @assertDOMElementHasClass interpreter.element, 'premium'

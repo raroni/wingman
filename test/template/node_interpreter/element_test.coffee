@@ -7,7 +7,7 @@ Wingman = require '../../../.'
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.Template.document = document
-
+  
   assertDOMElementHasClass: (element, class_name) ->
     # janitor should have a assertIncludes?
     @assert element.className.split(' ').indexOf(class_name) != -1
@@ -186,7 +186,7 @@ module.exports = class extends Janitor.TestCase
     element = new Element node_data, []
     @assertDOMElementHasClass element.dom_element, 'user'
 
-  'test element node with several static classes': ->
+  'test element node with two static classes': ->
     node_data =
       type: 'element'
       tag: 'div'
