@@ -322,3 +322,18 @@ module.exports = class extends Janitor.TestCase
     @assert_equal interpreter.element.className, 'user'
     context.set myAwesomeClass: 'something_else'
     @assert_equal interpreter.element.className, 'something_else'
+
+  'test deferred reset to falsy value with element node with single dynamic class': ->
+    node_data =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: [new Value('{myAwesomeClass}')]
+    
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user'
+
+    interpreter = new NodeInterpreter node_data, [], context
+    @assert_equal interpreter.element.className, 'user'
+    context.set myAwesomeClass: null
+    @assert_equal interpreter.element.className, ''

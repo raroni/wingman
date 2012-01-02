@@ -172,7 +172,7 @@ module.exports = class extends Janitor.TestCase
     element = template(context)[0]
     @assertElementHasClass element, 'user'
 
-  'test deferred update with element with single dynamic class': ->
+  'test deferred reset with element with single dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
     context = new Wingman.Object
     context.set myAwesomeClass: 'user'
@@ -182,3 +182,14 @@ module.exports = class extends Janitor.TestCase
 
     context.set myAwesomeClass: 'something_else'
     @assert_equal element.className, 'something_else'
+
+  'test deferred reset to falsy value with element with single dynamic class': ->
+    template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user'
+
+    element = template(context)[0]
+    @assert_equal element.className, 'user'
+
+    context.set myAwesomeClass: null
+    @assert_equal element.className, ''
