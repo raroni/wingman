@@ -24,7 +24,11 @@ module.exports = class
     @dom_element.className.split(' ').indexOf(class_name) != -1
 
   addClass: (class_name) ->
-    @dom_element.className += " #{class_name}" unless @hasClass class_name
+    unless @hasClass class_name
+      @dom_element.className = if @dom_element.className
+        @dom_element.className.split(' ').concat(class_name).join ' '
+      else
+        class_name        
 
   removeClass: (class_name) ->
     if @hasClass(class_name)

@@ -282,7 +282,7 @@ module.exports = class extends Janitor.TestCase
       classes: [new Value('user')]
     
     interpreter = new NodeInterpreter node_data, []
-    @assertDOMElementHasClass interpreter.element, 'user'
+    @assert_equal interpreter.element.className, 'user'
 
   'test element node with two static classes': ->
     node_data =
@@ -319,7 +319,6 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user'
 
     interpreter = new NodeInterpreter node_data, [], context
-    @assertDOMElementHasClass interpreter.element, 'user'
+    @assert_equal interpreter.element.className, 'user'
     context.set myAwesomeClass: 'something_else'
-    @assertDOMElementHasClass interpreter.element, 'something_else'
-    @refuteDOMElementHasClass interpreter.element, 'user'
+    @assert_equal interpreter.element.className, 'something_else'

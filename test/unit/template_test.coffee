@@ -156,7 +156,7 @@ module.exports = class extends Janitor.TestCase
   'test element with single static class': ->
     template = Wingman.Template.compile '<div class="user">something</div>'
     element = template()[0]
-    @assertElementHasClass element, 'user'
+    @assert_equal element.className, 'user'
 
   'test element with several static classes': ->
     template = Wingman.Template.compile '<div class="premium user">something</div>'
@@ -178,9 +178,7 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user'
 
     element = template(context)[0]
-    @assertElementHasClass element, 'user'
+    @assert_equal element.className, 'user'
 
     context.set myAwesomeClass: 'something_else'
-
-    @assertElementHasClass element, 'something_else'
-    @refuteElementHasClass element, 'user'
+    @assert_equal element.className, 'something_else'
