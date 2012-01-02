@@ -46,32 +46,25 @@ module.exports = class
 
   setupClasses: ->
     for class_name in @element_data.classes
-      class_name = if class_name.is_dynamic
-        value = @context.get class_name.get()
-        do =>
-          old_class_name = value
-          @context.observe class_name.get(), (new_class_name) =>
-            @removeClass old_class_name
-            @addClass new_class_name
-            old_class_name = new_class_name
-        value
-      else
-        class_name.get()
-      @addClass class_name
+      @observeClass class_name if class_name.is_dynamic
+      @addClass class_name.get @context
   
+  observeClass: (class_name) ->
+    @context.observe class_name.get(), (new_class_name, old_class_name) =>
+      @removeClass old_class_name
+      @addClass new_class_name
+
   setStyle: (key, value) ->
     key_css_notation = @constructor.convertCssPropertyFromDomToCssNotation key
     @dom_element.style[key_css_notation] = value
 
   setupStyles: -> 
     for key, value of @element_data.styles
-      value = if value.is_dynamic
-        do (key) =>
-          @context.observe value.get(), (new_value) => @setStyle key, new_value
-        @context.get value.get()
-      else
-        value.get()
-      @setStyle key, value
+      @observeStyle key, value if value.is_dynamic
+      @setStyle key, value.get @context
+
+  observeStyle: (key, value) ->
+    @context.observe value.get(), (new_value) => @setStyle key, new_value
   
   setupInnerHTML: ->
     @dom_element.innerHTML = if @element_data.value.is_dynamic

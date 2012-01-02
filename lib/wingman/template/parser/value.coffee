@@ -5,4 +5,7 @@ module.exports = class
     @body = match[1] if @is_dynamic
   
   get: (context) ->
-    @body
+    if @is_dynamic && context
+      context.get @body
+    else
+      @body
