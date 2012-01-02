@@ -19,11 +19,17 @@ module.exports = class extends Janitor.TestCase
   'test observe': ->
     Person = class extends Wingman.Object
     person = new Person
-    name_from_callback = ''
-    person.observe 'name', (new_name) ->
-      name_from_callback = new_name
+    person.set name: 'Roger'
+
+    new_name_from_callback = ''
+    old_name_from_callback = ''
+    person.observe 'name', (new_name, old_name) ->
+      new_name_from_callback = new_name
+      old_name_from_callback = old_name
     person.set name: 'Rasmus'
-    @assert_equal name_from_callback, 'Rasmus'
+    @assert_equal new_name_from_callback, 'Rasmus'
+    @assert_equal old_name_from_callback, 'Roger'
+
 
   'test unobserve': ->
     Person = class extends Wingman.Object
@@ -60,18 +66,27 @@ module.exports = class extends Janitor.TestCase
     city = new Wingman.Object
     city.set {region: region1}
 
-    names = []
-    city.observe 'region.country.name', (new_name) -> names.push(new_name)
+    new_names = []
+    old_names = []
+    city.observe 'region.country.name', (new_name, old_name) ->
+      new_names.push new_name
+      old_names.push old_name
+
     denmark.set name: 'Denmark test'
     region1.set country: england
     denmark.set name: 'Denmark test2'
     city.set region: region2
 
-    @assert_equal 3, names.length
-    @assert_equal 'Denmark test', names[0]
-    @assert_equal 'England', names[1]
-    @assert_equal 'Sweden', names[2]
+    @assert_equal 3, new_names.length
+    @assert_equal 'Denmark test', new_names[0]
+    @assert_equal 'England', new_names[1]
+    @assert_equal 'Sweden', new_names[2]
 
+    @assert_equal 3, old_names.length
+    @assert_equal 'Denmark', old_names[0]
+    @assert_equal 'Denmark test', old_names[1]
+    @assert_equal 'England', old_names[2]
+  
   'test property dependencies': ->
     Person = class extends Wingman.Object
       @addPropertyDependencies
