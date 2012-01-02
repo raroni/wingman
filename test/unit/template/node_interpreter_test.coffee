@@ -10,6 +10,7 @@ module.exports = class extends Janitor.TestCase
     Wingman.Template.document = document
   
   assertDOMElementHasClass: CustomAssertions.assertDOMElementHasClass
+  refuteDOMElementHasClass: CustomAssertions.refuteDOMElementHasClass
   
   'test simple element node': ->
     node_data = 
@@ -306,3 +307,19 @@ module.exports = class extends Janitor.TestCase
 
     interpreter = new NodeInterpreter node_data, [], context
     @assertDOMElementHasClass interpreter.element, 'user'
+
+  'test deferred reset with element node with single dynamic class': ->
+    node_data =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: [new Value('{myAwesomeClass}')]
+    
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user'
+
+    interpreter = new NodeInterpreter node_data, [], context
+    @assertDOMElementHasClass interpreter.element, 'user'
+    context.set myAwesomeClass: 'something_else'
+    @assertDOMElementHasClass interpreter.element, 'something_else'
+    @refuteDOMElementHasClass interpreter.element, 'user'

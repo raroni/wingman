@@ -8,6 +8,7 @@ module.exports = class extends Janitor.TestCase
     Wingman.Template.document = document
   
   assertElementHasClass: CustomAssertions.assertDOMElementHasClass
+  refuteElementHasClass: CustomAssertions.refuteDOMElementHasClass
   
   'test basic template with static value': ->
     template = Wingman.Template.compile '<div>hello</div>'
@@ -170,3 +171,16 @@ module.exports = class extends Janitor.TestCase
 
     element = template(context)[0]
     @assertElementHasClass element, 'user'
+
+  'test deferred update with element with single dynamic class': ->
+    template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user'
+
+    element = template(context)[0]
+    @assertElementHasClass element, 'user'
+
+    context.set myAwesomeClass: 'something_else'
+
+    @assertElementHasClass element, 'something_else'
+    @refuteElementHasClass element, 'user'

@@ -26,10 +26,22 @@ module.exports = class
   addClass: (class_name) ->
     @dom_element.className += " #{class_name}" unless @hasClass class_name
 
+  removeClass: (class_name) ->
+    if @hasClass(class_name)
+      reg = new RegExp '(\\s|^)' + class_name + '(\\s|$)'
+      @dom_element.className = @dom_element.className.replace reg, ''
+
   setupClasses: ->
     for class_name in @element_data.classes
       class_name = if class_name.is_dynamic
-        @context.get class_name.get()
+        value = @context.get class_name.get()
+        do =>
+          old_class_name = value
+          @context.observe class_name.get(), (new_class_name) =>
+            @removeClass old_class_name
+            @addClass new_class_name
+            old_class_name = new_class_name
+        value
       else
         class_name.get()
       @addClass class_name

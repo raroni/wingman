@@ -10,6 +10,7 @@ module.exports = class extends Janitor.TestCase
     Wingman.Template.document = document
   
   assertDOMElementHasClass: CustomAssertions.assertDOMElementHasClass
+  refuteDOMElementHasClass: CustomAssertions.refuteDOMElementHasClass
   
   'test css property name convertion from dom to css notation': ->
     @assert_equal 'fontSize', Element.convertCssPropertyFromDomToCssNotation 'font-size'
@@ -208,3 +209,19 @@ module.exports = class extends Janitor.TestCase
 
     element = new Element node_data, [], context
     @assertDOMElementHasClass element.dom_element, 'user'
+  
+  'test deferred reset with element node with single dynamic class': ->
+    node_data =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: [new Value('{myAwesomeClass}')]
+    
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user'
+
+    element = new Element node_data, [], context
+    @assertDOMElementHasClass element.dom_element, 'user'
+    context.set myAwesomeClass: 'something_else'
+    @assertDOMElementHasClass element.dom_element, 'something_else'
+    @refuteDOMElementHasClass element.dom_element, 'user'
