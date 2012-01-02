@@ -184,7 +184,7 @@ module.exports = class extends Janitor.TestCase
     
     element = new Element node_data, []
     @assertDOMElementHasClass element.dom_element, 'user'
-
+  
   'test element node with two static classes': ->
     node_data =
       type: 'element'
@@ -195,3 +195,16 @@ module.exports = class extends Janitor.TestCase
     element = new Element node_data, []
     @assertDOMElementHasClass element.dom_element, 'user'
     @assertDOMElementHasClass element.dom_element, 'premium'
+  
+  'test element node with single dynamic class': ->
+    node_data =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: [new Value('{myAwesomeClass}')]
+    
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user'
+
+    element = new Element node_data, [], context
+    @assertDOMElementHasClass element.dom_element, 'user'

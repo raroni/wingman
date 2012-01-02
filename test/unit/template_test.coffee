@@ -162,3 +162,11 @@ module.exports = class extends Janitor.TestCase
     element = template()[0]
     @assertElementHasClass element, 'user'
     @assertElementHasClass element, 'premium'
+  
+  'test element with single dynamic class': ->
+    template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user'
+
+    element = template(context)[0]
+    @assertElementHasClass element, 'user'

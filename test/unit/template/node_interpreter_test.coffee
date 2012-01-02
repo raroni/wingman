@@ -293,3 +293,16 @@ module.exports = class extends Janitor.TestCase
     interpreter = new NodeInterpreter node_data, []
     @assertDOMElementHasClass interpreter.element, 'user'
     @assertDOMElementHasClass interpreter.element, 'premium'
+
+  'test element node with single dynamic class': ->
+    node_data =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: [new Value('{myAwesomeClass}')]
+    
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user'
+
+    interpreter = new NodeInterpreter node_data, [], context
+    @assertDOMElementHasClass interpreter.element, 'user'
