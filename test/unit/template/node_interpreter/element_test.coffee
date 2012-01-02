@@ -255,3 +255,22 @@ module.exports = class extends Janitor.TestCase
 
     element = new Element element_node, [], context
     @assert_equal element.dom_element.className, 'user'
+
+  'test deferred reset of dynamic class that evaluates to the same value as another dynamic class': ->
+    element_node =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: [
+        new Value('{myAwesomeClass}'),
+        new Value('{mySuperbClass}')
+      ]
+    
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user', mySuperbClass: 'user'
+
+    element = new Element element_node, [], context
+    context.set myAwesomeClass: 'premium'
+
+    @assertDOMElementHasClass element.dom_element, 'user'
+    @assertDOMElementHasClass element.dom_element, 'premium'

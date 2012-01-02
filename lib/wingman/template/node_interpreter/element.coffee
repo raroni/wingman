@@ -4,6 +4,13 @@ module.exports = class
       s[1].toUpperCase()
 
   constructor: (@element_data, @scope, @context) ->
+    # The class_cache hash is used to indicate how many times a given class is set on an element.
+    # If for instance, 'user' has been added twice it would look lice this:
+    #
+    # { 'user': 2 }
+    #
+    @class_cache = {}
+
     @dom_element = Template.document.createElement @element_data.tag
     @addToScope()
     @setupStyles() if @element_data.styles
@@ -20,18 +27,20 @@ module.exports = class
     else
       @scope.push @dom_element
   
-  hasClass: (class_name) ->
-    @dom_element.className.split(' ').indexOf(class_name) != -1
-
   addClass: (class_name) ->
-    unless @hasClass class_name
+    @class_cache[class_name] ||= 0
+    @class_cache[class_name]++
+    
+    if @class_cache[class_name] == 1
       @dom_element.className = if @dom_element.className
-        @dom_element.className.split(' ').concat(class_name).join ' '
+       @dom_element.className.split(' ').concat(class_name).join ' '
       else
-        class_name        
+       class_name
 
   removeClass: (class_name) ->
-    if @hasClass(class_name)
+    @class_cache[class_name]-- if @class_cache[class_name]
+    
+    if @class_cache[class_name] == 0
       reg = new RegExp '(\\s|^)' + class_name + '(\\s|$)'
       @dom_element.className = @dom_element.className.replace reg, ''
 

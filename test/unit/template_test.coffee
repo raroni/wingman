@@ -201,3 +201,14 @@ module.exports = class extends Janitor.TestCase
 
     element = template(context)[0]
     @assert_equal element.className, 'user'
+
+  'test deferred reset of dynamic class that evaluates to the same value as another dynamic class': ->
+    template = Wingman.Template.compile '<div class="{myAwesomeClass} {mySuperbClass}">something</div>'
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user', mySuperbClass: 'user'
+
+    element = template(context)[0]
+
+    context.set mySuperbClass: 'premium'
+    @assertElementHasClass element, 'user'
+    @assertElementHasClass element, 'premium'
