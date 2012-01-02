@@ -239,3 +239,19 @@ module.exports = class extends Janitor.TestCase
     @assert_equal element.dom_element.className, 'user'
     context.set myAwesomeClass: null
     @assert_equal element.dom_element.className, ''
+  
+  'test element with two dynamic classes that evaluates to the same value': ->
+    element_node =
+      type: 'element'
+      tag: 'div'
+      value: new Value('Something')
+      classes: [
+        new Value('{myAwesomeClass}'),
+        new Value('{mySuperbClass}')
+      ]
+    
+    context = new Wingman.Object
+    context.set myAwesomeClass: 'user', mySuperbClass: 'user'
+
+    element = new Element element_node, [], context
+    @assert_equal element.dom_element.className, 'user'
