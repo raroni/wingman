@@ -36,7 +36,7 @@ module.exports = class
     result
   
   scanForStartTag: ->
-    result = @scanner.scan /<([a-zA-Z]+) *(.*?)>/
+    result = @scanner.scan /<([a-zA-Z0-9]+) *(.*?)>/
     if result
       new_node =
         tag: @scanner.getCapture(0)

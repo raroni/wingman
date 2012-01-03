@@ -14,6 +14,12 @@ module.exports = class extends Janitor.TestCase
     @assert_equal undefined, tree.children[0].value
     @assert !tree.children[0].is_dynamic
 
+  'test empty tag with tag name containing numbers': ->
+    tree = @parse '<h1></h1>'
+
+    @assert_equal 1, tree.children.length
+    @assert_equal 'h1', tree.children[0].tag
+
   'test tag with static text': ->
     tree = @parse '<div>hi</div>'
 
