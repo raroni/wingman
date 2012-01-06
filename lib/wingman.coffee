@@ -1,5 +1,7 @@
-module.exports =
-  Events: require('./wingman/events')
-  Module: require('./wingman/module')
-  Object: require('./wingman/object')
-  Template: require('./wingman/template')
+exports.document = document if window?
+exports.Events = require('./wingman/events')
+exports.Module = require('./wingman/module')
+exports.Object = require('./wingman/object')
+exports.Template = require('./wingman/template')
+exports.View = require('./wingman/view')
+

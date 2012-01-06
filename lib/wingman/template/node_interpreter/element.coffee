@@ -10,8 +10,7 @@ module.exports = class
     # { 'user': 2 }
     #
     @class_cache = {}
-
-    @dom_element = Template.document.createElement @element_data.tag
+    @dom_element = Wingman.document.createElement @element_data.tag
     @addToScope()
     @setupStyles() if @element_data.styles
     @setupClasses() if @element_data.classes
@@ -78,5 +77,5 @@ module.exports = class
     for child in @element_data.children
       new NodeInterpreter child, @dom_element, @context, @document
 
-Template = require '../../template'
+Wingman = require '../../../../.'
 NodeInterpreter = require '../node_interpreter'

@@ -1,6 +1,4 @@
 module.exports = class
-  @document: document if window?
-
   @compile = (source) ->
     template = new @ source
     (context) ->

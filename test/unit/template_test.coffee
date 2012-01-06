@@ -5,7 +5,7 @@ CustomAssertions = require '../custom_assertions'
 
 module.exports = class extends Janitor.TestCase
   setup: ->
-    Wingman.Template.document = document
+    Wingman.document = document
   
   assertElementHasClass: CustomAssertions.assertDOMElementHasClass
   refuteElementHasClass: CustomAssertions.refuteDOMElementHasClass

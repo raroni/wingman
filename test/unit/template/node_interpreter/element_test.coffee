@@ -7,7 +7,7 @@ CustomAssertions = require '../../../custom_assertions'
 
 module.exports = class extends Janitor.TestCase
   setup: ->
-    Wingman.Template.document = document
+    Wingman.document = document
   
   assertDOMElementHasClass: CustomAssertions.assertDOMElementHasClass
   refuteDOMElementHasClass: CustomAssertions.refuteDOMElementHasClass
@@ -22,8 +22,9 @@ module.exports = class extends Janitor.TestCase
       type: 'element'
       tag: 'div'
       value: new Value('test')
-
+    
     scope = []
+    
     element = new Element element_node, scope
     @assert element.dom_element
     @assert_equal 'DIV', element.dom_element.tagName

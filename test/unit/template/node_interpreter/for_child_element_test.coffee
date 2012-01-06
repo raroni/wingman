@@ -6,7 +6,7 @@ Wingman = require '../../../../.'
 
 module.exports = class extends Janitor.TestCase
   setup: ->
-    Wingman.Template.document = document
+    Wingman.document = document
 
   'test for node': ->
     node_data =
