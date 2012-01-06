@@ -1,4 +1,6 @@
-module.exports = class
+Wingman = require '../wingman'
+
+module.exports = class extends Wingman.Object
   constructor: (options) ->
     @el = Wingman.document.createElement 'div'
     options.parent_el.appendChild @el
@@ -10,5 +12,3 @@ module.exports = class
   
   templateSource: ->
     @constructor.templates[@template_path]
-
-Wingman = require '../wingman'
