@@ -11,4 +11,4 @@ module.exports = class extends Wingman.Object
       @el.appendChild element
   
   templateSource: ->
-    @constructor.templates[@template_path]
+    @constructor.template_sources[@template_path]

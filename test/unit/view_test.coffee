@@ -6,10 +6,10 @@ document = require('jsdom').jsdom()
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.document = document
-    View.templates = {}
+    View.template_sources = {}
   
   'test simple template': ->
-    View.templates.simple = '<div>hello</div>'
+    View.template_sources.simple = '<div>hello</div>'
     ViewKlass = class MainView extends View
       template_path: 'simple'
       
@@ -18,7 +18,7 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'hello', view.el.childNodes[0].innerHTML
 
   'test simple template': ->
-    View.templates.simple_with_dynamic_values = '<div>{myName}</div>'
+    View.template_sources.simple_with_dynamic_values = '<div>{myName}</div>'
     ViewKlass = class MainView extends View
       template_path: 'simple_with_dynamic_values'
 
