@@ -7,9 +7,6 @@ module.exports = class
   
   interpretFor: ->
     for new_node_data in @node_data.children
-      # Had to send @constructor because I could not require NodeInterpreter from within ForChildElement.
-      # Perhaps the requirement dependency then would be cyclic?
-      # Should be cleaned up at some point.
       new ForChildElement new_node_data, @scope, @context, @node_data.source
 
   interpretElement: ->
