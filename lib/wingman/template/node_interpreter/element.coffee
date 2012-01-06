@@ -75,7 +75,7 @@ module.exports = class
   
   setupChildren: ->
     for child in @element_data.children
-      new NodeInterpreter child, @dom_element, @context, @document
+      new NodeInterpreter child, @dom_element, @context
 
 Wingman = require '../../../../.'
 NodeInterpreter = require '../node_interpreter'
