@@ -77,5 +77,5 @@ module.exports = class
     for child in @element_data.children
       new NodeInterpreter child, @dom_element, @context
 
-Wingman = require '../../../../.'
+Wingman = require '../../../wingman'
 NodeInterpreter = require '../node_interpreter'
