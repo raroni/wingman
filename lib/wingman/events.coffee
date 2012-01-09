@@ -3,6 +3,7 @@ module.exports =
     @_callbacks ||= {}
     @_callbacks[event_name] ||= []
     @_callbacks[event_name].push callback
+    @_callbacks
 
   unbind: (event_name, callback) ->
     list = @_callbacks && @_callbacks[event_name]

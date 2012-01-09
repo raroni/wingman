@@ -63,3 +63,24 @@ module.exports = class extends Janitor.TestCase
     
     clickElement view.el.childNodes[0].childNodes[0]
     @assert clicked
+
+  'test trigger arguments': ->
+    View.template_sources.test = '<div>Something</div>'
+    ViewKlass = class MainView extends View
+      template_path: 'test'
+      events:
+        'click div': 'something_happened'
+      
+      somethingHappenedArguments: ->
+        ['a', 'b']
+
+    view = new ViewKlass parent_el: document.createElement('div')
+    a = null
+    b = null
+    view.bind 'something_happened', (x,y) ->
+      a = x
+      b = y
+
+    clickElement view.el.childNodes[0]
+    @assert_equal 'a', a
+    @assert_equal 'b', b

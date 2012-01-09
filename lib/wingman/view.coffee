@@ -1,4 +1,5 @@
 Wingman = require '../wingman'
+Fleck = require 'fleck'
 
 module.exports = class extends Wingman.Object
   @parseEvents: (events_hash) ->
@@ -28,9 +29,16 @@ module.exports = class extends Wingman.Object
   setupEvents: ->
     @setupEvent event for event in @constructor.parseEvents(@events)
   
+  triggerWithCustomArguments: (trigger) ->
+    args = [trigger]
+    arguments_method_name = Fleck.camelize(trigger) + "Arguments"
+    custom_arguments = @[arguments_method_name]?()
+    args.push.apply args, custom_arguments if custom_arguments
+    @trigger.apply @, args
+  
   setupEvent: (event) ->
     @el.addEventListener event.type, (e) =>
       for elm in Array.prototype.slice.call(@el.querySelectorAll(event.selector), 0)
         if elm == e.target
-          @trigger event.trigger
+          @triggerWithCustomArguments event.trigger
           e.preventDefault()
