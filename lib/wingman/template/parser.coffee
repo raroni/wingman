@@ -1,6 +1,8 @@
 {StringScanner} = require "strscan"
 Value = require "./parser/value"
 
+self_closing_tags = ['input', 'img', 'br', 'hr']
+
 module.exports = class
   @parse: (source) ->
     parser = new @ source
@@ -52,7 +54,7 @@ module.exports = class
           new_node.classes = @parseClass properties.class
 
       @current_scope.children.push new_node
-      @current_scope = new_node
+      @current_scope = new_node unless self_closing_tags.indexOf(new_node.tag) != -1
     result
     
   scanForForToken: ->

@@ -159,3 +159,14 @@ module.exports = class extends Janitor.TestCase
     @assert_equal 'funny_class', classes[0].get()
     @assert_equal 'another_funny_class', classes[1].get()
     @assert klass.is_dynamic for klass in classes
+
+  'test non closing tag': ->
+    tree = @parse '<div><input></div><div>something else</div>'
+
+    divs = tree.children
+    @assert_equal 2, divs.length
+    @assert_equal 1, divs[0].children.length
+    
+    input = divs[0].children[0]
+    @assert_equal 'element', input.type
+    @assert_equal 'input', input.tag
