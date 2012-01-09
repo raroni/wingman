@@ -14,6 +14,7 @@ module.exports = class extends Wingman.Object
   
   constructor: (options) ->
     @el = Wingman.document.createElement 'div'
+    @template_path = options.template_path if options.template_path
     options.parent_el.appendChild @el
    
     template = Wingman.Template.compile @templateSource()
