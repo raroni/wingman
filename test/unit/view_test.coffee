@@ -1,7 +1,14 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
 View = Wingman.View
-document = require('jsdom').jsdom()
+document = require('jsdom').jsdom(null, null, features: {
+        QuerySelector : true
+      })
+
+clickElement = (elm) ->
+  event = document.createEvent "MouseEvents"
+  event.initMouseEvent "click", true, true
+  elm.dispatchEvent event
 
 module.exports = class extends Janitor.TestCase
   setup: ->
@@ -26,3 +33,33 @@ module.exports = class extends Janitor.TestCase
     view.set myName: 'Razda'
     @assert_equal 1, view.el.childNodes.length
     @assert_equal 'Razda', view.el.childNodes[0].innerHTML
+  
+  'test parse events': ->
+    events_hash =
+      'click .user': 'user_clicked'
+      'hover button.some_class': 'button_hovered'
+      
+    events = View.parseEvents(events_hash).sort (e1, e2) -> e1.type > e2.type
+    
+    @assert_equal 'click', events[0].type
+    @assert_equal 'user_clicked', events[0].trigger
+    @assert_equal '.user', events[0].selector
+    
+    @assert_equal 'hover', events[1].type
+    @assert_equal 'button_hovered', events[1].trigger
+    @assert_equal 'button.some_class', events[1].selector
+  
+  'test simple event': ->
+    View.template_sources.test = '<div><div class="user">Johnny</div></div>'
+    ViewKlass = class MainView extends View
+      template_path: 'test'
+      events:
+        'click .user': 'user_clicked'
+    
+    view = new ViewKlass parent_el: document.createElement('div')
+    clicked = false
+    view.bind 'user_clicked', ->
+      clicked = true
+    
+    clickElement view.el.childNodes[0].childNodes[0]
+    @assert clicked
