@@ -31,4 +31,6 @@ module.exports = class extends Wingman.Object
   setupEvent: (event) ->
     @el.addEventListener event.type, (e) =>
       for elm in Array.prototype.slice.call(@el.querySelectorAll(event.selector), 0)
-        @trigger event.trigger if elm == e.target
+        if elm == e.target
+          @trigger event.trigger
+          e.preventDefault()
