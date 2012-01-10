@@ -1,5 +1,5 @@
 exports.document = document if window?
-exports.request = jQuery.ajax if jQuery?
+exports.request = require('./wingman/request').request
 exports.Events = require('./wingman/events')
 exports.Module = require('./wingman/module')
 exports.Object = require('./wingman/object')
