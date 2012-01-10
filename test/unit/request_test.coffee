@@ -11,7 +11,11 @@ module.exports = class extends Janitor.TestCase
     
     new FunkySocks el: Wingman.document.createElement('div')
     
-    Wingman.request
-      url: '/users'
+    Wingman.request url: '/users'
     
     @assertEqual 'http://funkysocks.net/users', Wingman.request.realRequest.args[0][0].url
+  
+  'test automatic data type': ->
+    Wingman.request.realRequest = sinon.spy()
+    Wingman.request url: '/users'
+    @assertEqual 'json', Wingman.request.realRequest.args[0][0].dataType
