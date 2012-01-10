@@ -176,3 +176,16 @@ module.exports = class extends Janitor.TestCase
       country.get('cities').push 'Liverpool'
   
       @assert_equal 'Liverpool', result
+
+  'test export to JSON': ->
+      Country = class extends Wingman.Object
+        @NAMES: { 'dk': 'Denmark' }
+        name: ->
+          @constructor.NAMES[@get('code')]
+          
+      country = new Country
+      country.set code: 'dk'
+      
+      @assert_equal 'dk', country.toJSON().code
+      @assert_equal 'Denmark', country.toJSON().name
+      @assert_equal 2, Object.keys(country.toJSON()).length

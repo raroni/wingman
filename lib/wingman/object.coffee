@@ -84,7 +84,14 @@ module.exports = class extends Module
       @[property_name].apply @
     else
       @[property_name]
-
+  
+  toJSON: ->
+    json = {}
+    for key, value of @
+      if @hasOwnProperty(key) || @constructor.hasOwnProperty(key)
+        json[key] = @get key
+    json
+  
   addTriggersToArray: (property_name) ->
     parent = @
     array = @[property_name]
