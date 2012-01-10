@@ -62,6 +62,7 @@ module.exports = class extends Module
     @unbind "#{type}:#{property_name}", callback
 
   setProperty: (property_name, value) ->
+    @registerPropertySet property_name
     old_value = @get property_name
     @[property_name] = value
     @triggerPropertyChange property_name, old_value
@@ -70,7 +71,12 @@ module.exports = class extends Module
     parent = @
     if Array.isArray @[property_name]
       @addTriggersToArray property_name
-
+  
+  # Without this, we wouldn't be able to make an appropriate #toJSON.
+  registerPropertySet: (property_name) ->
+    @setPropertyNames ||= []
+    @setPropertyNames.push property_name
+  
   get: (chain_as_string) ->
     chain = chain_as_string.split '.'
     if chain.length == 1
@@ -87,9 +93,8 @@ module.exports = class extends Module
   
   toJSON: ->
     json = {}
-    for key, value of @
-      if @hasOwnProperty(key)
-        json[key] = @get key
+    for property_name in @setPropertyNames
+        json[property_name] = @get property_name
     json
   
   addTriggersToArray: (property_name) ->

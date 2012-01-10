@@ -180,9 +180,13 @@ module.exports = class extends Janitor.TestCase
   'test export to JSON': ->
       Country = class extends Wingman.Object
         name: -> 'method properties should not be a part of toJSON'
+        otherProperty: => 'not even if you bind them like this'
           
       country = new Country
-      country.set code: 'dk'
+      country.set code: 'dk', region: 'eu'
+      
+      console.log country.toJSON()
       
       @assert_equal 'dk', country.toJSON().code
-      @assert_equal 1, Object.keys(country.toJSON()).length
+      @assert_equal 'eu', country.toJSON().region
+      @assert_equal 2, Object.keys(country.toJSON()).length
