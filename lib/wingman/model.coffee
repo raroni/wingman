@@ -19,7 +19,7 @@ module.exports = class extends Wingman.Object
     Wingman.request
       type: @saveHTTPMethod()
       url: @saveURL()
-      data: @dirtyStaticProperties() # måske overvej at gøre modellen klar over hvilke attributes der er ændret siden load?
+      data: @dirtyStaticProperties()
       success: @requestSuccess
   
   saveHTTPMethod: ->
