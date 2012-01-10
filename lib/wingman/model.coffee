@@ -3,10 +3,7 @@ Wingman = require '../wingman'
 module.exports = class extends Wingman.Object
   constructor: (hash) ->
     @dirty_static_property_names = []
-    for key, value of hash
-      h = {}
-      h[key] = value
-      @set h
+    @set hash
   
   clean: ->
     @dirty_static_property_names.length = 0
