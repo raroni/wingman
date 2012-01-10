@@ -13,25 +13,25 @@ module.exports = class extends Janitor.TestCase
   'test basic template with static value': ->
     template = Wingman.Template.compile '<div>hello</div>'
     elements = template()
-    @assert_equal 1, elements.length
-    @assert_equal 'hello', elements[0].innerHTML
+    @assertEqual 1, elements.length
+    @assertEqual 'hello', elements[0].innerHTML
 
   'test template with nested tags': ->
     template = Wingman.Template.compile '<ol><li>hello</li></ol>'
     elements = template()
 
-    @assert_equal 1, elements.length
+    @assertEqual 1, elements.length
     ol_elm = elements[0]
-    @assert_equal 1, ol_elm.childNodes.length
-    @assert_equal 'hello', ol_elm.childNodes[0].innerHTML
+    @assertEqual 1, ol_elm.childNodes.length
+    @assertEqual 'hello', ol_elm.childNodes[0].innerHTML
 
   'test basic template with dynamic content': ->
     template = Wingman.Template.compile '<div>{greeting}</div>'
     context = new Wingman.Object
     context.set greeting: 'hello'
     elements = template context
-    @assert_equal 1, elements.length
-    @assert_equal 'hello', elements[0].innerHTML
+    @assertEqual 1, elements.length
+    @assertEqual 'hello', elements[0].innerHTML
 
   'test template with dynamic value after updating context': ->
     template = Wingman.Template.compile '<div>{greeting}</div>'
@@ -40,8 +40,8 @@ module.exports = class extends Janitor.TestCase
     elements = template context
     context.set greeting: 'hi'
 
-    @assert_equal 1, elements.length
-    @assert_equal 'hi', elements[0].innerHTML
+    @assertEqual 1, elements.length
+    @assertEqual 'hi', elements[0].innerHTML
 
   'test template with nested dynamic value after updating context': ->
     template = Wingman.Template.compile '<div>{user.name}</div>'
@@ -51,11 +51,11 @@ module.exports = class extends Janitor.TestCase
     context.set {user}
     elements = template context
     
-    @assert_equal 1, elements.length
-    @assert_equal 'Rasmus', elements[0].innerHTML
+    @assertEqual 1, elements.length
+    @assertEqual 'Rasmus', elements[0].innerHTML
     
     user.set name: 'John'
-    @assert_equal 'John', elements[0].innerHTML
+    @assertEqual 'John', elements[0].innerHTML
 
   'test for token': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
@@ -64,12 +64,12 @@ module.exports = class extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
     elements = template context
 
-    @assert_equal 1, elements.length
+    @assertEqual 1, elements.length
 
     ol_elm = elements[0]
-    @assert_equal 2, ol_elm.childNodes.length
-    @assert_equal 'Rasmus', ol_elm.childNodes[0].innerHTML
-    @assert_equal 'John', ol_elm.childNodes[1].innerHTML
+    @assertEqual 2, ol_elm.childNodes.length
+    @assertEqual 'Rasmus', ol_elm.childNodes[0].innerHTML
+    @assertEqual 'John', ol_elm.childNodes[1].innerHTML
 
   'test for token with deferred push': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
@@ -79,11 +79,11 @@ module.exports = class extends Janitor.TestCase
     elements = template context
 
     ol_elm = elements[0]
-    @assert_equal 2, ol_elm.childNodes.length
+    @assertEqual 2, ol_elm.childNodes.length
 
     context.get('users').push 'Oliver'
-    @assert_equal 3, ol_elm.childNodes.length
-    @assert_equal 'Oliver', ol_elm.childNodes[2].innerHTML
+    @assertEqual 3, ol_elm.childNodes.length
+    @assertEqual 'Oliver', ol_elm.childNodes[2].innerHTML
 
   'test for token with deferred remove': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
@@ -93,10 +93,10 @@ module.exports = class extends Janitor.TestCase
     elements = template context
 
     ol_elm = elements[0]
-    @assert_equal 2, ol_elm.childNodes.length
+    @assertEqual 2, ol_elm.childNodes.length
 
     context.get('users').remove 'John'
-    @assert_equal 1, ol_elm.childNodes.length
+    @assertEqual 1, ol_elm.childNodes.length
 
   'test for token with deferred reset': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
@@ -106,14 +106,14 @@ module.exports = class extends Janitor.TestCase
     elements = template context
     ol_elm = elements[0]
     context.set users: ['Oliver']
-    @assert_equal 1, ol_elm.childNodes.length
-    @assert_equal 'Oliver', ol_elm.childNodes[0].innerHTML
+    @assertEqual 1, ol_elm.childNodes.length
+    @assertEqual 'Oliver', ol_elm.childNodes[0].innerHTML
   
   'test element with single static style': ->
     template = Wingman.Template.compile '<div style="color:red">yo</div>'
     elements = template()
 
-    @assert_equal 'red', elements[0].style.color
+    @assertEqual 'red', elements[0].style.color
 
   'test element with single dynamic style': ->
     template = Wingman.Template.compile '<div style="color:{color}">yo</div>'
@@ -121,7 +121,7 @@ module.exports = class extends Janitor.TestCase
     context.set color: 'red'
     elements = template context
 
-    @assert_equal 'red', elements[0].style.color
+    @assertEqual 'red', elements[0].style.color
 
   'test deferred reset for element with single dynamic style': ->
     template = Wingman.Template.compile '<div style="color:{myColor}">yo</div>'
@@ -129,7 +129,7 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'red'
     elements = template context
     context.set myColor: 'blue'
-    @assert_equal 'blue', elements[0].style.color
+    @assertEqual 'blue', elements[0].style.color
 
   'test element with two static styles': ->
     template = Wingman.Template.compile '<div style="color:{myColor}; font-size: 15px">yo</div>'
@@ -137,8 +137,8 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'red'
     elements = template context
 
-    @assert_equal 'red', elements[0].style.color
-    @assert_equal '15px', elements[0].style.fontSize
+    @assertEqual 'red', elements[0].style.color
+    @assertEqual '15px', elements[0].style.fontSize
   
   'test element with two dynamic styles': ->
     template = Wingman.Template.compile '<div style="color:{myColor}; font-size: {myFontSize}">yo</div>'
@@ -146,17 +146,17 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'red', myFontSize: '15px'
     elements = template context
 
-    @assert_equal 'red', elements[0].style.color
-    @assert_equal '15px', elements[0].style.fontSize
+    @assertEqual 'red', elements[0].style.color
+    @assertEqual '15px', elements[0].style.fontSize
 
     context.set myColor: 'blue', myFontSize: '13px'
-    @assert_equal 'blue', elements[0].style.color
-    @assert_equal '13px', elements[0].style.fontSize
+    @assertEqual 'blue', elements[0].style.color
+    @assertEqual '13px', elements[0].style.fontSize
 
   'test element with single static class': ->
     template = Wingman.Template.compile '<div class="user">something</div>'
     element = template()[0]
-    @assert_equal element.className, 'user'
+    @assertEqual element.className, 'user'
 
   'test element with several static classes': ->
     template = Wingman.Template.compile '<div class="premium user">something</div>'
@@ -178,10 +178,10 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user'
 
     element = template(context)[0]
-    @assert_equal element.className, 'user'
+    @assertEqual element.className, 'user'
 
     context.set myAwesomeClass: 'something_else'
-    @assert_equal element.className, 'something_else'
+    @assertEqual element.className, 'something_else'
 
   'test deferred reset to falsy value with element with single dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
@@ -189,10 +189,10 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user'
 
     element = template(context)[0]
-    @assert_equal element.className, 'user'
+    @assertEqual element.className, 'user'
 
     context.set myAwesomeClass: null
-    @assert_equal element.className, ''
+    @assertEqual element.className, ''
 
   'test element with two dynamic classes that evaluates to the same value': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass} {mySuperbClass}">something</div>'
@@ -200,7 +200,7 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
 
     element = template(context)[0]
-    @assert_equal element.className, 'user'
+    @assertEqual element.className, 'user'
 
   'test deferred reset of dynamic class that evaluates to the same value as another dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass} {mySuperbClass}">something</div>'

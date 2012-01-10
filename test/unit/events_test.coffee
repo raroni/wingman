@@ -28,7 +28,7 @@ module.exports = class extends Janitor.TestCase
       instance.bind 'something', (arg) -> received_arg = arg
       instance.trigger 'something', 'works?'
   
-      @assert_equal 'works?', received_arg
+      @assertEqual 'works?', received_arg
 
   'test unbind': ->
     klass = class extends Module

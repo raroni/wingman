@@ -21,8 +21,8 @@ module.exports = class extends Janitor.TestCase
       template_path: 'simple'
       
     view = new ViewKlass parent_el: document.createElement('div')
-    @assert_equal 1, view.el.childNodes.length
-    @assert_equal 'hello', view.el.childNodes[0].innerHTML
+    @assertEqual 1, view.el.childNodes.length
+    @assertEqual 'hello', view.el.childNodes[0].innerHTML
 
   'test simple template': ->
     View.template_sources.simple_with_dynamic_values = '<div>{myName}</div>'
@@ -31,8 +31,8 @@ module.exports = class extends Janitor.TestCase
 
     view = new ViewKlass parent_el: document.createElement('div')
     view.set myName: 'Razda'
-    @assert_equal 1, view.el.childNodes.length
-    @assert_equal 'Razda', view.el.childNodes[0].innerHTML
+    @assertEqual 1, view.el.childNodes.length
+    @assertEqual 'Razda', view.el.childNodes[0].innerHTML
   
   'test parse events': ->
     events_hash =
@@ -41,13 +41,13 @@ module.exports = class extends Janitor.TestCase
       
     events = View.parseEvents(events_hash).sort (e1, e2) -> e1.type > e2.type
     
-    @assert_equal 'click', events[0].type
-    @assert_equal 'user_clicked', events[0].trigger
-    @assert_equal '.user', events[0].selector
+    @assertEqual 'click', events[0].type
+    @assertEqual 'user_clicked', events[0].trigger
+    @assertEqual '.user', events[0].selector
     
-    @assert_equal 'hover', events[1].type
-    @assert_equal 'button_hovered', events[1].trigger
-    @assert_equal 'button.some_class', events[1].selector
+    @assertEqual 'hover', events[1].type
+    @assertEqual 'button_hovered', events[1].trigger
+    @assertEqual 'button.some_class', events[1].selector
   
   'test simple event': ->
     View.template_sources.test = '<div><div class="user">Johnny</div></div>'
@@ -82,5 +82,5 @@ module.exports = class extends Janitor.TestCase
       b = y
 
     clickElement view.el.childNodes[0]
-    @assert_equal 'a', a
-    @assert_equal 'b', b
+    @assertEqual 'a', a
+    @assertEqual 'b', b

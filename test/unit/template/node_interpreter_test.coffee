@@ -21,7 +21,7 @@ module.exports = class extends Janitor.TestCase
     scope = []
     interpreter = new NodeInterpreter node_data, scope
     @assert interpreter.element
-    @assert_equal 'DIV', interpreter.element.tagName
+    @assertEqual 'DIV', interpreter.element.tagName
 
   'test simple element node in dom scope': ->
     node_data = 
@@ -33,8 +33,8 @@ module.exports = class extends Janitor.TestCase
     interpreter = new NodeInterpreter node_data, scope
 
     @assert interpreter.element
-    @assert_equal 'DIV', interpreter.element.tagName
-    @assert_equal 'LI', interpreter.element.parentNode.tagName
+    @assertEqual 'DIV', interpreter.element.tagName
+    @assertEqual 'LI', interpreter.element.parentNode.tagName
 
   'test nested element nodes': ->
     node_data = 
@@ -50,10 +50,10 @@ module.exports = class extends Janitor.TestCase
 
     interpreter = new NodeInterpreter node_data, scope
     @assert interpreter.element
-    @assert_equal 'DIV', interpreter.element.tagName
-    @assert_equal 1, interpreter.element.childNodes.length
-    @assert_equal 'SPAN', interpreter.element.childNodes[0].tagName
-    @assert_equal 'test', interpreter.element.childNodes[0].innerHTML
+    @assertEqual 'DIV', interpreter.element.tagName
+    @assertEqual 1, interpreter.element.childNodes.length
+    @assertEqual 'SPAN', interpreter.element.childNodes[0].tagName
+    @assertEqual 'test', interpreter.element.childNodes[0].innerHTML
 
   'test element node with dynamic value': ->
     node_data = 
@@ -65,7 +65,7 @@ module.exports = class extends Janitor.TestCase
     context.set name: 'Rasmus'
     interpreter = new NodeInterpreter node_data, [], context
 
-    @assert_equal 'Rasmus', interpreter.element.innerHTML
+    @assertEqual 'Rasmus', interpreter.element.innerHTML
 
   'test element node with dynamic value and defered update': ->
     node_data = 
@@ -76,10 +76,10 @@ module.exports = class extends Janitor.TestCase
     context = new Wingman.Object
     context.set name: 'John'
     interpreter = new NodeInterpreter node_data, [], context
-    @assert_equal 'John', interpreter.element.innerHTML
+    @assertEqual 'John', interpreter.element.innerHTML
     context.set name: 'Rasmus'
 
-    @assert_equal 'Rasmus', interpreter.element.innerHTML
+    @assertEqual 'Rasmus', interpreter.element.innerHTML
 
   'test element node with dynamic nested value and defered update': ->
     node_data = 
@@ -92,10 +92,10 @@ module.exports = class extends Janitor.TestCase
     context = new Wingman.Object
     context.set {user}
     interpreter = new NodeInterpreter node_data, [], context
-    @assert_equal 'John', interpreter.element.innerHTML
+    @assertEqual 'John', interpreter.element.innerHTML
     user.set name: 'Rasmus'
 
-    @assert_equal 'Rasmus', interpreter.element.innerHTML
+    @assertEqual 'Rasmus', interpreter.element.innerHTML
 
   'test for node': ->
     node_data =
@@ -114,9 +114,9 @@ module.exports = class extends Janitor.TestCase
     interpreter = new NodeInterpreter node_data, element, context
     
     @assert !interpreter.element
-    @assert_equal 2, element.childNodes.length
-    @assert_equal 'Rasmus', element.childNodes[0].innerHTML
-    @assert_equal 'John', element.childNodes[1].innerHTML
+    @assertEqual 2, element.childNodes.length
+    @assertEqual 'Rasmus', element.childNodes[0].innerHTML
+    @assertEqual 'John', element.childNodes[1].innerHTML
 
   'test for node with deferred push': ->
     node_data =
@@ -134,10 +134,10 @@ module.exports = class extends Janitor.TestCase
     element = document.createElement 'ol'
     new NodeInterpreter node_data, element, context
     
-    @assert_equal 2, element.childNodes.length
+    @assertEqual 2, element.childNodes.length
     context.get('users').push 'Joe'
-    @assert_equal 3, element.childNodes.length
-    @assert_equal 'Joe', element.childNodes[2].innerHTML
+    @assertEqual 3, element.childNodes.length
+    @assertEqual 'Joe', element.childNodes[2].innerHTML
   
   'test for node with deferred remove': ->
     node_data =
@@ -155,9 +155,9 @@ module.exports = class extends Janitor.TestCase
     element = document.createElement 'ol'
     new NodeInterpreter node_data, element, context
     
-    @assert_equal 2, element.childNodes.length
+    @assertEqual 2, element.childNodes.length
     context.get('users').remove 'John'
-    @assert_equal 1, element.childNodes.length
+    @assertEqual 1, element.childNodes.length
 
   'test for node with deferred reset': ->
     node_data =
@@ -175,10 +175,10 @@ module.exports = class extends Janitor.TestCase
     element = document.createElement 'ol'
     new NodeInterpreter node_data, element, context
     
-    @assert_equal 2, element.childNodes.length
+    @assertEqual 2, element.childNodes.length
     context.set users: ['Oliver']
-    @assert_equal 1, element.childNodes.length
-    @assert_equal 'Oliver', element.childNodes[0].innerHTML
+    @assertEqual 1, element.childNodes.length
+    @assertEqual 'Oliver', element.childNodes[0].innerHTML
 
   'test element node with single static style': ->
     node_data = 
@@ -190,7 +190,7 @@ module.exports = class extends Janitor.TestCase
     
     interpreter = new NodeInterpreter node_data, []
     
-    @assert_equal 'red', interpreter.element.style.color
+    @assertEqual 'red', interpreter.element.style.color
 
   'test element node with single dynamic style': ->
     node_data = 
@@ -204,7 +204,7 @@ module.exports = class extends Janitor.TestCase
     context.set color: 'red'
     interpreter = new NodeInterpreter node_data, [], context
     
-    @assert_equal 'red', interpreter.element.style.color
+    @assertEqual 'red', interpreter.element.style.color
 
   'test deferred reset with element node with single dynamic style': ->
     node_data = 
@@ -218,7 +218,7 @@ module.exports = class extends Janitor.TestCase
     context.set color: 'red'
     interpreter = new NodeInterpreter node_data, [], context
     context.set color: 'blue'
-    @assert_equal 'blue', interpreter.element.style.color
+    @assertEqual 'blue', interpreter.element.style.color
 
   'test element node with two static styles': ->
     node_data = 
@@ -230,8 +230,8 @@ module.exports = class extends Janitor.TestCase
         'font-size': new Value('15px')
     
     interpreter = new NodeInterpreter node_data, []
-    @assert_equal 'red', interpreter.element.style.color
-    @assert_equal '15px', interpreter.element.style.fontSize
+    @assertEqual 'red', interpreter.element.style.color
+    @assertEqual '15px', interpreter.element.style.fontSize
 
   'test element node with two static styles': ->
     node_data = 
@@ -247,12 +247,12 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'red', myFontSize: '15px'
     interpreter = new NodeInterpreter node_data, [], context
     style = interpreter.element.style
-    @assert_equal 'red', style.color
-    @assert_equal '15px', style.fontSize
+    @assertEqual 'red', style.color
+    @assertEqual '15px', style.fontSize
 
     context.set myColor: 'blue', myFontSize: '13px'
-    @assert_equal 'blue', style.color
-    @assert_equal '13px', style.fontSize
+    @assertEqual 'blue', style.color
+    @assertEqual '13px', style.fontSize
 
   'test element node with two dynamic styles': ->
     node_data = 
@@ -267,12 +267,12 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'red', myFontSize: '15px'
     interpreter = new NodeInterpreter node_data, [], context
 
-    @assert_equal 'red', interpreter.element.style.color
-    @assert_equal '15px', interpreter.element.style.fontSize
+    @assertEqual 'red', interpreter.element.style.color
+    @assertEqual '15px', interpreter.element.style.fontSize
 
     context.set myColor: 'blue', myFontSize: '13px'
-    @assert_equal 'blue', interpreter.element.style.color
-    @assert_equal '13px', interpreter.element.style.fontSize
+    @assertEqual 'blue', interpreter.element.style.color
+    @assertEqual '13px', interpreter.element.style.fontSize
   
   'test element node with single static class': ->
     node_data =
@@ -282,7 +282,7 @@ module.exports = class extends Janitor.TestCase
       classes: [new Value('user')]
     
     interpreter = new NodeInterpreter node_data, []
-    @assert_equal interpreter.element.className, 'user'
+    @assertEqual interpreter.element.className, 'user'
 
   'test element node with two static classes': ->
     node_data =
@@ -319,9 +319,9 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user'
 
     interpreter = new NodeInterpreter node_data, [], context
-    @assert_equal interpreter.element.className, 'user'
+    @assertEqual interpreter.element.className, 'user'
     context.set myAwesomeClass: 'something_else'
-    @assert_equal interpreter.element.className, 'something_else'
+    @assertEqual interpreter.element.className, 'something_else'
 
   'test deferred reset to falsy value with element node with single dynamic class': ->
     node_data =
@@ -334,9 +334,9 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user'
 
     interpreter = new NodeInterpreter node_data, [], context
-    @assert_equal interpreter.element.className, 'user'
+    @assertEqual interpreter.element.className, 'user'
     context.set myAwesomeClass: null
-    @assert_equal interpreter.element.className, ''
+    @assertEqual interpreter.element.className, ''
 
   'test element node with two dynamic classes that evaluates to the same value': ->
     element_node =
@@ -352,7 +352,7 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
 
     interpreter = new NodeInterpreter element_node, [], context
-    @assert_equal interpreter.element.className, 'user'
+    @assertEqual interpreter.element.className, 'user'
 
   'test deferred reset of dynamic class that evaluates to the same value as another dynamic class in node element': ->
     element_node =

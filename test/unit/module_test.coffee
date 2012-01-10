@@ -13,11 +13,11 @@ module.exports = class extends Janitor.TestCase
     instance = new klass
 
     @assert instance.testMethod
-    @assert_equal 'function', typeof(instance.testMethod)
+    @assertEqual 'function', typeof(instance.testMethod)
   
   'test extend': ->
     klass = class extends Module
       @extend test_module
 
     @assert klass.testMethod
-    @assert_equal 'function', typeof(klass.testMethod)
+    @assertEqual 'function', typeof(klass.testMethod)

@@ -6,7 +6,7 @@ module.exports = class extends Janitor.TestCase
     klass = class extends Wingman.Object
     instance = new klass
     instance.set name: 'rasmus'
-    @assert_equal 'rasmus', instance.get('name')
+    @assertEqual 'rasmus', instance.get('name')
   
   'test get method property': ->
     Person = class extends Wingman.Object
@@ -14,7 +14,7 @@ module.exports = class extends Janitor.TestCase
     
     person = new Person
     person.set firstName: 'Rasmus', lastName: 'Nielsen'
-    @assert_equal 'Rasmus Nielsen', person.get('fullName')
+    @assertEqual 'Rasmus Nielsen', person.get('fullName')
   
   'test observe': ->
     Person = class extends Wingman.Object
@@ -27,8 +27,8 @@ module.exports = class extends Janitor.TestCase
       new_name_from_callback = new_name
       old_name_from_callback = old_name
     person.set name: 'Rasmus'
-    @assert_equal new_name_from_callback, 'Rasmus'
-    @assert_equal old_name_from_callback, 'Roger'
+    @assertEqual new_name_from_callback, 'Rasmus'
+    @assertEqual old_name_from_callback, 'Roger'
 
 
   'test unobserve': ->
@@ -50,7 +50,7 @@ module.exports = class extends Janitor.TestCase
     slow_car.set name: 'Toyota'
     car = new Car()
     car.set type: slow_car
-    @assert_equal 'Toyota', car.get('type.name')
+    @assertEqual 'Toyota', car.get('type.name')
   
   'test nested observe': ->
     denmark = new Wingman.Object
@@ -77,15 +77,15 @@ module.exports = class extends Janitor.TestCase
     denmark.set name: 'Denmark test2'
     city.set region: region2
 
-    @assert_equal 3, new_names.length
-    @assert_equal 'Denmark test', new_names[0]
-    @assert_equal 'England', new_names[1]
-    @assert_equal 'Sweden', new_names[2]
+    @assertEqual 3, new_names.length
+    @assertEqual 'Denmark test', new_names[0]
+    @assertEqual 'England', new_names[1]
+    @assertEqual 'Sweden', new_names[2]
 
-    @assert_equal 3, old_names.length
-    @assert_equal 'Denmark', old_names[0]
-    @assert_equal 'Denmark test', old_names[1]
-    @assert_equal 'England', old_names[2]
+    @assertEqual 3, old_names.length
+    @assertEqual 'Denmark', old_names[0]
+    @assertEqual 'Denmark test', old_names[1]
+    @assertEqual 'England', old_names[2]
   
   'test property dependencies': ->
     Person = class extends Wingman.Object
@@ -99,7 +99,7 @@ module.exports = class extends Janitor.TestCase
     person.observe 'fullName', (new_value) -> result = new_value
     person.set firstName: 'Rasmus', lastName: 'Nielsen'
 
-    @assert_equal result, 'Rasmus Nielsen'
+    @assertEqual result, 'Rasmus Nielsen'
 
   'test nested observe combined with property dependencies': ->
     Country = class extends Wingman.Object
@@ -134,10 +134,10 @@ module.exports = class extends Janitor.TestCase
     denmark.set code: 'UK'
     city.set region: region2
 
-    @assert_equal 3, names.length
-    @assert_equal 'Sweden', names[0]
-    @assert_equal 'England', names[1]
-    @assert_equal 'Sweden', names[2]
+    @assertEqual 3, names.length
+    @assertEqual 'Sweden', names[0]
+    @assertEqual 'England', names[1]
+    @assertEqual 'Sweden', names[2]
 
   'test observe array property add': ->
     instance = new Wingman.Object
@@ -149,10 +149,10 @@ module.exports = class extends Janitor.TestCase
     instance.set users: []
     instance.get('users').push 'Jack'
 
-    @assert_equal 'Rasmus', added[0]
-    @assert_equal 'John', added[1]
-    @assert_equal 'Jack', added[2]
-    @assert_equal 1, instance.get('users').length
+    @assertEqual 'Rasmus', added[0]
+    @assertEqual 'John', added[1]
+    @assertEqual 'Jack', added[2]
+    @assertEqual 1, instance.get('users').length
 
   'test observe array property remove': ->
     country = new Wingman.Object
@@ -161,9 +161,9 @@ module.exports = class extends Janitor.TestCase
     country.observe 'cities', 'remove', (removed_value) -> removed_value_from_callback = removed_value
     country.get('cities').remove 'London'
 
-    @assert_equal 'London', removed_value_from_callback
-    @assert_equal 'Manchester', country.get('cities')[0]
-    @assert_equal 1, country.get('cities').length
+    @assertEqual 'London', removed_value_from_callback
+    @assertEqual 'Manchester', country.get('cities')[0]
+    @assertEqual 1, country.get('cities').length
 
   'test observe nested array property': ->
       country = new Wingman.Object
@@ -175,7 +175,7 @@ module.exports = class extends Janitor.TestCase
       user.observe 'country.cities', 'add', (new_value) -> result = new_value
       country.get('cities').push 'Liverpool'
   
-      @assert_equal 'Liverpool', result
+      @assertEqual 'Liverpool', result
 
   'test export to JSON': ->
       Country = class extends Wingman.Object
@@ -185,9 +185,9 @@ module.exports = class extends Janitor.TestCase
       country = new Country
       country.set code: 'dk', region: 'eu'
       
-      @assert_equal 'dk', country.toJSON().code
-      @assert_equal 'eu', country.toJSON().region
-      @assert_equal 2, Object.keys(country.toJSON()).length
+      @assertEqual 'dk', country.toJSON().code
+      @assertEqual 'eu', country.toJSON().region
+      @assertEqual 2, Object.keys(country.toJSON()).length
 
   'test export to JSON with only options': ->
       country = new Wingman.Object
@@ -195,11 +195,11 @@ module.exports = class extends Janitor.TestCase
 
       only_code = country.toJSON(only: 'code')
 
-      @assert_equal 'dk', only_code.code
-      @assert_equal 1, Object.keys(only_code).length
+      @assertEqual 'dk', only_code.code
+      @assertEqual 1, Object.keys(only_code).length
       
       only_code_and_region = country.toJSON(only: ['code', 'region'])
 
-      @assert_equal 'dk', only_code.code
-      @assert_equal 'eu', country.toJSON().region
-      @assert_equal 2, Object.keys(only_code_and_region).length
+      @assertEqual 'dk', only_code.code
+      @assertEqual 'eu', country.toJSON().region
+      @assertEqual 2, Object.keys(only_code_and_region).length

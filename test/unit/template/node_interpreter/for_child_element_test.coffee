@@ -21,9 +21,9 @@ module.exports = class extends Janitor.TestCase
     new ForChildElement node_data, parent_element, context, 'users'
     
     child_elements = parent_element.childNodes
-    @assert_equal 2, child_elements.length
-    @assert_equal 'Rasmus', child_elements[0].innerHTML
-    @assert_equal 'John', child_elements[1].innerHTML
+    @assertEqual 2, child_elements.length
+    @assertEqual 'Rasmus', child_elements[0].innerHTML
+    @assertEqual 'John', child_elements[1].innerHTML
   
   'test for node with deferred push': ->
       node_data =
@@ -38,10 +38,10 @@ module.exports = class extends Janitor.TestCase
       new ForChildElement node_data, parent_element, context, 'users'
       
       child_elements = parent_element.childNodes
-      @assert_equal 2, child_elements.length
+      @assertEqual 2, child_elements.length
       context.get('users').push 'Joe'
-      @assert_equal 3, child_elements.length
-      @assert_equal 'Joe', child_elements[2].innerHTML
+      @assertEqual 3, child_elements.length
+      @assertEqual 'Joe', child_elements[2].innerHTML
   
     'test for node with deferred remove': ->
       node_data =
@@ -56,9 +56,9 @@ module.exports = class extends Janitor.TestCase
       new ForChildElement node_data, parent_element, context, 'users'
       
       child_elements = parent_element.childNodes
-      @assert_equal 2, child_elements.length
+      @assertEqual 2, child_elements.length
       context.get('users').remove 'John'
-      @assert_equal 1, child_elements.length
+      @assertEqual 1, child_elements.length
   
     'test for node with deferred reset': ->
       node_data =
@@ -72,7 +72,7 @@ module.exports = class extends Janitor.TestCase
       element = document.createElement 'ol'
       new ForChildElement node_data, element, context, 'users'
       
-      @assert_equal 2, element.childNodes.length
+      @assertEqual 2, element.childNodes.length
       context.set users: ['Oliver']
-      @assert_equal 1, element.childNodes.length
-      @assert_equal 'Oliver', element.childNodes[0].innerHTML
+      @assertEqual 1, element.childNodes.length
+      @assertEqual 'Oliver', element.childNodes[0].innerHTML

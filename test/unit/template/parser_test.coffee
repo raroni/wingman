@@ -8,24 +8,24 @@ module.exports = class extends Janitor.TestCase
   'test empty tag': ->
     tree = @parse '<div></div>'
 
-    @assert_equal 1, tree.children.length
-    @assert_equal 'div', tree.children[0].tag
-    @assert_equal 'element', tree.children[0].type
-    @assert_equal undefined, tree.children[0].value
+    @assertEqual 1, tree.children.length
+    @assertEqual 'div', tree.children[0].tag
+    @assertEqual 'element', tree.children[0].type
+    @assertEqual undefined, tree.children[0].value
     @assert !tree.children[0].is_dynamic
 
   'test empty tag with tag name containing numbers': ->
     tree = @parse '<h1></h1>'
 
-    @assert_equal 1, tree.children.length
-    @assert_equal 'h1', tree.children[0].tag
+    @assertEqual 1, tree.children.length
+    @assertEqual 'h1', tree.children[0].tag
 
   'test tag with static text': ->
     tree = @parse '<div>hi</div>'
 
-    @assert_equal 1, tree.children.length
-    @assert_equal 'div', tree.children[0].tag
-    @assert_equal 'hi', tree.children[0].value.get()
+    @assertEqual 1, tree.children.length
+    @assertEqual 'div', tree.children[0].tag
+    @assertEqual 'hi', tree.children[0].value.get()
     @assert !tree.children[0].is_dynamic
 
   'test use of newlines and tabs': ->
@@ -37,136 +37,136 @@ module.exports = class extends Janitor.TestCase
 
     tree = @parse template_source
 
-    @assert_equal 1, tree.children.length
-    @assert_equal 'div', tree.children[0].tag
-    @assert_equal 'Raz to the mouse!', tree.children[0].value.get()
+    @assertEqual 1, tree.children.length
+    @assertEqual 'div', tree.children[0].tag
+    @assertEqual 'Raz to the mouse!', tree.children[0].value.get()
     @assert !tree.children[0].is_dynamic
 
   'test multiple tags': ->
     tree = @parse '<div>one</div><span>two</span>'
 
-    @assert_equal 2, tree.children.length
+    @assertEqual 2, tree.children.length
 
     first_element = tree.children[0]
-    @assert_equal 'div', first_element.tag
-    @assert_equal 'one', first_element.value.get()
+    @assertEqual 'div', first_element.tag
+    @assertEqual 'one', first_element.value.get()
 
     last_element = tree.children[1]
-    @assert_equal 'span', last_element.tag
-    @assert_equal 'two', last_element.value.get()
+    @assertEqual 'span', last_element.tag
+    @assertEqual 'two', last_element.value.get()
   
   'test nested tags': ->
     tree = @parse '<ol><li>One</li><li>Two</li></ol>'
 
-    @assert_equal 1, tree.children.length
+    @assertEqual 1, tree.children.length
 
     first_element = tree.children[0]
-    @assert_equal 'ol', first_element.tag
+    @assertEqual 'ol', first_element.tag
 
     for value, i in ['One', 'Two']
       element = first_element.children[i]
-      @assert_equal 'li', element.tag
-      @assert_equal value, element.value.get()
+      @assertEqual 'li', element.tag
+      @assertEqual value, element.value.get()
   
   'test tag with dynamic text': ->
     tree = @parse '<div>{greeting}</div>'
 
-    @assert_equal 1, tree.children.length
-    @assert_equal 'div', tree.children[0].tag
-    @assert_equal 'greeting', tree.children[0].value.get()
+    @assertEqual 1, tree.children.length
+    @assertEqual 'div', tree.children[0].tag
+    @assertEqual 'greeting', tree.children[0].value.get()
     @assert tree.children[0].value.is_dynamic
 
   'test for token': ->
     tree = @parse '<ol>{for users}<li>{user}</li>{end}</ol>'
 
-    @assert_equal 1, tree.children.length
+    @assertEqual 1, tree.children.length
     
     ol_node = tree.children[0]
     for_node = ol_node.children[0]
-    @assert_equal 'for', for_node.type
-    @assert_equal 'users', for_node.source
+    @assertEqual 'for', for_node.type
+    @assertEqual 'users', for_node.source
     
     li_elm = for_node.children[0]
-    @assert_equal 'li', li_elm.tag
-    @assert_equal 'user', li_elm.value.get()
+    @assertEqual 'li', li_elm.tag
+    @assertEqual 'user', li_elm.value.get()
     @assert li_elm.value.is_dynamic
   
   'test element with single static style': ->
     tree = @parse '<div style="color: red">funky text</div>'
 
-    @assert_equal 1, tree.children.length
+    @assertEqual 1, tree.children.length
     @assert tree.children[0].styles
-    @assert_equal 'red', tree.children[0].styles.color.get()
+    @assertEqual 'red', tree.children[0].styles.color.get()
 
   'test element with single dynamic style': ->
     tree = @parse '<div style="color: {color}">funky text</div>'
 
-    @assert_equal 1, tree.children.length
+    @assertEqual 1, tree.children.length
     @assert tree.children[0].styles
-    @assert_equal 'color', tree.children[0].styles.color.get()
+    @assertEqual 'color', tree.children[0].styles.color.get()
     @assert tree.children[0].styles.color.is_dynamic
   
   'test element with several static styles': ->
     tree = @parse '<div style="color: blue; font-size: 14px">funky text</div>'
 
-    @assert_equal 1, tree.children.length
+    @assertEqual 1, tree.children.length
     element = tree.children[0]
     @assert element.styles
-    @assert_equal 'blue', element.styles.color.get()
-    @assert_equal '14px', element.styles['font-size'].get()
+    @assertEqual 'blue', element.styles.color.get()
+    @assertEqual '14px', element.styles['font-size'].get()
 
   'test element with static and dynamic styles': ->
     tree = @parse '<div style="color: blue; font-size: {someFontSize}">funky text</div>'
 
-    @assert_equal 1, tree.children.length
+    @assertEqual 1, tree.children.length
     styles = tree.children[0].styles
     @assert styles
-    @assert_equal 'blue', styles.color.get()
+    @assertEqual 'blue', styles.color.get()
     @assert !styles.color.is_dynamic
-    @assert_equal 'someFontSize', styles['font-size'].get()
+    @assertEqual 'someFontSize', styles['font-size'].get()
     @assert styles['font-size'].is_dynamic
   
   'test element with single static class': ->
     tree = @parse '<div class="funny_class">funky text</div>'
     classes = tree.children[0].classes
     @assert classes
-    @assert_equal 1, classes.length
-    @assert_equal 'funny_class', classes[0].get()
+    @assertEqual 1, classes.length
+    @assertEqual 'funny_class', classes[0].get()
     @assert !classes[0].is_dynamic
 
   'test element with two static classes': ->
     tree = @parse '<div class="funny_class another_funny_class">funky text</div>'
     classes = tree.children[0].classes
     @assert classes
-    @assert_equal 2, classes.length
-    @assert_equal 'funny_class', classes[0].get()
-    @assert_equal 'another_funny_class', classes[1].get()
+    @assertEqual 2, classes.length
+    @assertEqual 'funny_class', classes[0].get()
+    @assertEqual 'another_funny_class', classes[1].get()
     @assert !klass.is_dynamic for klass in classes
 
   'test element with single dynamic class': ->
     tree = @parse '<div class="{funny_class}">funky text</div>'
     classes = tree.children[0].classes
     @assert classes
-    @assert_equal 1, classes.length
-    @assert_equal 'funny_class', classes[0].get()
+    @assertEqual 1, classes.length
+    @assertEqual 'funny_class', classes[0].get()
     @assert classes[0].is_dynamic
     
   'test element with two dynamic classes': ->
     tree = @parse '<div class="{funny_class} {another_funny_class}">funky text</div>'
     classes = tree.children[0].classes
     @assert classes
-    @assert_equal 2, classes.length
-    @assert_equal 'funny_class', classes[0].get()
-    @assert_equal 'another_funny_class', classes[1].get()
+    @assertEqual 2, classes.length
+    @assertEqual 'funny_class', classes[0].get()
+    @assertEqual 'another_funny_class', classes[1].get()
     @assert klass.is_dynamic for klass in classes
 
   'test non closing tag': ->
     tree = @parse '<div><input></div><div>something else</div>'
 
     divs = tree.children
-    @assert_equal 2, divs.length
-    @assert_equal 1, divs[0].children.length
+    @assertEqual 2, divs.length
+    @assertEqual 1, divs[0].children.length
     
     input = divs[0].children[0]
-    @assert_equal 'element', input.type
-    @assert_equal 'input', input.tag
+    @assertEqual 'element', input.type
+    @assertEqual 'input', input.tag

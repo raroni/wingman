@@ -13,9 +13,9 @@ module.exports = class extends Janitor.TestCase
   refuteDOMElementHasClass: CustomAssertions.refuteDOMElementHasClass
   
   'test css property name convertion from dom to css notation': ->
-    @assert_equal 'fontSize', Element.convertCssPropertyFromDomToCssNotation 'font-size'
-    @assert_equal 'marginTop', Element.convertCssPropertyFromDomToCssNotation 'margin-top'
-    @assert_equal 'borderTopColor', Element.convertCssPropertyFromDomToCssNotation 'border-top-color'
+    @assertEqual 'fontSize', Element.convertCssPropertyFromDomToCssNotation 'font-size'
+    @assertEqual 'marginTop', Element.convertCssPropertyFromDomToCssNotation 'margin-top'
+    @assertEqual 'borderTopColor', Element.convertCssPropertyFromDomToCssNotation 'border-top-color'
 
   'test simple element': ->
     element_node =
@@ -27,7 +27,7 @@ module.exports = class extends Janitor.TestCase
     
     element = new Element element_node, scope
     @assert element.dom_element
-    @assert_equal 'DIV', element.dom_element.tagName
+    @assertEqual 'DIV', element.dom_element.tagName
   
   'test simple element in dom scope': ->
     element_node = 
@@ -39,8 +39,8 @@ module.exports = class extends Janitor.TestCase
     element = new Element element_node, scope
 
     @assert element.dom_element
-    @assert_equal 'DIV', element.dom_element.tagName
-    @assert_equal 'LI', element.dom_element.parentNode.tagName
+    @assertEqual 'DIV', element.dom_element.tagName
+    @assertEqual 'LI', element.dom_element.parentNode.tagName
   
   'test nested elements': ->
     element_node = 
@@ -56,10 +56,10 @@ module.exports = class extends Janitor.TestCase
 
     element = new Element element_node, scope
     @assert element.dom_element
-    @assert_equal 'DIV', element.dom_element.tagName
-    @assert_equal 1, element.dom_element.childNodes.length
-    @assert_equal 'SPAN', element.dom_element.childNodes[0].tagName
-    @assert_equal 'test', element.dom_element.childNodes[0].innerHTML
+    @assertEqual 'DIV', element.dom_element.tagName
+    @assertEqual 1, element.dom_element.childNodes.length
+    @assertEqual 'SPAN', element.dom_element.childNodes[0].tagName
+    @assertEqual 'test', element.dom_element.childNodes[0].innerHTML
 
   'test element with dynamic value': ->
     element_node = 
@@ -71,7 +71,7 @@ module.exports = class extends Janitor.TestCase
     context.set name: 'Rasmus'
     element = new Element element_node, [], context
 
-    @assert_equal 'Rasmus', element.dom_element.innerHTML
+    @assertEqual 'Rasmus', element.dom_element.innerHTML
   
   'test element with dynamic value and defered update': ->
     element_node = 
@@ -82,10 +82,10 @@ module.exports = class extends Janitor.TestCase
     context = new Wingman.Object
     context.set name: 'John'
     element = new Element element_node, [], context
-    @assert_equal 'John', element.dom_element.innerHTML
+    @assertEqual 'John', element.dom_element.innerHTML
     context.set name: 'Rasmus'
 
-    @assert_equal 'Rasmus', element.dom_element.innerHTML
+    @assertEqual 'Rasmus', element.dom_element.innerHTML
   
   'test element with dynamic nested value and defered update': ->
     element_node = 
@@ -98,10 +98,10 @@ module.exports = class extends Janitor.TestCase
     context = new Wingman.Object
     context.set {user}
     element = new Element element_node, [], context
-    @assert_equal 'John', element.dom_element.innerHTML
+    @assertEqual 'John', element.dom_element.innerHTML
     user.set name: 'Rasmus'
 
-    @assert_equal 'Rasmus', element.dom_element.innerHTML
+    @assertEqual 'Rasmus', element.dom_element.innerHTML
   
   'test element with single static style': ->
     element_node = 
@@ -113,7 +113,7 @@ module.exports = class extends Janitor.TestCase
     
     element = new Element element_node, []
     
-    @assert_equal 'red', element.dom_element.style.color
+    @assertEqual 'red', element.dom_element.style.color
   
   'test element with single dynamic style': ->
     element_node = 
@@ -127,7 +127,7 @@ module.exports = class extends Janitor.TestCase
     context.set color: 'red'
     element = new Element element_node, [], context
     
-    @assert_equal 'red', element.dom_element.style.color
+    @assertEqual 'red', element.dom_element.style.color
   
   'test deferred reset with element with single dynamic style': ->
     element_node = 
@@ -141,7 +141,7 @@ module.exports = class extends Janitor.TestCase
     context.set color: 'red'
     element = new Element element_node, [], context
     context.set color: 'blue'
-    @assert_equal 'blue', element.dom_element.style.color
+    @assertEqual 'blue', element.dom_element.style.color
   
   'test element with two static styles': ->
     element_node = 
@@ -154,8 +154,8 @@ module.exports = class extends Janitor.TestCase
     
     element = new Element element_node, []
     
-    @assert_equal 'red', element.dom_element.style.color
-    @assert_equal '15px', element.dom_element.style.fontSize
+    @assertEqual 'red', element.dom_element.style.color
+    @assertEqual '15px', element.dom_element.style.fontSize
 
   'test element with two dynamic styles': ->
     element_node = 
@@ -170,12 +170,12 @@ module.exports = class extends Janitor.TestCase
     context.set myColor: 'red', myFontSize: '15px'
     element = new Element element_node, [], context
 
-    @assert_equal 'red', element.dom_element.style.color
-    @assert_equal '15px', element.dom_element.style.fontSize
+    @assertEqual 'red', element.dom_element.style.color
+    @assertEqual '15px', element.dom_element.style.fontSize
 
     context.set myColor: 'blue', myFontSize: '13px'
-    @assert_equal 'blue', element.dom_element.style.color
-    @assert_equal '13px', element.dom_element.style.fontSize
+    @assertEqual 'blue', element.dom_element.style.color
+    @assertEqual '13px', element.dom_element.style.fontSize
   
   'test element with single static class': ->
     element_node =
@@ -185,7 +185,7 @@ module.exports = class extends Janitor.TestCase
       classes: [new Value('user')]
     
     element = new Element element_node, []
-    @assert_equal element.dom_element.className, 'user'
+    @assertEqual element.dom_element.className, 'user'
   
   'test element with two static classes': ->
     element_node =
@@ -222,9 +222,9 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user'
 
     element = new Element element_node, [], context
-    @assert_equal element.dom_element.className, 'user'
+    @assertEqual element.dom_element.className, 'user'
     context.set myAwesomeClass: 'something_else'
-    @assert_equal element.dom_element.className, 'something_else'
+    @assertEqual element.dom_element.className, 'something_else'
 
   'test deferred reset to falsy value with element with single dynamic class': ->
     element_node =
@@ -237,9 +237,9 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user'
 
     element = new Element element_node, [], context
-    @assert_equal element.dom_element.className, 'user'
+    @assertEqual element.dom_element.className, 'user'
     context.set myAwesomeClass: null
-    @assert_equal element.dom_element.className, ''
+    @assertEqual element.dom_element.className, ''
   
   'test element with two dynamic classes that evaluates to the same value': ->
     element_node =
@@ -255,7 +255,7 @@ module.exports = class extends Janitor.TestCase
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
 
     element = new Element element_node, [], context
-    @assert_equal element.dom_element.className, 'user'
+    @assertEqual element.dom_element.className, 'user'
 
   'test deferred reset of dynamic class that evaluates to the same value as another dynamic class': ->
     element_node =

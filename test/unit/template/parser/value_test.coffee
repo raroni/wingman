@@ -5,7 +5,7 @@ RangoObject = require '../../../../lib/wingman/object'
 module.exports = class extends Janitor.TestCase
   'test static': ->
     value = new Value 'test'
-    @assert_equal 'test', value.get()
+    @assertEqual 'test', value.get()
     @assert !value.is_dynamic
 
   'test dynamic': ->
@@ -15,5 +15,5 @@ module.exports = class extends Janitor.TestCase
     context = new RangoObject
     context.set something: 'my value'
 
-    @assert_equal 'my value', value.get(context)
-    @assert_equal 'something', value.get()
+    @assertEqual 'my value', value.get(context)
+    @assertEqual 'something', value.get()
