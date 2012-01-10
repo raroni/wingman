@@ -88,7 +88,7 @@ module.exports = class extends Module
   toJSON: ->
     json = {}
     for key, value of @
-      if @hasOwnProperty(key) || @constructor.hasOwnProperty(key)
+      if @hasOwnProperty(key)
         json[key] = @get key
     json
   
