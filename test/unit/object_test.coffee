@@ -188,3 +188,18 @@ module.exports = class extends Janitor.TestCase
       @assert_equal 'dk', country.toJSON().code
       @assert_equal 'eu', country.toJSON().region
       @assert_equal 2, Object.keys(country.toJSON()).length
+
+  'test export to JSON with only options': ->
+      country = new Wingman.Object
+      country.set code: 'dk', region: 'eu', population: 5000000
+
+      only_code = country.toJSON(only: 'code')
+
+      @assert_equal 'dk', only_code.code
+      @assert_equal 1, Object.keys(only_code).length
+      
+      only_code_and_region = country.toJSON(only: ['code', 'region'])
+
+      @assert_equal 'dk', only_code.code
+      @assert_equal 'eu', country.toJSON().region
+      @assert_equal 2, Object.keys(only_code_and_region).length

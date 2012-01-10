@@ -91,10 +91,12 @@ module.exports = class extends Module
     else
       @[property_name]
   
-  toJSON: ->
+  toJSON: (options = {}) ->
+    options.only = [options.only] if options.only && !Array.isArray options.only
+    
     json = {}
     for property_name in @setPropertyNames
-        json[property_name] = @get property_name
+      json[property_name] = @get property_name if !options.only || options.only.indexOf(property_name) != -1
     json
   
   addTriggersToArray: (property_name) ->
