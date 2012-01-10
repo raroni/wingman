@@ -5,7 +5,7 @@ sinon = require 'sinon'
 
 module.exports = class extends Janitor.TestCase
   'test host addition': ->
-    Wingman.realRequest = sinon.spy()
+    Wingman.request.realRequest = sinon.spy()
     class FunkySocks extends Wingman.App
       host: 'funkysocks.net'
     
@@ -14,4 +14,4 @@ module.exports = class extends Janitor.TestCase
     Wingman.request
       url: '/users'
     
-    @assert 'http://funkysocks.net/users', Wingman.realRequest.args[0][0].url
+    @assert 'http://funkysocks.net/users', Wingman.request.realRequest.args[0][0].url

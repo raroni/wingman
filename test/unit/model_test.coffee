@@ -20,12 +20,12 @@ module.exports = class extends Janitor.TestCase
     @assert !user.persisted()
   
   'test request parameters when saving new model': ->
-    Wingman.realRequest = sinon.spy()
+    Wingman.request.realRequest = sinon.spy()
     
     user = new User name: 'Rasmus', age: 25
     user.save()
     
-    first_argument = Wingman.realRequest.args[0][0]
+    first_argument = Wingman.request.realRequest.args[0][0]
     @assertEqual 'POST', first_argument.type
     @assertEqual '/users', first_argument.url
     @assertEqual 'Rasmus', first_argument.data.name
@@ -33,21 +33,21 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 2, Object.keys(first_argument.data).length
     
   'test request parameters when updating existing model': ->
-    Wingman.realRequest = sinon.spy()
+    Wingman.request.realRequest = sinon.spy()
     
     user = new User id: 1, name: 'Rasmus', age: 25
     user.clean()
     user.set name: 'Rasmus RN'
     user.save()
     
-    first_argument = Wingman.realRequest.args[0][0]
+    first_argument = Wingman.request.realRequest.args[0][0]
     @assertEqual 'PUT', first_argument.type
     @assertEqual "/users/#{user.get('id')}", first_argument.url
     @assertEqual 'Rasmus RN', first_argument.data.name
     @assertEqual 1, Object.keys(first_argument.data).length
 
   'test setting id after succesfully persisting to server': ->
-    Wingman.realRequest = (options) ->
+    Wingman.request.realRequest = (options) ->
       options.success id: 123
     
     user = new User name: 'Rasmus', age: 25
