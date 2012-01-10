@@ -1,8 +1,6 @@
 Wingman = require '../wingman'
 
-module.exports = class Model extends Wingman.Object
-  @host: 'test'
-  
+module.exports = class extends Wingman.Object
   constructor: (hash) ->
     @dirty_static_property_names = []
     for key, value of hash
@@ -40,9 +38,6 @@ module.exports = class Model extends Wingman.Object
     !!@get('id')
   
   saveURL: ->
-    url = []
-    host = @constructor.__super__.constructor.host
-    url.push host if host
-    url.push @get('url')
-    url.push "/#{@get('id')}" if @persisted()
-    url.join ''
+    url = @get 'url'
+    url += "/#{@get('id')}" if @persisted()
+    url
