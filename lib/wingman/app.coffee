@@ -4,6 +4,7 @@ module.exports = class
   constructor: (options) ->
     @el = options.el
     @setupControllers()
+    @ready?()
 
   setupControllers: ->
     @controllers = []

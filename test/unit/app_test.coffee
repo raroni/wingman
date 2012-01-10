@@ -16,3 +16,12 @@ module.exports = class extends Janitor.TestCase
     app = new App el: root_el
     
     @assert root_el.innerHTML.match('stubbing the source')
+
+  'test ready callback': ->
+    callback_fired = false
+    App = class extends Wingman.App
+      ready: ->
+        callback_fired = true
+        
+    app = new App el: Wingman.document.createElement('div')
+    @assert callback_fired
