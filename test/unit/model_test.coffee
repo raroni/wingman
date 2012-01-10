@@ -19,6 +19,12 @@ module.exports = class extends Janitor.TestCase
     user = new User name: 'Rasmus'
     @assert !user.persisted()
   
+  'test saveURL with app host': ->
+    Wingman.Model.host = 'http://wingmanjs.com'
+    user = new User
+    @assertEqual 'http://wingmanjs.com/users', user.saveURL()
+    delete Wingman.Model.host
+  
   'test request parameters when saving new model': ->
     Wingman.request = sinon.spy()
     
