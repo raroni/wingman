@@ -14,4 +14,4 @@ module.exports = class extends Janitor.TestCase
     Wingman.request
       url: '/users'
     
-    @assert 'http://funkysocks.net/users', Wingman.request.realRequest.args[0][0].url
+    @assertEqual 'http://funkysocks.net/users', Wingman.request.realRequest.args[0][0].url

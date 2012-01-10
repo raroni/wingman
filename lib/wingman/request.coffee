@@ -2,7 +2,7 @@ Wingman = require '../wingman'
 
 request = (args...) ->
   if Wingman.App.instance?.host?
-    args[0].url = "http://#{Wingman.App.instance.host}/#{args[0].url}"
+    args[0].url = ['http://', Wingman.App.instance.host, args[0].url].join ''
   
   request.realRequest args...
 
