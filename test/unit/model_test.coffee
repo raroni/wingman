@@ -54,5 +54,31 @@ module.exports = class extends Janitor.TestCase
     user.save()
     
     @assert 123, user.get('id')
+  
+  'test success callback': ->
+    Wingman.request.realRequest = (options) ->
+      options.success id: 1
+    
+    callback_called = false
+    
+    user = new User name: 'Rasmus', age: 25
+    user.save
+      success: ->
+        callback_called = true
 
-    # TODO: LOAD AND DESTROY
+    @assert callback_called
+    
+  'test error callback': ->
+    Wingman.request.realRequest = (options) ->
+      options.error()
+    
+    callback_called = false
+    
+    user = new User name: 'Rasmus', age: 25
+    user.save
+      error: ->
+        callback_called = true
+    
+    @assert callback_called
+
+# TODO: LOAD AND DESTROY

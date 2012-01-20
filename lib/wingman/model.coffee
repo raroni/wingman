@@ -15,12 +15,15 @@ module.exports = class extends Wingman.Object
     @dirty_static_property_names.push property_name
     super property_name, values
   
-  save: ->
+  save: (options = {}) ->
     Wingman.request
       type: @saveHTTPMethod()
       url: @saveURL()
       data: @dirtyStaticProperties()
-      success: @requestSuccess
+      error: options.error
+      success: (data) =>
+        @requestSuccess data
+        options.success?()
   
   saveHTTPMethod: ->
     if @persisted()
