@@ -1,7 +1,8 @@
 Wingman = require '../wingman'
+WingmanObject = require './shared/object'
 Fleck = require 'fleck'
 
-module.exports = class extends Wingman.Object
+module.exports = class extends WingmanObject
   @parseEvents: (events_hash) ->
     (@parseEvent(key, trigger) for key, trigger of events_hash)
   

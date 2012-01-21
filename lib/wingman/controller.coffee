@@ -1,5 +1,5 @@
-Module = require './module'
-ChildInstantiator = require './child_instantiator'
+Module = require './shared/module'
+ChildInstantiator = require './shared/child_instantiator'
 
 module.exports = class extends Module
   @include ChildInstantiator

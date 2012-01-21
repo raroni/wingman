@@ -1,8 +1,10 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
 Value = require '../../../../lib/wingman/template/parser/value'
+WingmanObject = require '../../../../lib/wingman/shared/object'
 ForChildElement = require '../../../../lib/wingman/template/node_interpreter/for_child_element'
 Wingman = require '../../../../.'
+
 
 module.exports = class extends Janitor.TestCase
   setup: ->
@@ -14,7 +16,7 @@ module.exports = class extends Janitor.TestCase
       tag: 'li'
       value: new Value('{user}')
     
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set users: ['Rasmus', 'John']
 
     parent_element = document.createElement 'ol'
@@ -31,7 +33,7 @@ module.exports = class extends Janitor.TestCase
         tag: 'li'
         value: new Value('{user}')
       
-      context = new Wingman.Object
+      context = new WingmanObject
       context.set users: ['Rasmus', 'John']
   
       parent_element = document.createElement 'ol'
@@ -49,7 +51,7 @@ module.exports = class extends Janitor.TestCase
         tag: 'li'
         value: new Value('{user}')
       
-      context = new Wingman.Object
+      context = new WingmanObject
       context.set users: ['Rasmus', 'John']
   
       parent_element = document.createElement 'ol'
@@ -66,7 +68,7 @@ module.exports = class extends Janitor.TestCase
         tag: 'li'
         value: new Value('{user}')
       
-      context = new Wingman.Object
+      context = new WingmanObject
       context.set users: ['Rasmus', 'John']
   
       element = document.createElement 'ol'

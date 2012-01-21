@@ -1,6 +1,6 @@
 Janitor = require 'janitor'
 Value = require '../../../../lib/wingman/template/parser/value'
-RangoObject = require '../../../../lib/wingman/object'
+RangoObject = require '../../../../lib/wingman/shared/object'
 
 module.exports = class extends Janitor.TestCase
   'test static': ->

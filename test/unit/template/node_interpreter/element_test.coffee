@@ -3,6 +3,7 @@ Janitor = require 'janitor'
 Value = require '../../../../lib/wingman/template/parser/value'
 Element = require '../../../../lib/wingman/template/node_interpreter/element'
 Wingman = require '../../../../.'
+WingmanObject = require '../../../../lib/wingman/shared/object'
 CustomAssertions = require '../../../custom_assertions'
 
 module.exports = class extends Janitor.TestCase
@@ -67,7 +68,7 @@ module.exports = class extends Janitor.TestCase
       tag: 'div'
       value: new Value('{name}')
 
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set name: 'Rasmus'
     element = new Element element_node, [], context
 
@@ -79,7 +80,7 @@ module.exports = class extends Janitor.TestCase
       tag: 'div'
       value: new Value('{name}')
 
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set name: 'John'
     element = new Element element_node, [], context
     @assertEqual 'John', element.dom_element.innerHTML
@@ -93,9 +94,9 @@ module.exports = class extends Janitor.TestCase
       tag: 'div'
       value: new Value('{user.name}')
 
-    user = new Wingman.Object
+    user = new WingmanObject
     user.set name: 'John'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set {user}
     element = new Element element_node, [], context
     @assertEqual 'John', element.dom_element.innerHTML
@@ -123,7 +124,7 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('{color}')
     
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set color: 'red'
     element = new Element element_node, [], context
     
@@ -137,7 +138,7 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('{color}')
     
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set color: 'red'
     element = new Element element_node, [], context
     context.set color: 'blue'
@@ -166,7 +167,7 @@ module.exports = class extends Janitor.TestCase
         color: new Value('{myColor}')
         'font-size': new Value('{myFontSize}')
     
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myColor: 'red', myFontSize: '15px'
     element = new Element element_node, [], context
 
@@ -205,7 +206,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('Something')
       classes: [new Value('{myAwesomeClass}')]
     
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user'
 
     element = new Element element_node, [], context
@@ -218,7 +219,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('Something')
       classes: [new Value('{myAwesomeClass}')]
     
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user'
 
     element = new Element element_node, [], context
@@ -233,7 +234,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('Something')
       classes: [new Value('{myAwesomeClass}')]
     
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user'
 
     element = new Element element_node, [], context
@@ -251,7 +252,7 @@ module.exports = class extends Janitor.TestCase
         new Value('{mySuperbClass}')
       ]
     
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
 
     element = new Element element_node, [], context
@@ -267,7 +268,7 @@ module.exports = class extends Janitor.TestCase
         new Value('{mySuperbClass}')
       ]
     
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
 
     element = new Element element_node, [], context

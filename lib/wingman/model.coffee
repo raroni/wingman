@@ -1,6 +1,7 @@
 Wingman = require '../wingman'
+WingmanObject = require './shared/object'
 
-module.exports = class extends Wingman.Object
+module.exports = class extends WingmanObject
   constructor: (hash) ->
     @dirty_static_property_names = []
     @set hash

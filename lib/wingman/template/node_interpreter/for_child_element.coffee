@@ -1,4 +1,4 @@
-WingmanObject = require '../../object'
+WingmanObject = require '../../shared/object'
 Fleck = require 'fleck'
 NodeInterpreter = require '../node_interpreter'
 

@@ -1,5 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../..'
+WingmanObject = require '../../lib/wingman/shared/object'
 document = require('jsdom').jsdom()
 CustomAssertions = require '../custom_assertions'
 
@@ -27,7 +28,7 @@ module.exports = class extends Janitor.TestCase
 
   'test basic template with dynamic content': ->
     template = Wingman.Template.compile '<div>{greeting}</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set greeting: 'hello'
     elements = template context
     @assertEqual 1, elements.length
@@ -35,7 +36,7 @@ module.exports = class extends Janitor.TestCase
 
   'test template with dynamic value after updating context': ->
     template = Wingman.Template.compile '<div>{greeting}</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set greeting: 'hello'
     elements = template context
     context.set greeting: 'hi'
@@ -45,9 +46,9 @@ module.exports = class extends Janitor.TestCase
 
   'test template with nested dynamic value after updating context': ->
     template = Wingman.Template.compile '<div>{user.name}</div>'
-    user = new Wingman.Object
+    user = new WingmanObject
     user.set name: 'Rasmus'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set {user}
     elements = template context
     
@@ -60,7 +61,7 @@ module.exports = class extends Janitor.TestCase
   'test for token': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set users: ['Rasmus', 'John']
     elements = template context
 
@@ -74,7 +75,7 @@ module.exports = class extends Janitor.TestCase
   'test for token with deferred push': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set users: ['Rasmus', 'John']
     elements = template context
 
@@ -88,7 +89,7 @@ module.exports = class extends Janitor.TestCase
   'test for token with deferred remove': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set users: ['Rasmus', 'John']
     elements = template context
 
@@ -101,7 +102,7 @@ module.exports = class extends Janitor.TestCase
   'test for token with deferred reset': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
 
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set users: ['Rasmus', 'John']
     elements = template context
     ol_elm = elements[0]
@@ -117,7 +118,7 @@ module.exports = class extends Janitor.TestCase
 
   'test element with single dynamic style': ->
     template = Wingman.Template.compile '<div style="color:{color}">yo</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set color: 'red'
     elements = template context
 
@@ -125,7 +126,7 @@ module.exports = class extends Janitor.TestCase
 
   'test deferred reset for element with single dynamic style': ->
     template = Wingman.Template.compile '<div style="color:{myColor}">yo</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myColor: 'red'
     elements = template context
     context.set myColor: 'blue'
@@ -133,7 +134,7 @@ module.exports = class extends Janitor.TestCase
 
   'test element with two static styles': ->
     template = Wingman.Template.compile '<div style="color:{myColor}; font-size: 15px">yo</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myColor: 'red'
     elements = template context
 
@@ -142,7 +143,7 @@ module.exports = class extends Janitor.TestCase
   
   'test element with two dynamic styles': ->
     template = Wingman.Template.compile '<div style="color:{myColor}; font-size: {myFontSize}">yo</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myColor: 'red', myFontSize: '15px'
     elements = template context
 
@@ -166,7 +167,7 @@ module.exports = class extends Janitor.TestCase
   
   'test element with single dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user'
 
     element = template(context)[0]
@@ -174,7 +175,7 @@ module.exports = class extends Janitor.TestCase
 
   'test deferred reset with element with single dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user'
 
     element = template(context)[0]
@@ -185,7 +186,7 @@ module.exports = class extends Janitor.TestCase
 
   'test deferred reset to falsy value with element with single dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user'
 
     element = template(context)[0]
@@ -196,7 +197,7 @@ module.exports = class extends Janitor.TestCase
 
   'test element with two dynamic classes that evaluates to the same value': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass} {mySuperbClass}">something</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
 
     element = template(context)[0]
@@ -204,7 +205,7 @@ module.exports = class extends Janitor.TestCase
 
   'test deferred reset of dynamic class that evaluates to the same value as another dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass} {mySuperbClass}">something</div>'
-    context = new Wingman.Object
+    context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
 
     element = template(context)[0]

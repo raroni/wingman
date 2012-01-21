@@ -1,6 +1,6 @@
 Janitor = require 'janitor'
-Module = require '../../lib/wingman/module'
-ChildInstantiator = require '../../lib/wingman/child_instantiator'
+Module = require '../../../lib/wingman/shared/module'
+ChildInstantiator = require '../../../lib/wingman/shared/child_instantiator'
 
 DummyController = class extends Module  
   @include ChildInstantiator

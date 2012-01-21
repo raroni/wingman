@@ -1,5 +1,5 @@
-Janitor = require('janitor')
-Module = require('../../lib/wingman/module')
+Janitor = require 'janitor'
+Module = require '../../../lib/wingman/shared/module'
 
 test_module =
   testMethod: ->
