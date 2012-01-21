@@ -3,7 +3,7 @@ Wingman = require '../../.'
 Wingman.document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
-  'test automatic setup': ->
+  'test automatic children instantiation': ->
     Wingman.View.template_sources = {
       'user': '<div>stubbing the source</div>'
     }

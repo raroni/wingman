@@ -6,5 +6,5 @@ exports.Object = require('./wingman/object')
 exports.Template = require('./wingman/template')
 exports.View = require('./wingman/view')
 exports.Model = require('./wingman/model')
-exports.Controller = class
+exports.Controller = require('./wingman/controller')
 exports.App = require('./wingman/app')
