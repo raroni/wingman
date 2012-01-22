@@ -1,8 +1,11 @@
 Wingman = require '../wingman'
 WingmanObject = require './shared/object'
+Elementary = require './shared/elementary'
 Fleck = require 'fleck'
 
 module.exports = class extends WingmanObject
+  @include Elementary
+  
   @parseEvents: (events_hash) ->
     (@parseEvent(key, trigger) for key, trigger of events_hash)
   
@@ -15,7 +18,7 @@ module.exports = class extends WingmanObject
     }
   
   constructor: (options) ->
-    @el = Wingman.document.createElement 'div'
+    @el = @dom_element = Wingman.document.createElement 'div'
     @template_path = options.template_path if options.template_path
     options.parent_el.appendChild @el
    
@@ -43,3 +46,11 @@ module.exports = class extends WingmanObject
         if elm == e.target
           @triggerWithCustomArguments event.trigger
           e.preventDefault()
+  
+  activate: ->
+    @is_active = true
+    @addClass 'active'
+
+  deactivate: ->
+    @is_active = false
+    @removeClass 'active'

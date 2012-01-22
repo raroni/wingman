@@ -73,14 +73,31 @@ module.exports = class extends Janitor.TestCase
       
       somethingHappenedArguments: ->
         ['a', 'b']
-
+    
     view = new ViewKlass parent_el: document.createElement('div')
     a = null
     b = null
     view.bind 'something_happened', (x,y) ->
       a = x
       b = y
-
+    
     clickElement view.el.childNodes[0]
     @assertEqual 'a', a
     @assertEqual 'b', b
+  
+  'test activate': ->
+    TestView = class MainView extends View
+      templateSource: -> '<div>test</div>'
+    
+    view = new TestView parent_el: document.createElement('div')
+    view.activate()
+    @assertEqual 'active', view.el.className
+  
+  'test deactivate': ->
+    TestView = class MainView extends View
+      templateSource: -> '<div>test</div>'
+    
+    view = new TestView parent_el: document.createElement('div')
+    view.activate()
+    view.deactivate()
+    @assertEqual '', view.el.className
