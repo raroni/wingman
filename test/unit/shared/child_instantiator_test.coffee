@@ -4,32 +4,41 @@ ChildInstantiator = require '../../../lib/wingman/shared/child_instantiator'
 
 DummyController = class extends Module
   @include ChildInstantiator
+  constructor: (@options) ->
+  deactivate: ->
+    @active = false
 
-Controller = class
-  constructor: (@view) ->
-
-DummyController.UserController = class extends Controller
-DummyController.UserView = class
-DummyController.MailController = class extends Controller
-DummyController.MailView = class
+MainController = class extends DummyController
+MainController.UserController = class extends DummyController
+MainController.UserView = class
+MainController.MailController = class extends DummyController
+MainController.MailView = class
 
 module.exports = class extends Janitor.TestCase
   setup: ->
-    @dummy_controller = new DummyController
+    @main_controller = new MainController
   
   'test find child controllers': ->
-    @child_controllers = @dummy_controller.findChildControllers()
+    @child_controllers = @main_controller.findChildControllers()
     @assertEqual 2, @child_controllers.length
-    @assertContains @child_controllers, DummyController.UserController
-    @assertContains @child_controllers, DummyController.MailController
+    @assertContains @child_controllers, MainController.UserController
+    @assertContains @child_controllers, MainController.MailController
   
   'test single controller setup': ->
-    @dummy_controller.setupController DummyController.UserController
-    @assertEqual 1, Object.keys(@dummy_controller.controllers).length
-    @assert @dummy_controller.controllers['user'].view instanceof DummyController.UserView
+    @main_controller.setupController MainController.UserController
+    @assertEqual 1, Object.keys(@main_controller.controllers).length
+    @assert @main_controller.controllers.user instanceof MainController.UserController
+    @assertEqual @main_controller, @main_controller.controllers.user.options.parent
+    @assert @main_controller.controllers.user.options.view instanceof MainController.UserView
   
   'test setup all controllers': ->
-    @dummy_controller.setupChildControllers()
-    @assertEqual 2, Object.keys(@dummy_controller.controllers).length
-    @assert @dummy_controller.controllers['mail'] instanceof DummyController.MailController
-    @assert @dummy_controller.controllers['user'] instanceof DummyController.UserController
+    @main_controller.setupChildControllers()
+    @assertEqual 2, Object.keys(@main_controller.controllers).length
+    @assert @main_controller.controllers.mail instanceof MainController.MailController
+    @assert @main_controller.controllers.user instanceof MainController.UserController
+  
+  'test deactivation of children': ->
+    @main_controller.setupChildControllers()
+    @main_controller.deactivateChildrenExcept 'user'
+    @assertEqual undefined, @main_controller.controllers.user.active
+    @assertEqual false, @main_controller.controllers['mail'].active

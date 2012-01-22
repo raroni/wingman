@@ -7,5 +7,16 @@ module.exports = class extends Module
   @include Navigator
   
   constructor: (options) ->
-    @el = options.el
+    @view = options.view
+    @parent = options.parent
     @setupChildControllers()
+  
+  activate: ->
+    @parent.deactivateChildrenExcept @name
+    @active = true
+  
+  deactivate: ->
+    @active = false
+  
+  isActive: ->
+    @active
