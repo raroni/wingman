@@ -10,6 +10,7 @@ module.exports = class extends Module
     @view = options.view
     @parent = options.parent
     @setupChildControllers()
+    @ready?()
   
   activate: ->
     @parent.deactivateChildrenExcept @name

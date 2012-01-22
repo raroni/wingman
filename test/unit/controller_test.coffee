@@ -44,3 +44,17 @@ module.exports = class extends Janitor.TestCase
     dummy_controller.controllers.user.activate()
     @assert dummy_controller.controllers.user.isActive()
     @assert !dummy_controller.controllers.mail.isActive()
+
+  'test ready callback': ->
+    callback_fired = false
+    DummyController = class extends Wingman.Controller
+      ready: ->
+        callback_fired = true
+      
+    DummyView = class extends Wingman.View
+      templateSource: -> '<div>test</div>'
+      
+    dummy_view = new DummyView parent_el: Wingman.document.createElement 'div'
+    dummy_controller = new DummyController view: dummy_view
+    
+    @assert callback_fired
