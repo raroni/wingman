@@ -20,30 +20,57 @@ module.exports = class extends Janitor.TestCase
     controller = new MainController {view}
     
     @assert root_el.innerHTML.match('stubbing the source')
+  
+  'test activation': ->
+    DummyController = class extends Wingman.Controller
+    DummyView = class extends Wingman.View
+      templateSource: -> '<div>test</div>'
     
+    dummy_view = new DummyView parent_el: Wingman.document.createElement 'div'
+    parent_controller = new DummyController view: dummy_view
+    dummy_controller = new DummyController view: dummy_view, parent: parent_controller
+    
+    dummy_controller.activate()
+    @assertEqual true, dummy_controller.is_active
+    @assertEqual true, dummy_controller.view.is_active
+  
+  'test deactivation': ->
+    DummyController = class extends Wingman.Controller
+    DummyView = class extends Wingman.View
+      templateSource: -> '<div>test</div>'
+
+    dummy_view = new DummyView parent_el: Wingman.document.createElement 'div'
+    parent_controller = new DummyController view: dummy_view
+    dummy_controller = new DummyController view: dummy_view, parent: parent_controller
+
+    dummy_controller.activate()
+    dummy_controller.deactivate()
+    @assertEqual false, dummy_controller.is_active
+    @assertEqual false, dummy_controller.view.is_active
+  
   'test activation/deactivation of siblings': ->
     DummyController = class extends Wingman.Controller
     DummyView = class extends Wingman.View
       templateSource: -> '<div>test</div>'
       
     DummyController.UserController = class extends Wingman.Controller
-    DummyController.UserView = class
+    DummyController.UserView = class extends Wingman.View
       templateSource: -> '<div>test</div>'
       
     DummyController.MailController = class extends Wingman.Controller
-    DummyController.MailView = class
+    DummyController.MailView = class extends Wingman.View
       templateSource: -> '<div>test</div>'
     
     dummy_view = new DummyView parent_el: Wingman.document.createElement 'div'
     dummy_controller = new DummyController view: dummy_view
     
     dummy_controller.controllers.mail.activate()
-    @assert dummy_controller.controllers.mail.isActive()
-    @assert !dummy_controller.controllers.user.isActive()
+    @assert dummy_controller.controllers.mail.is_active
+    @assert !dummy_controller.controllers.user.is_active
     
     dummy_controller.controllers.user.activate()
-    @assert dummy_controller.controllers.user.isActive()
-    @assert !dummy_controller.controllers.mail.isActive()
+    @assert dummy_controller.controllers.user.is_active
+    @assert !dummy_controller.controllers.mail.is_active
 
   'test ready callback': ->
     callback_fired = false

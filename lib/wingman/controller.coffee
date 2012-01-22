@@ -14,10 +14,9 @@ module.exports = class extends Module
   
   activate: ->
     @parent.deactivateChildrenExcept @name
-    @active = true
+    @is_active = true
+    @view.activate()
   
   deactivate: ->
-    @active = false
-  
-  isActive: ->
-    @active
+    @is_active = false
+    @view.deactivate()
