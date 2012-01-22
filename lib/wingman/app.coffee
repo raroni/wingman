@@ -13,7 +13,7 @@ module.exports = class extends Module
     @el = options.el
     @setupChildControllers()
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
-    @navigate('')
+    @navigate ''
     @ready?()
 
   handlePopStateChange: (e) =>
