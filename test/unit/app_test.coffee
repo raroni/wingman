@@ -1,5 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
+JSDomWindowPopStateDecorator = require '../jsdom_window_pop_state_decorator'
 
 Wingman.View.template_sources = {
   'user': '<div>stubbing the source</div>'
@@ -9,7 +10,6 @@ Wingman.View.template_sources = {
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.document = require('jsdom').jsdom()
-    JSDomWindowPopStateDecorator = require '../jsdom_window_pop_state_decorator'
     Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
     
   'test automatic children instantiation': ->
