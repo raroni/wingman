@@ -13,11 +13,6 @@ module.exports = class extends Janitor.TestCase
   assertDOMElementHasClass: CustomAssertions.assertDOMElementHasClass
   refuteDOMElementHasClass: CustomAssertions.refuteDOMElementHasClass
   
-  'test css property name convertion from dom to css notation': ->
-    @assertEqual 'fontSize', Element.convertCssPropertyFromDomToCssNotation 'font-size'
-    @assertEqual 'marginTop', Element.convertCssPropertyFromDomToCssNotation 'margin-top'
-    @assertEqual 'borderTopColor', Element.convertCssPropertyFromDomToCssNotation 'border-top-color'
-
   'test simple element': ->
     element_node =
       type: 'element'

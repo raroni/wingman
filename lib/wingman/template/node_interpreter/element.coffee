@@ -1,7 +1,8 @@
-module.exports = class
-  @convertCssPropertyFromDomToCssNotation: (property_name) ->
-    property_name.replace /(-[a-z]{1})/g, (s) ->
-      s[1].toUpperCase()
+Module = require '../../shared/module'
+Elementary = require '../../shared/elementary'
+
+module.exports = class extends Module
+  @include Elementary
   
   constructor: (@element_data, @scope, @context) ->
     # The class_cache hash is used to indicate how many times a given class is set on an element.
@@ -9,7 +10,6 @@ module.exports = class
     #
     # { 'user': 2 }
     #
-    @class_cache = {}
     @dom_element = Wingman.document.createElement @element_data.tag
     @addToScope()
     @setupStyles() if @element_data.styles
@@ -26,23 +26,6 @@ module.exports = class
     else
       @scope.push @dom_element
   
-  addClass: (class_name) ->
-    @class_cache[class_name] ||= 0
-    @class_cache[class_name]++
-    
-    if @class_cache[class_name] == 1
-      @dom_element.className = if @dom_element.className
-       @dom_element.className.split(' ').concat(class_name).join ' '
-      else
-       class_name
-  
-  removeClass: (class_name) ->
-    @class_cache[class_name]-- if @class_cache[class_name]
-    
-    if @class_cache[class_name] == 0
-      reg = new RegExp '(\\s|^)' + class_name + '(\\s|$)'
-      @dom_element.className = @dom_element.className.replace reg, ''
-  
   setupClasses: ->
     for class_name in @element_data.classes
       @observeClass class_name if class_name.is_dynamic
@@ -52,10 +35,6 @@ module.exports = class
     @context.observe class_name.get(), (new_class_name, old_class_name) =>
       @removeClass old_class_name
       @addClass new_class_name
-  
-  setStyle: (key, value) ->
-    key_css_notation = @constructor.convertCssPropertyFromDomToCssNotation key
-    @dom_element.style[key_css_notation] = value
   
   setupStyles: -> 
     for key, value of @element_data.styles
