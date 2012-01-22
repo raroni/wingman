@@ -2,7 +2,7 @@ module.exports = class
   @convertCssPropertyFromDomToCssNotation: (property_name) ->
     property_name.replace /(-[a-z]{1})/g, (s) ->
       s[1].toUpperCase()
-
+  
   constructor: (@element_data, @scope, @context) ->
     # The class_cache hash is used to indicate how many times a given class is set on an element.
     # If for instance, 'user' has been added twice it would look lice this:
@@ -14,12 +14,12 @@ module.exports = class
     @addToScope()
     @setupStyles() if @element_data.styles
     @setupClasses() if @element_data.classes
-
+  
     if @element_data.value
       @setupInnerHTML()
     else if @element_data.children
       @setupChildren()
-
+  
   addToScope: ->
     if @scope.appendChild
       @scope.appendChild @dom_element
@@ -35,14 +35,14 @@ module.exports = class
        @dom_element.className.split(' ').concat(class_name).join ' '
       else
        class_name
-
+  
   removeClass: (class_name) ->
     @class_cache[class_name]-- if @class_cache[class_name]
     
     if @class_cache[class_name] == 0
       reg = new RegExp '(\\s|^)' + class_name + '(\\s|$)'
       @dom_element.className = @dom_element.className.replace reg, ''
-
+  
   setupClasses: ->
     for class_name in @element_data.classes
       @observeClass class_name if class_name.is_dynamic
@@ -52,16 +52,16 @@ module.exports = class
     @context.observe class_name.get(), (new_class_name, old_class_name) =>
       @removeClass old_class_name
       @addClass new_class_name
-
+  
   setStyle: (key, value) ->
     key_css_notation = @constructor.convertCssPropertyFromDomToCssNotation key
     @dom_element.style[key_css_notation] = value
-
+  
   setupStyles: -> 
     for key, value of @element_data.styles
       @observeStyle key, value if value.is_dynamic
       @setStyle key, value.get @context
-
+  
   observeStyle: (key, value) ->
     @context.observe value.get(), (new_value) => @setStyle key, new_value
   
