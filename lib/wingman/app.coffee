@@ -32,5 +32,3 @@ module.exports = class extends Module
           controller.activate()
         else
           throw new Error("Controller #{controller_key} does not exist.")
-  
-  is_app: true
