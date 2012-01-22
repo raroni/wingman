@@ -1,6 +1,11 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
 
+Wingman.View.template_sources = {
+  'user': '<div>stubbing the source</div>'
+  'main': '<div>stubbing the source</div>'
+}
+
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.document = require('jsdom').jsdom()
@@ -8,10 +13,6 @@ module.exports = class extends Janitor.TestCase
     Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
     
   'test automatic children instantiation': ->
-    Wingman.View.template_sources = {
-      'user': '<div>stubbing the source</div>'
-    }
-    
     App = class extends Wingman.App
     App.UserController = class extends Wingman.Controller
     App.UserView = class extends Wingman.View
@@ -67,6 +68,22 @@ module.exports = class extends Janitor.TestCase
     app = new App el: Wingman.document.createElement('div')
     app.navigate 'user'
     @assert user_controller_activated
+
+  'test initial route': ->
+    main_controller_activated = false
+
+    App = class extends Wingman.App
+      routes:
+        '': 'main'
+
+    App.MainController = class extends Wingman.Controller
+      activate: ->
+        main_controller_activated = true
+
+    App.MainView = class extends Wingman.View
+
+    app = new App el: Wingman.document.createElement('div')
+    @assert main_controller_activated
   
   teardown: ->
     delete Wingman.App.instance

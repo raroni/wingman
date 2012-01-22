@@ -13,6 +13,7 @@ module.exports = class extends Module
     @el = options.el
     @setupChildControllers()
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
+    @navigate('')
     @ready?()
 
   handlePopStateChange: (e) =>
@@ -22,6 +23,11 @@ module.exports = class extends Module
       @checkURL()
   
   checkURL: ->
-    controller_key = @routes[Wingman.document.location]
-    controller = @controllers[controller_key]
-    controller.activate()
+    if @routes
+      controller_key = @routes[Wingman.document.location]
+      if controller_key
+        controller = @controllers[controller_key]
+        if controller
+          controller.activate()
+        else
+          throw new Error("Controller #{controller_key} does not exist.")
