@@ -1,4 +1,4 @@
-# As jsdom does not support neither window.history nor pushState, I made this decorator to enable it.
+# As jsdom does not support neither window.history nor pushState, I made this decorator to fake it.
 
 class History
   constructor: (@window) ->
