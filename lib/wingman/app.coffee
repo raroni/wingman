@@ -24,10 +24,13 @@ module.exports = class extends Module
   
   checkURL: ->
     if @routes
-      controller_key = @routes[Wingman.document.location]
+      path = Wingman.document.location.pathname.substr 1
+      controller_key = @routes[path]
       if controller_key
         controller = @controllers[controller_key]
         if controller
           controller.activate()
         else
           throw new Error("Controller #{controller_key} does not exist.")
+  
+  is_app: true

@@ -5,7 +5,7 @@ class History
   
   pushState: (obj, title, location) ->
     event = { description: 'Im just a dummy event!' }
-    @window.document.location = location
+    @window.document.location.pathname = location
     for callback in @window._popstate_callbacks
       callback event
 
