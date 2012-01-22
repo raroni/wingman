@@ -2,7 +2,7 @@ Janitor = require 'janitor'
 Module = require '../../../lib/wingman/shared/module'
 ChildInstantiator = require '../../../lib/wingman/shared/child_instantiator'
 
-DummyController = class extends Module  
+DummyController = class extends Module
   @include ChildInstantiator
 
 Controller = class
@@ -25,11 +25,11 @@ module.exports = class extends Janitor.TestCase
   
   'test single controller setup': ->
     @dummy_controller.setupController DummyController.UserController
-    @assertEqual 1, @dummy_controller.controllers.length
-    @assert @dummy_controller.controllers[0].view instanceof DummyController.UserView
+    @assertEqual 1, Object.keys(@dummy_controller.controllers).length
+    @assert @dummy_controller.controllers['user'].view instanceof DummyController.UserView
   
   'test setup all controllers': ->
     @dummy_controller.setupChildControllers()
-    @assertEqual 2, @dummy_controller.controllers.length
-    for controller_class in [DummyController.MailController, DummyController.UserController]
-      @assert @dummy_controller.controllers.some (c) -> c instanceof controller_class
+    @assertEqual 2, Object.keys(@dummy_controller.controllers).length
+    @assert @dummy_controller.controllers['mail'] instanceof DummyController.MailController
+    @assert @dummy_controller.controllers['user'] instanceof DummyController.UserController

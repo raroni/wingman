@@ -10,7 +10,7 @@ module.exports =
     view_class = @constructor[view_name]
     view = new view_class parent_el: @el, template_path: controller_class._name
     controller = new controller_class view
-    (@controllers ||= []).push controller
+    (@controllers ||= {})[controller_class._name] = controller
 
   findChildControllers: ->
     controllers = []
