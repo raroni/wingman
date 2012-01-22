@@ -13,7 +13,7 @@ module.exports = class extends Module
     @ready?()
   
   activate: ->
-    @parent.deactivateChildrenExcept @name
+    @parent.deactivateDescendantsExceptChild @name
     @is_active = true
     @view.activate()
   

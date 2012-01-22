@@ -21,6 +21,6 @@ module.exports =
         controllers.push value
     controllers
   
-  deactivateChildrenExcept: (controller_name) ->
+  deactivateDescendantsExceptChild: (controller_name) ->
     controller.deactivate() for name, controller of @controllers when name != controller_name
-    @parent?.deactivateChildrenExcept @constructor._name
+    @parent?.deactivateDescendantsExceptChild @constructor._name

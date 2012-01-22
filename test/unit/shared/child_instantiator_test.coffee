@@ -45,7 +45,7 @@ module.exports = class extends Janitor.TestCase
   'test deactivation of children': ->
     main_controller = @simpleController()
     main_controller.setupChildControllers()
-    main_controller.deactivateChildrenExcept 'user'
+    main_controller.deactivateDescendantsExceptChild 'user'
     @assertEqual undefined, main_controller.controllers.user.is_active
     @assertEqual false, main_controller.controllers.mail.is_active
   
@@ -61,6 +61,6 @@ module.exports = class extends Janitor.TestCase
     main_controller = new MainController()
     main_controller.setupChildControllers()
     
-    main_controller.controllers.logged_in.deactivateChildrenExcept 'welcome'
+    main_controller.controllers.logged_in.deactivateDescendantsExceptChild 'welcome'
     @assertEqual undefined, main_controller.controllers.logged_in.is_active
     @assertEqual false, main_controller.controllers.login.is_active
