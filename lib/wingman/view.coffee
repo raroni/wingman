@@ -19,26 +19,30 @@ module.exports = class extends WingmanObject
     }
   
   constructor: (options) ->
-    @parent = options.parent
-    @el = @dom_element = Wingman.document.createElement 'div'
-    new ObjectTree @, 'View'
-    options.parent.el.appendChild @el
-   
+    @parent = options.parent if options?.parent?
+    @el = @dom_element = options?.el || Wingman.document.createElement 'div'
+    new ObjectTree @, 'View', child_source: options?.child_source
     template = Wingman.Template.compile @templateSource()
     elements = template @
     @el.appendChild element for element in elements
     @setupEvents() if @events?
   
   pathKeys: ->
+    return [] if @parent instanceof Wingman.App
     path_keys = [@constructor._name]
     path_keys.unshift path_key for path_key in @parent.pathKeys()
     path_keys
 
   path: ->
-    @pathKeys().join '.'
+    if @parent instanceof Wingman.App
+      'root'
+    else
+      @pathKeys().join '.'
   
   templateSource: ->
-    @constructor.template_sources[@path()]
+    template_source = @constructor.template_sources[@path()]
+    throw new Error "Template '#{@path()}' not found." unless template_source
+    template_source
 
   setupEvents: ->
     @setupEvent event for event in @constructor.parseEvents(@events)

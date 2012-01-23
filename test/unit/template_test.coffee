@@ -213,3 +213,18 @@ module.exports = class extends Janitor.TestCase
     context.set mySuperbClass: 'premium'
     @assertElementHasClass element, 'user'
     @assertElementHasClass element, 'premium'
+
+  'test sub view': ->
+    template = Wingman.Template.compile '<div>Test</div>{view sunset}'
+    
+    SunsetView = class extends Wingman.View
+      templateSource: -> '<div>tester</div>'
+    
+    sunset_view = new SunsetView
+    context = new WingmanObject
+    context.set sunset: sunset_view
+
+    elements = template context
+
+    @assertEqual 2, elements.length
+    @assertEqual '<div>tester</div>', elements[1].innerHTML

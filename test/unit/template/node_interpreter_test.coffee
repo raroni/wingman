@@ -373,3 +373,18 @@ module.exports = class extends Janitor.TestCase
 
     @assertDOMElementHasClass interpreter.element, 'user'
     @assertDOMElementHasClass interpreter.element, 'premium'
+
+  'test sub view': ->
+    element_node =
+      type: 'sub_view'
+      name: 'user'
+
+    class UserView extends Wingman.View
+      templateSource: -> '<div>test</div>'
+
+    user_view = new UserView
+    context = new WingmanObject
+    context.set user: user_view
+    scope = []
+    interpreter = new NodeInterpreter element_node, scope, context
+    @assertEqual '<div>test</div>', scope[0].innerHTML

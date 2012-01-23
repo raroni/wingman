@@ -11,15 +11,17 @@ module.exports = class extends Module
   constructor: (options) ->
     throw new Error 'You cannot instantiate two Wingman apps at the same time.' if @constructor.__super__.constructor.instance
     @constructor.__super__.constructor.instance = @
-    @el = options.el
-    @setupViews()
+    
+    @el = options.el if options.el?
+    @view = options.view || @buildView()
+    
     @setupControllers()
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
     @navigate ''
     @ready?()
   
-  setupViews: ->
-    @views = new ObjectTree @, 'View', attach_to: 'tree'
+  buildView: ->
+    new @constructor.RootView parent: @, child_source: @, el: @el
     
   setupControllers: ->
     @controllers = new ObjectTree @, 'Controller', attach_to: 'tree'
@@ -31,7 +33,7 @@ module.exports = class extends Module
       @checkURL()
   
   findView: (path) ->
-    @views.get path
+    @view.get path
   
   # This method should be refactored someday. Perhaps out into new class Router?
   checkURL: ->
