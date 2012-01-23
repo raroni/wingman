@@ -6,12 +6,26 @@ module.exports =
       @setupController controller_class
 
   setupController: (controller_class) ->
+    (@controllers ||= {})[controller_class._name] = @buildController controller_class
+
+  buildController: (controller_class) ->
     view_name = Fleck.camelize(controller_class._name, true) + 'View'
     view_class = @constructor[view_name]
-    view = new view_class parent_el: (@view?.el || @el), template_path: controller_class._name
-    controller = new controller_class view: view, parent: @
-    (@controllers ||= {})[controller_class._name] = controller
+      
+    template_path_keys = [controller_class._name]
+    template_path_keys.unshift @path() if @path()
+    view = new view_class parent_el: (@view?.el || @el), template_path: template_path_keys.join('.')
+    new controller_class view: view, parent: @
 
+  pathKeys: ->
+    return [] unless @parent
+    path_keys = [@constructor._name]
+    path_keys.unshift path_key for path_key in @parent.pathKeys()
+    path_keys
+    
+  path: ->
+    @pathKeys().join '.'
+      
   findChildControllers: ->
     controllers = []
     for key, value of @constructor
