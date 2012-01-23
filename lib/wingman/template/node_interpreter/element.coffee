@@ -5,11 +5,6 @@ module.exports = class extends Module
   @include Elementary
   
   constructor: (@element_data, @scope, @context) ->
-    # The class_cache hash is used to indicate how many times a given class is set on an element.
-    # If for instance, 'user' has been added twice it would look lice this:
-    #
-    # { 'user': 2 }
-    #
     @dom_element = Wingman.document.createElement @element_data.tag
     @addToScope()
     @setupStyles() if @element_data.styles

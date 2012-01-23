@@ -1,4 +1,9 @@
 module.exports =
+  # The class_cache hash is used to indicate how many times a given class is set on an element.
+  # If for instance, 'user' has been added twice it would look lice this:
+  #
+  # { 'user': 2 }
+  #
   classCache: ->
     @class_cache ||= {}
   
