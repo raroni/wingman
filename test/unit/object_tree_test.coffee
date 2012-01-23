@@ -1,16 +1,16 @@
 Janitor = require 'janitor'
-Tree = require '../../lib/wingman/tree'
+ObjectTree = require '../../lib/wingman/object_tree'
 WingmanObject = require '../../lib/wingman/shared/object'
 
 module.exports = class extends Janitor.TestCase
   'test simple tree': ->
     DummyApp = class
       constructor: ->
-        @views = new Tree @, 'View', attach_to: 'tree'
+        @views = new ObjectTree @, 'View', attach_to: 'tree'
     
     View = class extends WingmanObject
       constructor: ->
-        new Tree @, 'View'
+        new ObjectTree @, 'View'
     
     DummyApp.UserView = class extends View
     DummyApp.HomeView = class extends View
@@ -25,11 +25,11 @@ module.exports = class extends Janitor.TestCase
   'test multi level tree': ->
     DummyApp = class
       constructor: ->
-        @views = new Tree @, 'View', attach_to: 'tree'
+        @views = new ObjectTree @, 'View', attach_to: 'tree'
     
     View = class extends WingmanObject
       constructor: ->
-        new Tree @, 'View'
+        new ObjectTree @, 'View'
     
     DummyApp.UserView = class extends View
     DummyApp.UserView.NameView = class extends View
