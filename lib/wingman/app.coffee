@@ -1,6 +1,7 @@
 Wingman = require '../wingman'
 Module = require './shared/module'
 ChildInstantiator = require './shared/child_instantiator'
+ObjectTree = require './object_tree'
 Navigator = require './shared/navigator'
 
 module.exports = class extends Module
@@ -11,10 +12,17 @@ module.exports = class extends Module
     throw new Error 'You cannot instantiate two Wingman apps at the same time.' if @constructor.__super__.constructor.instance
     @constructor.__super__.constructor.instance = @
     @el = options.el
-    @setupChildControllers()
+    @setupViews()
+    @setupControllers()
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
     @navigate ''
     @ready?()
+  
+  setupViews: ->
+    @views = new ObjectTree @, 'View', attach_to: 'tree'
+    
+  setupControllers: ->
+    @controllers = new ObjectTree @, 'Controller', attach_to: 'tree'
 
   handlePopStateChange: (e) =>
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run
@@ -22,20 +30,16 @@ module.exports = class extends Module
     else
       @checkURL()
   
+  findView: (path) ->
+    @views.get path
+  
   # This method should be refactored someday. Perhaps out into new class Router?
   checkURL: ->
     if @routes
       path = Wingman.document.location.pathname.substr 1
       controller_key = @routes[path]
       if controller_key
-        keys = controller_key.split '.'
-        scope = @
-        while key = keys.shift()
-          if keys.length != 0
-            scope = scope.controllers[key]
-          else
-            controller = scope.controllers[key]
-
+        controller = @controllers.get controller_key
         if controller
           controller.activate()
         else

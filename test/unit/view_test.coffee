@@ -18,18 +18,26 @@ module.exports = class extends Janitor.TestCase
   'test simple template': ->
     View.template_sources.simple = '<div>hello</div>'
     ViewKlass = class MainView extends View
-      template_path: 'simple'
-      
-    view = new ViewKlass parent_el: document.createElement('div')
+      @_name: 'simple'
+    
+    dummy_app =
+      pathKeys: -> []
+      el: document.createElement('div')
+    
+    view = new ViewKlass parent: dummy_app
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'hello', view.el.childNodes[0].innerHTML
-
-  'test simple template': ->
+  
+  'test simple template with dynamic values': ->
     View.template_sources.simple_with_dynamic_values = '<div>{myName}</div>'
     ViewKlass = class MainView extends View
-      template_path: 'simple_with_dynamic_values'
-
-    view = new ViewKlass parent_el: document.createElement('div')
+      @_name: 'simple_with_dynamic_values'
+  
+    dummy_app =
+      pathKeys: -> []
+      el: document.createElement('div')
+  
+    view = new ViewKlass parent: dummy_app
     view.set myName: 'Razda'
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'Razda', view.el.childNodes[0].innerHTML
@@ -52,29 +60,37 @@ module.exports = class extends Janitor.TestCase
   'test simple event': ->
     View.template_sources.test = '<div><div class="user">Johnny</div></div>'
     ViewKlass = class MainView extends View
-      template_path: 'test'
+      @_name: 'test'
       events:
         'click .user': 'user_clicked'
     
-    view = new ViewKlass parent_el: document.createElement('div')
+    dummy_app =
+      pathKeys: -> []
+      el: document.createElement('div')
+    
+    view = new ViewKlass parent: dummy_app
     clicked = false
     view.bind 'user_clicked', ->
       clicked = true
     
     clickElement view.el.childNodes[0].childNodes[0]
     @assert clicked
-
+  
   'test trigger arguments': ->
     View.template_sources.test = '<div>Something</div>'
     ViewKlass = class MainView extends View
-      template_path: 'test'
+      @_name: 'test'
       events:
         'click div': 'something_happened'
       
       somethingHappenedArguments: ->
         ['a', 'b']
     
-    view = new ViewKlass parent_el: document.createElement('div')
+    dummy_app =
+      pathKeys: -> []
+      el: document.createElement('div')
+    
+    view = new ViewKlass parent: dummy_app
     a = null
     b = null
     view.bind 'something_happened', (x,y) ->
@@ -89,7 +105,7 @@ module.exports = class extends Janitor.TestCase
     TestView = class MainView extends View
       templateSource: -> '<div>test</div>'
     
-    view = new TestView parent_el: document.createElement('div')
+    view = new TestView parent: { el: document.createElement('div') }
     view.activate()
     @assertEqual 'active', view.el.className
   
@@ -97,7 +113,7 @@ module.exports = class extends Janitor.TestCase
     TestView = class MainView extends View
       templateSource: -> '<div>test</div>'
     
-    view = new TestView parent_el: document.createElement('div')
+    view = new TestView parent: { el: document.createElement('div') }
     view.activate()
     view.deactivate()
     @assertEqual '', view.el.className

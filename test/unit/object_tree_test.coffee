@@ -9,8 +9,9 @@ module.exports = class extends Janitor.TestCase
         @views = new ObjectTree @, 'View', attach_to: 'tree'
     
     View = class extends WingmanObject
-      constructor: ->
+      constructor: (options) ->
         new ObjectTree @, 'View'
+        @parent = options.parent
     
     DummyApp.UserView = class extends View
     DummyApp.HomeView = class extends View
@@ -20,6 +21,7 @@ module.exports = class extends Janitor.TestCase
     
     @assert dummy_app.views.get('user') instanceof DummyApp.UserView
     @assert dummy_app.views.get('home') instanceof DummyApp.HomeView
+    @assertEqual dummy_app, dummy_app.views.get('home').parent
     @assert !dummy_app.views.get('blah')
     
   'test multi level tree': ->
@@ -28,12 +30,15 @@ module.exports = class extends Janitor.TestCase
         @views = new ObjectTree @, 'View', attach_to: 'tree'
     
     View = class extends WingmanObject
-      constructor: ->
+      constructor: (options) ->
         new ObjectTree @, 'View'
+        @parent = options.parent
     
     DummyApp.UserView = class extends View
     DummyApp.UserView.NameView = class extends View
     DummyApp.HomeView = class extends View
     
     dummy_app = new DummyApp
-    @assert dummy_app.views.get('user.name') instanceof DummyApp.UserView.NameView
+    name_view = dummy_app.views.get('user.name')
+    @assert name_view instanceof DummyApp.UserView.NameView
+    @assert name_view.parent instanceof DummyApp.UserView

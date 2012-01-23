@@ -1,4 +1,5 @@
 Wingman = require '../wingman'
+ObjectTree = require './object_tree'
 WingmanObject = require './shared/object'
 Elementary = require './shared/elementary'
 Fleck = require 'fleck'
@@ -18,17 +19,26 @@ module.exports = class extends WingmanObject
     }
   
   constructor: (options) ->
+    @parent = options.parent
     @el = @dom_element = Wingman.document.createElement 'div'
-    @template_path = options.template_path if options.template_path
-    options.parent_el.appendChild @el
+    new ObjectTree @, 'View'
+    options.parent.el.appendChild @el
    
     template = Wingman.Template.compile @templateSource()
     elements = template @
     @el.appendChild element for element in elements
     @setupEvents() if @events?
   
+  pathKeys: ->
+    path_keys = [@constructor._name]
+    path_keys.unshift path_key for path_key in @parent.pathKeys()
+    path_keys
+
+  path: ->
+    @pathKeys().join '.'
+  
   templateSource: ->
-    @constructor.template_sources[@template_path]
+    @constructor.template_sources[@path()]
 
   setupEvents: ->
     @setupEvent event for event in @constructor.parseEvents(@events)

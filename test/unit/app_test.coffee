@@ -7,6 +7,14 @@ Wingman.View.template_sources = {
   'main': '<div>stubbing the source</div>'
 }
 
+class ViewWithTemplateSource extends Wingman.View
+  templateSource: -> '<div>test</div>'
+
+class ControllerWithView extends Wingman.Controller
+  constructor: (options = {}) ->
+    options.view = new ViewWithTemplateSource parent: { el: Wingman.document.createElement('div') }
+    super options
+
 module.exports = class extends Janitor.TestCase
   setup: ->
     Wingman.document = require('jsdom').jsdom()
@@ -51,7 +59,7 @@ module.exports = class extends Janitor.TestCase
         
     app = new App el: Wingman.document.createElement('div')
     @assert callback_fired
-
+  
   'test simple routing': ->
     user_controller_activated = false
     
@@ -68,20 +76,20 @@ module.exports = class extends Janitor.TestCase
     app = new App el: Wingman.document.createElement('div')
     app.navigate 'user'
     @assert user_controller_activated
-
+  
   'test initial route': ->
     main_controller_activated = false
-
+  
     App = class extends Wingman.App
       routes:
         '': 'main'
-
+  
     App.MainController = class extends Wingman.Controller
       activate: ->
         main_controller_activated = true
-
+  
     App.MainView = class extends Wingman.View
-
+  
     app = new App el: Wingman.document.createElement('div')
     @assert main_controller_activated
   
@@ -91,10 +99,9 @@ module.exports = class extends Janitor.TestCase
     App = class extends Wingman.App
       routes:
         'test': 'main.sub'
-
-    App.MainController = class extends Wingman.Controller
-    App.MainView = class extends Wingman.View
-    App.MainController.SubController = class extends Wingman.Controller
+  
+    App.MainController = class extends ControllerWithView
+    App.MainController.SubController = class extends ControllerWithView
       activate: ->
         sub_controller_activated = true
     App.MainController.SubView = class extends Wingman.View
@@ -103,6 +110,24 @@ module.exports = class extends Janitor.TestCase
     app = new App el: Wingman.document.createElement('div')
     app.navigate 'test'
     @assert sub_controller_activated
+  
+  'test controller finding matching view automatically': ->
+    MyApp = class extends Wingman.App
+    MyApp.MainController = class extends Wingman.Controller
+    MyApp.MainView = class extends Wingman.View
+    
+    app = new MyApp el: Wingman.document.createElement('div')
+    @assert app.controllers.get('main').view instanceof MyApp.MainView
+    
+  'test nested controllers finding matching view automatically': ->
+    MyApp = class extends Wingman.App
+    MyApp.MainController = class extends ControllerWithView
+    MyApp.MainController.UserController = class extends Wingman.Controller
+    MyApp.MainView = class extends ViewWithTemplateSource
+    MyApp.MainView.UserView = class extends ViewWithTemplateSource
+    
+    app = new MyApp el: Wingman.document.createElement('div')
+    @assert app.controllers.get('main.user').view instanceof MyApp.MainView.UserView
     
   teardown: ->
     delete Wingman.App.instance

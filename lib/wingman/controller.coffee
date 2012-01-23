@@ -1,15 +1,21 @@
-Module = require './shared/module'
+WingmanObject = require './shared/object'
 ChildInstantiator = require './shared/child_instantiator'
+ObjectTree = require './object_tree'
 Navigator = require './shared/navigator'
 
-module.exports = class extends Module
+module.exports = class extends WingmanObject
   @include ChildInstantiator
   @include Navigator
   
   constructor: (options) ->
-    @view = options.view
-    @parent = options.parent
-    @setupChildControllers()
+    @parent = options.parent if options?.parent?
+    new ObjectTree @, 'Controller'
+    
+    @view = if options?.view?
+      options.view 
+    else
+      @findView()
+      
     @ready?()
   
   activate: ->
@@ -20,3 +26,6 @@ module.exports = class extends Module
   deactivate: ->
     @is_active = false
     @view.deactivate()
+  
+  findView: (path) ->
+    @parent.findView(path || @path())
