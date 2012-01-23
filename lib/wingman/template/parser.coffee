@@ -29,7 +29,7 @@ module.exports = class
         @scan()
   
   scan: ->
-    @scanForEndTag() || @scanForStartTag() || @scanForForToken() || @scanForEndToken() || @scanForText()
+    @scanForEndTag() || @scanForStartTag() || @scanForViewToken() || @scanForForToken() || @scanForEndToken() || @scanForText()
   
   scanForEndTag: ->
     result = @scanner.scan /<\/(.*?)>/
@@ -67,6 +67,16 @@ module.exports = class
         type: 'for'
       @current_scope.children.push new_node
       @current_scope = new_node
+    result
+    
+  scanForViewToken: ->
+    result = @scanner.scan /\{view (.*?)\}/
+    if result
+      new_node =
+        name: @scanner.getCapture(0)
+        parent: @current_scope
+        type: 'sub_view'
+      @current_scope.children.push new_node
     result
     
   scanForEndToken: ->
