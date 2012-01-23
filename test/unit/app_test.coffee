@@ -85,5 +85,24 @@ module.exports = class extends Janitor.TestCase
     app = new App el: Wingman.document.createElement('div')
     @assert main_controller_activated
   
+  'test route to nested controller': ->
+    sub_controller_activated = false
+    
+    App = class extends Wingman.App
+      routes:
+        'test': 'main.sub'
+
+    App.MainController = class extends Wingman.Controller
+    App.MainView = class extends Wingman.View
+    App.MainController.SubController = class extends Wingman.Controller
+      activate: ->
+        sub_controller_activated = true
+    App.MainController.SubView = class extends Wingman.View
+      templateSource: -> '<div>test</div>'
+    
+    app = new App el: Wingman.document.createElement('div')
+    app.navigate 'test'
+    @assert sub_controller_activated
+    
   teardown: ->
     delete Wingman.App.instance

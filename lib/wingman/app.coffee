@@ -22,12 +22,20 @@ module.exports = class extends Module
     else
       @checkURL()
   
+  # This method should be refactored someday. Perhaps out into new class Router?
   checkURL: ->
     if @routes
       path = Wingman.document.location.pathname.substr 1
       controller_key = @routes[path]
       if controller_key
-        controller = @controllers[controller_key]
+        keys = controller_key.split '.'
+        scope = @
+        while key = keys.shift()
+          if keys.length != 0
+            scope = scope.controllers[key]
+          else
+            controller = scope.controllers[key]
+
         if controller
           controller.activate()
         else
