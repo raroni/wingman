@@ -213,3 +213,18 @@ module.exports = class extends Janitor.TestCase
     
     @assertEqual 'Rasmus', context.get('user.name')
     @assertEqual 25, context.get('user.age')
+
+  'test nested set with arrays': ->
+    context = new WingmanObject
+    context.set
+      name: 'Rasmus'
+      age: 25
+      friends: [
+        { name: 'Marcus', age: 26 }
+        { name: 'John', age: 27 }
+      ]
+
+    @assertEqual 'Marcus', context.get('friends')[0].get('name')
+    @assertEqual 26, context.get('friends')[0].get('age')
+    @assertEqual 'John', context.get('friends')[1].get('name')
+    @assertEqual 27, context.get('friends')[1].get('age')

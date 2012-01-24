@@ -62,10 +62,7 @@ WingmanObject = class extends Module
     @unbind "#{type}:#{property_name}", callback
 
   setProperty: (property_name, value) ->
-    if @shouldBeConvertedToWingmanObject(value)
-      wo = new WingmanObject
-      wo.set value
-      value = wo
+    value = @convertIfNecessary value
     
     @registerPropertySet property_name
     old_value = @get property_name
@@ -76,6 +73,8 @@ WingmanObject = class extends Module
 
     parent = @
     if Array.isArray @[property_name]
+      for value, i in @[property_name]
+        @[property_name][i] = @convertIfNecessary value
       @addTriggersToArray property_name
   
   # Without this, we wouldn't be able to make an appropriate #toJSON.
@@ -105,7 +104,15 @@ WingmanObject = class extends Module
       json[property_name] = @get property_name if !options.only || options.only.indexOf(property_name) != -1
     json
   
-  shouldBeConvertedToWingmanObject: (value) ->
+  convertIfNecessary: (value) ->
+    if @convertable(value)
+      wo = new WingmanObject
+      wo.set value
+      wo
+    else
+      value
+  
+  convertable: (value) ->
     typeof(value) == 'object' &&
     value?.constructor? &&
     value.constructor.name == 'Object' &&
