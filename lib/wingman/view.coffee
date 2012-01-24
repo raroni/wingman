@@ -24,13 +24,14 @@ module.exports = class extends WingmanObject
     new ObjectTree @, 'View', child_source: options?.child_source
     template = Wingman.Template.compile @templateSource()
     elements = template @
+    @addClass @constructor._name
     @el.appendChild element for element in elements
     @setupEvents() if @events?
   
   pathKeys: ->
     return [] unless @constructor._name
     path_keys = [@constructor._name]
-    path_keys = @parent.pathKeys().concat path_keys
+    path_keys = @parent.pathKeys().concat path_keys if @parent?.pathKeys?
     path_keys
 
   path: ->

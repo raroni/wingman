@@ -27,6 +27,14 @@ module.exports = class extends Janitor.TestCase
     view = new ViewKlass parent: dummy_app
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'hello', view.el.childNodes[0].innerHTML
+    
+  'test setting dom class': ->
+    UserView = class extends View
+      @_name: 'user'
+      templateSource: -> '<div>hello</div>'
+
+    view = new UserView
+    @assertEqual 'user', view.el.className
   
   'test simple template with dynamic values': ->
     View.template_sources.simple_with_dynamic_values = '<div>{myName}</div>'
