@@ -1,7 +1,7 @@
 Module = require './module'
 Events = require './events'
 
-module.exports = class extends Module
+WingmanObject = class extends Module
   @include Events
 
   @addPropertyDependencies: (hash) ->
@@ -62,8 +62,14 @@ module.exports = class extends Module
     @unbind "#{type}:#{property_name}", callback
 
   setProperty: (property_name, value) ->
+    if @shouldBeConvertedToWingmanObject(value)
+      wo = new WingmanObject
+      wo.set value
+      value = wo
+    
     @registerPropertySet property_name
     old_value = @get property_name
+
     @[property_name] = value
     @triggerPropertyChange property_name, old_value
     @triggerPropertyChangesForDependingProperties property_name, old_value
@@ -99,6 +105,12 @@ module.exports = class extends Module
       json[property_name] = @get property_name if !options.only || options.only.indexOf(property_name) != -1
     json
   
+  shouldBeConvertedToWingmanObject: (value) ->
+    typeof(value) == 'object' &&
+    value?.constructor? &&
+    value.constructor.name == 'Object' &&
+    (!(value instanceof WingmanObject))
+  
   addTriggersToArray: (property_name) ->
     parent = @
     array = @[property_name]
@@ -111,3 +123,5 @@ module.exports = class extends Module
       if index != -1
         @splice index, 1
         parent.trigger "remove:#{property_name}", value
+
+module.exports = WingmanObject

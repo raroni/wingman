@@ -166,40 +166,50 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 1, country.get('cities').length
 
   'test observe nested array property': ->
-      country = new WingmanObject
-      country.set cities: ['London', 'Manchester']
-      user = new WingmanObject
-      user.set {country}
-  
-      result = ''
-      user.observe 'country.cities', 'add', (new_value) -> result = new_value
-      country.get('cities').push 'Liverpool'
-  
-      @assertEqual 'Liverpool', result
+    country = new WingmanObject
+    country.set cities: ['London', 'Manchester']
+    user = new WingmanObject
+    user.set {country}
+
+    result = ''
+    user.observe 'country.cities', 'add', (new_value) -> result = new_value
+    country.get('cities').push 'Liverpool'
+
+    @assertEqual 'Liverpool', result
 
   'test export to JSON': ->
-      Country = class extends WingmanObject
-        name: -> 'method properties should not be a part of toJSON'
-        otherProperty: => 'not even if you bind them like this'
-          
-      country = new Country
-      country.set code: 'dk', region: 'eu'
-      
-      @assertEqual 'dk', country.toJSON().code
-      @assertEqual 'eu', country.toJSON().region
-      @assertEqual 2, Object.keys(country.toJSON()).length
+    Country = class extends WingmanObject
+      name: -> 'method properties should not be a part of toJSON'
+      otherProperty: => 'not even if you bind them like this'
+        
+    country = new Country
+    country.set code: 'dk', region: 'eu'
+    
+    @assertEqual 'dk', country.toJSON().code
+    @assertEqual 'eu', country.toJSON().region
+    @assertEqual 2, Object.keys(country.toJSON()).length
 
   'test export to JSON with only options': ->
-      country = new WingmanObject
-      country.set code: 'dk', region: 'eu', population: 5000000
+    country = new WingmanObject
+    country.set code: 'dk', region: 'eu', population: 5000000
 
-      only_code = country.toJSON(only: 'code')
+    only_code = country.toJSON(only: 'code')
 
-      @assertEqual 'dk', only_code.code
-      @assertEqual 1, Object.keys(only_code).length
-      
-      only_code_and_region = country.toJSON(only: ['code', 'region'])
+    @assertEqual 'dk', only_code.code
+    @assertEqual 1, Object.keys(only_code).length
+    
+    only_code_and_region = country.toJSON(only: ['code', 'region'])
 
-      @assertEqual 'dk', only_code.code
-      @assertEqual 'eu', country.toJSON().region
-      @assertEqual 2, Object.keys(only_code_and_region).length
+    @assertEqual 'dk', only_code.code
+    @assertEqual 'eu', country.toJSON().region
+    @assertEqual 2, Object.keys(only_code_and_region).length
+  
+  'test nested set': ->
+    context = new WingmanObject
+    context.set
+      user:
+        name: 'Rasmus'
+        age: 25
+    
+    @assertEqual 'Rasmus', context.get('user.name')
+    @assertEqual 25, context.get('user.age')
