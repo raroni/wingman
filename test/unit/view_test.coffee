@@ -117,3 +117,15 @@ module.exports = class extends Janitor.TestCase
     view.activate()
     view.deactivate()
     @assertEqual '', view.el.className
+
+  'test path of deeply nested view': ->
+    ViewWithTemplateSource = class extends View
+      templateSource: -> '<div>test</div>'
+    
+    MainView = class extends ViewWithTemplateSource
+    MainView.UserView = class extends ViewWithTemplateSource
+    MainView.UserView.NameView = class extends ViewWithTemplateSource
+    MainView.UserView.NameView.FirstView = class extends ViewWithTemplateSource
+    
+    view = new MainView parent: { el: document.createElement('div') }
+    @assertEqual 'user.name.first', view.get('user.name.first').path()

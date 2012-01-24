@@ -3,11 +3,11 @@ Wingman = require '../../wingman'
 
 module.exports =
   pathKeys: ->
-    return [] unless @parent?.pathKeys?
+    return [] unless @constructor._name
     path_keys = [@constructor._name]
-    path_keys.unshift path_key for path_key in @parent.pathKeys()
+    path_keys = @parent.pathKeys().concat path_keys
     path_keys
-    
+
   path: ->
     @pathKeys().join '.'
   
