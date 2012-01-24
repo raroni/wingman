@@ -28,7 +28,7 @@ module.exports = class extends Module
 
   handlePopStateChange: (e) =>
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run
-      @first_run = true
+      @_first_run = true
     else
       @checkURL()
   
