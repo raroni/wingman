@@ -28,19 +28,6 @@ module.exports = class extends Janitor.TestCase
     MainController.LoginController = class extends ControllerWithView
     new MainController
   
-  'test deactivation of children': ->
-    main_controller = @simpleController()
-    main_controller.deactivateDescendantsExceptChild 'user'
-    @assertEqual undefined, main_controller.get('user').is_active
-    @assertEqual false, main_controller.get('mail').is_active
-  
-  'test nested deactivation of children': ->
-    main_controller = @nestedController()
-    
-    main_controller.get('logged_in').deactivateDescendantsExceptChild 'welcome'
-    @assertEqual undefined, main_controller.get('logged_in').is_active
-    @assertEqual false, main_controller.get('login').is_active
-  
   'test nested path': ->
     main_controller = @nestedController()
     welcome_controller = main_controller.get('logged_in.welcome')

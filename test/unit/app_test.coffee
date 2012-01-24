@@ -69,61 +69,56 @@ module.exports = class extends Janitor.TestCase
     @assert callback_fired
   
   'test simple routing': ->
-    user_controller_activated = false
-    
     App = class extends Wingman.App
+      one_child_at_a_time: true
       routes:
         'user': 'user'
     
     App.UserController = class extends Wingman.Controller
-      activate: ->
-        user_controller_activated = true
+    App.UserView = class extends ViewWithTemplateSource
+    App.MailController = class extends Wingman.Controller
+    App.MailView = class extends ViewWithTemplateSource
+    App.RootView = class extends ViewWithTemplateSource
     
-    App.UserView = class extends Wingman.View
-    
-    root_view = new ViewWithTemplateSource
-    app = new App view: root_view
+    app = new App el: Wingman.document.createElement('div')
     app.navigate 'user'
-    @assert user_controller_activated
+    
+    @assert app.controllers.get('user').is_active
+    @assertEqual false, app.controllers.get('mail').is_active
   
   'test initial route': ->
-    main_controller_activated = false
-    
     App = class extends Wingman.App
+      one_child_at_a_time: true
       routes:
         '': 'main'
     
     App.MainController = class extends Wingman.Controller
-      activate: ->
-        main_controller_activated = true
-    
-    App.MainView = class extends Wingman.View
+    App.MainView = class extends ViewWithTemplateSource
+    App.RootView = class extends ViewWithTemplateSource
   
-    root_view = new ViewWithTemplateSource
-    app = new App view: root_view
-    @assert main_controller_activated
+    app = new App el: Wingman.document.createElement('div')
+    @assert app.controllers.get('main').is_active
   
   'test route to nested controller': ->
-    sub_controller_activated = false
-    
     App = class extends Wingman.App
+      one_child_at_a_time: true
       routes:
         'test': 'main.sub'
   
     App.MainController = class extends ControllerWithView
+      one_child_at_a_time: true
     App.MainController.SubController = class extends ControllerWithView
-      activate: ->
-        sub_controller_activated = true
     App.MainController.SubView = class extends Wingman.View
       templateSource: -> '<div>test</div>'
     
     root_view = new ViewWithTemplateSource
     app = new App view: root_view
     app.navigate 'test'
-    @assert sub_controller_activated
+    @assert app.controllers.get('main.sub').is_active
   
   'test controller finding matching view automatically': ->
     MyApp = class extends Wingman.App
+      @one_child_at_a_time: true
     MyApp.RootView = class extends Wingman.View
       templateSource: -> '{view main}'
     MyApp.MainController = class extends Wingman.Controller

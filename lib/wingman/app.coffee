@@ -39,10 +39,16 @@ module.exports = class extends Module
   checkURL: ->
     if @routes
       path = Wingman.document.location.pathname.substr 1
-      controller_key = @routes[path]
-      if controller_key
-        controller = @controllers.get controller_key
-        if controller
-          controller.activate()
-        else
-          throw new Error("Controller #{controller_key} does not exist.")
+      chain = @routes[path]
+      if chain
+        chain_parts = chain.split '.'
+        child_key = chain_parts[0]
+        child = @controllers.get child_key
+        if @one_child_at_a_time
+          child.activate()
+          # This is UGLY and should be refactored!
+          for name, controller of @controllers
+            if controller instanceof Wingman.Controller && controller != child && name != 'parent'
+              controller.deactivate()
+          # #######################################
+        child.activateDescendant chain_parts.slice(1).join('.') unless chain_parts.length == 1

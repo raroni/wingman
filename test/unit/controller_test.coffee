@@ -44,6 +44,7 @@ module.exports = class extends Janitor.TestCase
   
   'test activation/deactivation of siblings': ->
     MainController = class extends ControllerWithView
+      one_child_at_a_time: true
     MainController.UserController = class extends ControllerWithView
     MainController.MailController = class extends ControllerWithView
     
@@ -51,11 +52,11 @@ module.exports = class extends Janitor.TestCase
       deactivateDescendantsExceptChild: ->
     dummy_controller = new MainController parent: dummy_app
     
-    dummy_controller.get('mail').activate()
+    dummy_controller.activateDescendant 'mail'
     @assert dummy_controller.get('mail').is_active
     @assert !dummy_controller.get('user').is_active
     
-    dummy_controller.get('user').activate()
+    dummy_controller.activateDescendant 'user'
     @assert dummy_controller.get('user').is_active
     @assert !dummy_controller.get('mail').is_active
   
@@ -72,3 +73,24 @@ module.exports = class extends Janitor.TestCase
     dummy_controller = new DummyController view: dummy_view
     
     @assert callback_fired
+  
+  'test deactivation with deeply nested controllers': ->
+    MainController = class extends ControllerWithView
+      one_child_at_a_time: true
+    MainController.LoginController = class extends ControllerWithView
+    MainController.LoggedInController = class extends ControllerWithView
+    MainController.LoggedInController.StatusController = class extends ControllerWithView
+    MainController.LoggedInController.MainController = class extends ControllerWithView
+      one_child_at_a_time: true
+    MainController.LoggedInController.MainController.OverviewController = class extends ControllerWithView
+    MainController.LoggedInController.MainController.MailController = class extends ControllerWithView
+    
+    controller = new MainController
+    controller.activateDescendant('logged_in.main.overview')
+    
+    @assert controller.get('logged_in.main.overview').is_active
+    @assert !controller.get('logged_in.main.mail').is_active
+    @assertEqual undefined, controller.get('logged_in.main').is_active
+    @assertEqual undefined, controller.get('logged_in.status').is_active
+    @assert controller.get('logged_in').is_active
+    @assert !controller.get('login').is_active
