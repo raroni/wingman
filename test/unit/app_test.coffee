@@ -91,13 +91,17 @@ module.exports = class extends Janitor.TestCase
       one_child_at_a_time: true
       routes:
         '': 'main'
+        'user': 'user'
     
     App.MainController = class extends Wingman.Controller
-    App.MainView = class extends ViewWithTemplateSource
+    App.UserController = class extends Wingman.Controller
     App.RootView = class extends ViewWithTemplateSource
-  
+    App.MainView = class extends ViewWithTemplateSource
+    App.UserView = class extends ViewWithTemplateSource
+    
+    Wingman.window.document.location.pathname = '/user'
     app = new App el: Wingman.document.createElement('div')
-    @assert app.controllers.get('main').is_active
+    @assert app.controllers.get('user').is_active
   
   'test route to nested controller': ->
     App = class extends Wingman.App

@@ -17,7 +17,7 @@ module.exports = class extends Module
     
     @setupControllers()
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
-    @navigate ''
+    @checkURL()
     @ready?()
   
   buildView: ->
