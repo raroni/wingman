@@ -16,10 +16,7 @@ module.exports = class extends Module
       @setupChildren()
   
   addToScope: ->
-    if @scope.appendChild
-      @scope.appendChild @dom_element
-    else
-      @scope.push @dom_element
+    @scope.appendChild @dom_element
   
   setupClasses: ->
     for class_name in @element_data.classes

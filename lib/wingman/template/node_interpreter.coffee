@@ -14,10 +14,7 @@ module.exports = class
   interpretSubView: ->
     view = @context.get @node_data.name
     element = view.el
-    if @scope.appendChild
-      @scope.appendChild element
-    else
-      @scope.push element
+    @scope.appendChild element
   
   interpretElement: ->
     e = new Element @node_data, @scope, @context

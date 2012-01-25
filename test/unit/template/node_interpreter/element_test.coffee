@@ -1,14 +1,14 @@
-document = require('jsdom').jsdom()
 Janitor = require 'janitor'
 Value = require '../../../../lib/wingman/template/parser/value'
 Element = require '../../../../lib/wingman/template/node_interpreter/element'
 Wingman = require '../../../../.'
 WingmanObject = require '../../../../lib/wingman/shared/object'
 CustomAssertions = require '../../../custom_assertions'
+Wingman.document = require('jsdom').jsdom()
 
 module.exports = class extends Janitor.TestCase
   setup: ->
-    Wingman.document = document
+    @parent = Wingman.document.createElement 'div'
   
   assertDOMElementHasClass: CustomAssertions.assertDOMElementHasClass
   refuteDOMElementHasClass: CustomAssertions.refuteDOMElementHasClass
@@ -19,24 +19,10 @@ module.exports = class extends Janitor.TestCase
       tag: 'div'
       value: new Value('test')
     
-    scope = []
-    
-    element = new Element element_node, scope
+    element = new Element element_node, @parent
     @assert element.dom_element
     @assertEqual 'DIV', element.dom_element.tagName
-  
-  'test simple element in dom scope': ->
-    element_node = 
-      type: 'element'
-      tag: 'div'
-      value: new Value('test')
-
-    scope = document.createElement 'li'
-    element = new Element element_node, scope
-
-    @assert element.dom_element
-    @assertEqual 'DIV', element.dom_element.tagName
-    @assertEqual 'LI', element.dom_element.parentNode.tagName
+    @assertEqual @parent, element.dom_element.parentNode
   
   'test nested elements': ->
     element_node = 
@@ -47,26 +33,24 @@ module.exports = class extends Janitor.TestCase
         tag: 'span'
         value: new Value('test')
       ]
-
-    scope = []
-
-    element = new Element element_node, scope
+  
+    element = new Element element_node, @parent
     @assert element.dom_element
     @assertEqual 'DIV', element.dom_element.tagName
     @assertEqual 1, element.dom_element.childNodes.length
     @assertEqual 'SPAN', element.dom_element.childNodes[0].tagName
     @assertEqual 'test', element.dom_element.childNodes[0].innerHTML
-
+  
   'test element with dynamic value': ->
     element_node = 
       type: 'element'
       tag: 'div'
       value: new Value('{name}')
-
+  
     context = new WingmanObject
     context.set name: 'Rasmus'
-    element = new Element element_node, [], context
-
+    element = new Element element_node, @parent, context
+  
     @assertEqual 'Rasmus', element.dom_element.innerHTML
   
   'test element with dynamic value and defered update': ->
@@ -74,13 +58,13 @@ module.exports = class extends Janitor.TestCase
       type: 'element'
       tag: 'div'
       value: new Value('{name}')
-
+  
     context = new WingmanObject
     context.set name: 'John'
-    element = new Element element_node, [], context
+    element = new Element element_node, @parent, context
     @assertEqual 'John', element.dom_element.innerHTML
     context.set name: 'Rasmus'
-
+  
     @assertEqual 'Rasmus', element.dom_element.innerHTML
   
   'test element with dynamic nested value and defered update': ->
@@ -88,15 +72,15 @@ module.exports = class extends Janitor.TestCase
       type: 'element'
       tag: 'div'
       value: new Value('{user.name}')
-
+  
     user = new WingmanObject
     user.set name: 'John'
     context = new WingmanObject
     context.set {user}
-    element = new Element element_node, [], context
+    element = new Element element_node, @parent, context
     @assertEqual 'John', element.dom_element.innerHTML
     user.set name: 'Rasmus'
-
+  
     @assertEqual 'Rasmus', element.dom_element.innerHTML
   
   'test element with single static style': ->
@@ -107,7 +91,7 @@ module.exports = class extends Janitor.TestCase
       styles:
         color: new Value('red')
     
-    element = new Element element_node, []
+    element = new Element element_node, @parent
     
     @assertEqual 'red', element.dom_element.style.color
   
@@ -121,7 +105,7 @@ module.exports = class extends Janitor.TestCase
     
     context = new WingmanObject
     context.set color: 'red'
-    element = new Element element_node, [], context
+    element = new Element element_node, @parent, context
     
     @assertEqual 'red', element.dom_element.style.color
   
@@ -135,7 +119,7 @@ module.exports = class extends Janitor.TestCase
     
     context = new WingmanObject
     context.set color: 'red'
-    element = new Element element_node, [], context
+    element = new Element element_node, @parent, context
     context.set color: 'blue'
     @assertEqual 'blue', element.dom_element.style.color
   
@@ -148,11 +132,11 @@ module.exports = class extends Janitor.TestCase
         color: new Value('red')
         'font-size': new Value('15px')
     
-    element = new Element element_node, []
+    element = new Element element_node, @parent
     
     @assertEqual 'red', element.dom_element.style.color
     @assertEqual '15px', element.dom_element.style.fontSize
-
+  
   'test element with two dynamic styles': ->
     element_node = 
       type: 'element'
@@ -164,11 +148,11 @@ module.exports = class extends Janitor.TestCase
     
     context = new WingmanObject
     context.set myColor: 'red', myFontSize: '15px'
-    element = new Element element_node, [], context
-
+    element = new Element element_node, @parent, context
+  
     @assertEqual 'red', element.dom_element.style.color
     @assertEqual '15px', element.dom_element.style.fontSize
-
+  
     context.set myColor: 'blue', myFontSize: '13px'
     @assertEqual 'blue', element.dom_element.style.color
     @assertEqual '13px', element.dom_element.style.fontSize
@@ -180,7 +164,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('Something')
       classes: [new Value('user')]
     
-    element = new Element element_node, []
+    element = new Element element_node, @parent
     @assertEqual element.dom_element.className, 'user'
   
   'test element with two static classes': ->
@@ -190,7 +174,7 @@ module.exports = class extends Janitor.TestCase
       value: new Value('Something')
       classes: [new Value('user'), new Value('premium')]
     
-    element = new Element element_node, []
+    element = new Element element_node, @parent
     @assertDOMElementHasClass element.dom_element, 'user'
     @assertDOMElementHasClass element.dom_element, 'premium'
   
@@ -203,8 +187,8 @@ module.exports = class extends Janitor.TestCase
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
-
-    element = new Element element_node, [], context
+  
+    element = new Element element_node, @parent, context
     @assertDOMElementHasClass element.dom_element, 'user'
   
   'test deferred reset with element with single dynamic class': ->
@@ -216,12 +200,12 @@ module.exports = class extends Janitor.TestCase
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
-
-    element = new Element element_node, [], context
+  
+    element = new Element element_node, @parent, context
     @assertEqual element.dom_element.className, 'user'
     context.set myAwesomeClass: 'something_else'
     @assertEqual element.dom_element.className, 'something_else'
-
+  
   'test deferred reset to falsy value with element with single dynamic class': ->
     element_node =
       type: 'element'
@@ -231,8 +215,8 @@ module.exports = class extends Janitor.TestCase
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
-
-    element = new Element element_node, [], context
+  
+    element = new Element element_node, @parent, context
     @assertEqual element.dom_element.className, 'user'
     context.set myAwesomeClass: null
     @assertEqual element.dom_element.className, ''
@@ -249,10 +233,10 @@ module.exports = class extends Janitor.TestCase
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
-
-    element = new Element element_node, [], context
+  
+    element = new Element element_node, @parent, context
     @assertEqual element.dom_element.className, 'user'
-
+  
   'test deferred reset of dynamic class that evaluates to the same value as another dynamic class': ->
     element_node =
       type: 'element'
@@ -265,9 +249,9 @@ module.exports = class extends Janitor.TestCase
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
-
-    element = new Element element_node, [], context
+    
+    element = new Element element_node, @parent, context
     context.set myAwesomeClass: 'premium'
-
+    
     @assertDOMElementHasClass element.dom_element, 'user'
     @assertDOMElementHasClass element.dom_element, 'premium'
