@@ -5,6 +5,9 @@ document = require('jsdom').jsdom(null, null, features: {
         QuerySelector : true
       })
 
+ViewWithTemplateSource = class extends View
+  templateSource: -> '<div>test</div>'
+
 clickElement = (elm) ->
   event = document.createEvent "MouseEvents"
   event.initMouseEvent "click", true, true
@@ -127,9 +130,6 @@ module.exports = class extends Janitor.TestCase
     @assertEqual '', view.el.className
 
   'test path of deeply nested view': ->
-    ViewWithTemplateSource = class extends View
-      templateSource: -> '<div>test</div>'
-    
     MainView = class extends ViewWithTemplateSource
     MainView.UserView = class extends ViewWithTemplateSource
     MainView.UserView.NameView = class extends ViewWithTemplateSource
@@ -137,3 +137,18 @@ module.exports = class extends Janitor.TestCase
     
     view = new MainView parent: { el: document.createElement('div') }
     @assertEqual 'user.name.first', view.get('user.name.first').path()
+  
+  'test show/hide via isActive': ->
+    LoggedInView = class extends ViewWithTemplateSource
+      @addPropertyDependencies
+        isActive: ['logged_in']
+      
+      isActive: ->
+        @get 'logged_in'
+    
+    view = new LoggedInView
+    @assertEqual 'none', view.el.style.display
+    view.set logged_in: true
+    @assertEqual '', view.el.style.display
+    view.set logged_in: false
+    @assertEqual 'none', view.el.style.display

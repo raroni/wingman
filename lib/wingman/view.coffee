@@ -27,6 +27,7 @@ module.exports = class extends WingmanObject
     template @el, @
     @addClass @constructor._name
     @setupEvents() if @events?
+    @setupActiveListener()
   
   templateSource: ->
     template_source = @constructor.template_sources[@path()]
@@ -49,6 +50,16 @@ module.exports = class extends WingmanObject
         if elm == e.target
           @triggerWithCustomArguments event.trigger
           e.preventDefault()
+  
+  setupActiveListener: ->
+    @observe 'isActive', @checkIsActive
+    @checkIsActive()
+  
+  checkIsActive: =>
+    if @get 'isActive'
+      @setStyle 'display', ''
+    else
+      @setStyle 'display', 'none'
   
   activate: ->
     @is_active = true
