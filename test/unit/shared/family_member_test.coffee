@@ -1,6 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../../../lib/wingman'
-ChildInstantiator = require '../../../lib/wingman/shared/child_instantiator'
+FamilyMember = require '../../../lib/wingman/shared/family_member'
 ObjectTree = require '../../../lib/wingman/object_tree'
 
 dummy_app =

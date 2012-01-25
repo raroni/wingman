@@ -1,11 +1,11 @@
 Wingman = require '../wingman'
 Module = require './shared/module'
-ChildInstantiator = require './shared/child_instantiator'
+FamilyMember = require './shared/family_member'
 ObjectTree = require './object_tree'
 Navigator = require './shared/navigator'
 
 module.exports = class extends Module
-  @include ChildInstantiator
+  @include FamilyMember
   @include Navigator
   
   constructor: (options) ->
