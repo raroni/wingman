@@ -2,10 +2,12 @@ Wingman = require '../wingman'
 ObjectTree = require './object_tree'
 WingmanObject = require './shared/object'
 Elementary = require './shared/elementary'
+FamilyMember = require './shared/family_member'
 Fleck = require 'fleck'
 
 module.exports = class extends WingmanObject
   @include Elementary
+  @include FamilyMember
   
   @parseEvents: (events_hash) ->
     (@parseEvent(key, trigger) for key, trigger of events_hash)
@@ -27,18 +29,6 @@ module.exports = class extends WingmanObject
     @addClass @constructor._name
     @el.appendChild element for element in elements
     @setupEvents() if @events?
-  
-  pathKeys: ->
-    return [] unless @constructor._name
-    path_keys = [@constructor._name]
-    path_keys = @parent.pathKeys().concat path_keys if @parent?.pathKeys?
-    path_keys
-
-  path: ->
-    if @parent instanceof Wingman.App
-      'root'
-    else
-      @pathKeys().join '.'
   
   templateSource: ->
     template_source = @constructor.template_sources[@path()]
