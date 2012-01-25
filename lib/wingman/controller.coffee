@@ -1,7 +1,6 @@
 WingmanObject = require './shared/object'
 Wingman = require '../wingman'
 FamilyMember = require './shared/family_member'
-ObjectTree = require './object_tree'
 Navigator = require './shared/navigator'
 
 module.exports = class extends WingmanObject
@@ -10,7 +9,7 @@ module.exports = class extends WingmanObject
   
   constructor: (options) ->
     @parent = options.parent if options?.parent?
-    new ObjectTree @, 'Controller', child_source: options?.child_source
+    @createChildren 'Controller', child_source: options?.child_source
     @view = options?.view || @findView()
     @ready?()
   

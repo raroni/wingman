@@ -13,3 +13,18 @@ module.exports =
       'root'
     else
       @pathKeys().join '.'
+  
+  createChildren: (type, options) ->
+    for child_klass in @childClasses(type, options)
+      object = new child_klass parent: @
+      @setProperty child_klass._name, object
+    
+  childClasses: (type, options) ->
+    classes = []
+    source = options?.child_source || @
+    for key, value of source.constructor
+      match = key.match "(.*)#{type}$"
+      if match && value != @constructor
+        value._name = Fleck.underscore match[1]
+        classes.push value
+    classes

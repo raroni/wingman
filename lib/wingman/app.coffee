@@ -1,7 +1,6 @@
 Wingman = require '../wingman'
 Module = require './shared/module'
 FamilyMember = require './shared/family_member'
-ObjectTree = require './object_tree'
 Navigator = require './shared/navigator'
 
 module.exports = class extends Module
@@ -25,7 +24,6 @@ module.exports = class extends Module
     
   setupController: ->
     @controller = new @constructor.RootController parent: @, child_source: @
-#    @controller = new RootControllerObjectTree @, 'Controller', attach_to: 'tree'
 
   handlePopStateChange: (e) =>
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run

@@ -1,5 +1,4 @@
 Wingman = require '../wingman'
-ObjectTree = require './object_tree'
 WingmanObject = require './shared/object'
 Elementary = require './shared/elementary'
 FamilyMember = require './shared/family_member'
@@ -23,7 +22,7 @@ module.exports = class extends WingmanObject
   constructor: (options) ->
     @parent = options.parent if options?.parent?
     @el = @dom_element = options?.el || Wingman.document.createElement 'div'
-    new ObjectTree @, 'View', child_source: options?.child_source
+    @createChildren 'View', child_source: options?.child_source
     template = Wingman.Template.compile @templateSource()
     elements = template @
     @addClass @constructor._name

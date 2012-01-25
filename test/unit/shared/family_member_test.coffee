@@ -1,35 +1,49 @@
 Janitor = require 'janitor'
-Wingman = require '../../../lib/wingman'
+WingmanObject = require '../../../lib/wingman/shared/object'
 FamilyMember = require '../../../lib/wingman/shared/family_member'
-ObjectTree = require '../../../lib/wingman/object_tree'
 
-dummy_app =
-  deactivateDescendantsExceptChild: ->
+class DummyController extends WingmanObject
+  @include FamilyMember
+  
+  constructor: (options) ->
+    @parent = options.parent
+    @createChildren 'Controller', child_source: options?.child_source
 
-class DummyView extends Wingman.View
-  templateSource: -> '<div>test</div>'
+SimpleController = class extends DummyController
+SimpleController.UserController = class extends DummyController
+SimpleController.MailController = class extends DummyController
 
-class ControllerWithView extends Wingman.Controller
-  constructor: (options = {}) ->
-    options.view = new DummyView parent: { el: Wingman.document.createElement('div') }
-    super options
+NestedController = class extends DummyController
+NestedController.LoggedInController = class extends DummyController
+NestedController.LoggedInController.WelcomeController = class extends DummyController
+NestedController.LoginController = class extends DummyController
 
 module.exports = class extends Janitor.TestCase
-  simpleController: ->
-    MainController = class extends ControllerWithView
-    MainController.UserController = class extends ControllerWithView
-    MainController.MailController = class extends ControllerWithView
-    new MainController
+  'test simple child instantiation': ->
+    controller = new SimpleController parent: {}
+    @assert controller.get('user') instanceof SimpleController.UserController
+    @assert controller.get('mail') instanceof SimpleController.MailController
   
-  nestedController: ->
-    MainController = class extends ControllerWithView
-    MainController.LoggedInController = class extends ControllerWithView
-    MainController.LoggedInController.WelcomeController = class extends ControllerWithView
-    MainController.LoginController = class extends ControllerWithView
-    new MainController
+  'test nested child instantiation': ->
+    controller = new NestedController parent: {}
+    @assert controller.get('logged_in') instanceof NestedController.LoggedInController
+    @assert controller.get('login') instanceof NestedController.LoginController
+    @assert controller.get('logged_in.welcome') instanceof NestedController.LoggedInController.WelcomeController
   
   'test nested path': ->
-    main_controller = @nestedController()
-    welcome_controller = main_controller.get('logged_in.welcome')
+    controller = new NestedController parent: {}
+    welcome_controller = controller.get('logged_in.welcome')
     @assertEqual 'logged_in.welcome', welcome_controller.path()
-  
+
+  'test child source': ->
+    DummyApp = class
+    DummyApp.UserController = class extends DummyController
+    DummyApp.MainController = class extends DummyController
+    DummyApp.RootController = class extends DummyController
+    
+    app = new DummyApp
+    controller = new DummyApp.RootController parent: app, child_source: app
+    
+    @assert controller.get('user') instanceof DummyApp.UserController
+    @assert controller.get('main') instanceof DummyApp.MainController
+    @assertEqual undefined, controller.get('root')
