@@ -21,7 +21,7 @@ module.exports = class extends Module
   
   buildView: ->
     new @constructor.RootView parent: @, child_source: @, el: @el
-    
+  
   setupController: ->
     @controller = new @constructor.RootController parent: @, child_source: @
 

@@ -1,17 +1,15 @@
 module.exports = class
   @compile = (source) ->
     template = new @ source
-    (context) ->
-      template.evaluate context
+    (el, context) ->
+      template.evaluate el, context
   
   constructor: (source) ->
     @tree = Parser.parse source
 
-  evaluate: (context) ->
-    @elements = []
+  evaluate: (el, context) ->
     for node_data in @tree.children
-      new NodeInterpreter node_data, @elements, context
-    @elements
+      new NodeInterpreter node_data, el, context
 
 Parser = require './template/parser'
 NodeInterpreter = require './template/node_interpreter'

@@ -24,9 +24,8 @@ module.exports = class extends WingmanObject
     @el = @dom_element = options?.el || Wingman.document.createElement 'div'
     @createChildren 'View', child_source: options?.child_source
     template = Wingman.Template.compile @templateSource()
-    elements = template @
+    template @el, @
     @addClass @constructor._name
-    @el.appendChild element for element in elements
     @setupEvents() if @events?
   
   templateSource: ->
