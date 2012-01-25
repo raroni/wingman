@@ -20,6 +20,7 @@ module.exports = class extends WingmanObject
     }
   
   constructor: (options) ->
+    super()
     @parent = options.parent if options?.parent?
     @el = @dom_element = options?.el || Wingman.document.createElement 'div'
     @familize 'View', (options?.children? && options.children || undefined)

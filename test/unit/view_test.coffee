@@ -124,7 +124,7 @@ module.exports = class extends Janitor.TestCase
   
   'test show/hide via isActive': ->
     LoggedInView = class extends ViewWithTemplateSource
-      @addPropertyDependencies
+      property_dependencies:
         isActive: ['logged_in']
       
       isActive: ->
@@ -136,7 +136,24 @@ module.exports = class extends Janitor.TestCase
     @assertEqual '', view.el.style.display
     view.set logged_in: false
     @assertEqual 'none', view.el.style.display
-
+  
+  'test show/hide via isActive using nested properties': ->
+    LoggedInView = class extends ViewWithTemplateSource
+      property_dependencies:
+        isActive: ['session.user_id']
+    
+      isActive: ->
+        @get 'session.user_id'
+    
+    view = new LoggedInView
+    session = new WingmanObject
+    view.set { session }
+    @assertEqual 'none', view.el.style.display
+    session.set user_id: 2
+    @assertEqual '', view.el.style.display
+    session.set user_id: null
+    @assertEqual 'none', view.el.style.display
+  
   'test show/hide via isActive when isActive is not implemented': ->
     SomeView = class extends ViewWithTemplateSource
     view = new SomeView

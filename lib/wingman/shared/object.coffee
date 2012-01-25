@@ -4,36 +4,41 @@ Events = require './events'
 WingmanObject = class extends Module
   @include Events
 
-  @addPropertyDependencies: (hash) ->
-    @_property_dependencies ||= {}
-    for property_name, dependent_properties of hash
-      @_property_dependencies[property_name] ||= []
-      @_property_dependencies[property_name].concat dependent_properties
-
+  constructor: ->
+    @initPropertyDependency()
+  
+  initPropertyDependency: ->
+    for dependent_property_key, depending_properties_keys of @property_dependencies
+      for depending_property_key in depending_properties_keys
+        @observe depending_property_key, =>
+          @triggerPropertyChange dependent_property_key
+  
   set: (hash) ->
     @setProperties hash
 
   setProperties: (hash) ->
     for property_name, value of hash
       @setProperty property_name, value
-
+  
   triggerPropertyChangesForDependingProperties: (property, old_value) ->
     # This implementation should probably be cleaned up.
     triggered = {}
     for property_name, dependent_properties of @constructor._property_dependencies
       @triggerPropertyChange property_name, old_value if !triggered[property_name]
       triggered[property_name] = true
-
+  
   triggerPropertyChange: (property_name, old_value) ->
     @trigger "change:#{property_name}", @get(property_name), old_value
-
+  
   observe: (chain_as_string, args...) ->
+    # Beware, all ye who enter, for here be dragons!
     callback = args.pop()
     type = args.pop() || 'change'
 
     chain = chain_as_string.split '.'
     chain_except_first = chain.slice 1, chain.length
     chain_except_first_as_string = chain_except_first.join '.'
+    nested = chain_except_first.length != 0
 
     get_and_send_to_callback = (new_value, old_value) =>
       if type == 'change'
@@ -41,16 +46,21 @@ WingmanObject = class extends Module
       else
         callback new_value
 
-    @observeProperty chain[0], type, (new_value, old_value) ->
-      if chain_except_first.length != 0
-        property.unobserve chain_except_first_as_string, type, get_and_send_to_callback
-        get_and_send_to_callback new_value.get(chain_except_first.join('.')), old_value.get(chain_except_first.join('.'))
-      else
-        get_and_send_to_callback new_value, old_value
+    property = @get chain[0]
 
-    if chain_except_first.length != 0
-      property = @get chain[0]
-      property.observe chain_except_first_as_string, type, (new_value, old_value) ->
+    observeOnNested = (p) =>
+      p.observe chain_except_first_as_string, type, (new_value, old_value) ->
+        get_and_send_to_callback new_value, old_value
+    observeOnNested(property) if nested && property
+    @observeProperty chain[0], type, (new_value, old_value) ->
+      if nested
+        if new_value
+          ov = if old_value then old_value.get(chain_except_first.join('.')) else undefined
+          get_and_send_to_callback new_value.get(chain_except_first.join('.')), ov
+          observeOnNested new_value
+        if old_value
+          property.unobserve chain_except_first_as_string, type, get_and_send_to_callback
+      else
         get_and_send_to_callback new_value, old_value
   
   observeProperty: (property_name, type, callback) ->
@@ -88,7 +98,11 @@ WingmanObject = class extends Module
       @getProperty chain[0]
     else
       nested_property_name = chain.shift()
-      @getProperty(nested_property_name).get chain.join('.')
+      nested_property = @getProperty nested_property_name
+      if nested_property
+        nested_property.get chain.join('.')
+      else
+        undefined
   
   getProperty: (property_name) ->
     if typeof(@[property_name]) == 'function'
