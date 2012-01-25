@@ -15,7 +15,7 @@ module.exports = class extends Module
     @el = options.el if options.el?
     @view = options.view || @buildView()
     
-    @setupControllers()
+    @setupController()
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
     @checkURL()
     @ready?()
@@ -23,8 +23,9 @@ module.exports = class extends Module
   buildView: ->
     new @constructor.RootView parent: @, child_source: @, el: @el
     
-  setupControllers: ->
-    @controllers = new ObjectTree @, 'Controller', attach_to: 'tree'
+  setupController: ->
+    @controller = new @constructor.RootController parent: @, child_source: @
+#    @controller = new RootControllerObjectTree @, 'Controller', attach_to: 'tree'
 
   handlePopStateChange: (e) =>
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run
@@ -43,11 +44,11 @@ module.exports = class extends Module
       if chain
         chain_parts = chain.split '.'
         child_key = chain_parts[0]
-        child = @controllers.get child_key
+        child = @controller.get child_key
         if @one_child_at_a_time
           child.activate()
           # This is UGLY and should be refactored!
-          for name, controller of @controllers
+          for name, controller of @controller
             if controller instanceof Wingman.Controller && controller != child && name != 'parent'
               controller.deactivate()
           # #######################################

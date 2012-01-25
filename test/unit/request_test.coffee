@@ -9,7 +9,11 @@ module.exports = class extends Janitor.TestCase
     class FunkySocks extends Wingman.App
       host: 'funkysocks.net'
     
-    new FunkySocks el: Wingman.document.createElement('div'), view: {}
+    class FunkySocks.RootController extends Wingman.Controller
+    class FunkySocks.RootView extends Wingman.View
+      templateSource: -> '<div>test</div>'
+    
+    new FunkySocks el: Wingman.document.createElement('div')
     
     Wingman.request url: '/users'
     
