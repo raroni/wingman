@@ -99,66 +99,27 @@ module.exports = class extends Janitor.TestCase
     root_view = new ViewWithTemplateSource
     app = new MyApp el: Wingman.document.createElement('div')
     @assert callback_fired
-  
-  'test simple routing': ->
-    MyApp = class extends Wingman.App
-      one_child_at_a_time: true
-      routes:
-        'user': 'user'
-    
+
+  'test navigate and session': ->
+    class MyApp extends Wingman.App
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
-    MyApp.UserController = class extends Wingman.Controller
-    MyApp.UserView = class extends ViewWithTemplateSource
-    MyApp.MailController = class extends Wingman.Controller
-    MyApp.MailView = class extends ViewWithTemplateSource
     
-    app = new MyApp el: Wingman.document.createElement('div')
+    app = new MyApp el: Wingman.document.createElement 'div'
     app.navigate 'user'
-    @assert app.controller.get('user').is_active
-    @assertEqual false, app.controller.get('mail').is_active
+    @assertEqual 'user', app.session.get('path')
   
-  'test initial route': ->
+  'test initial path': ->
     MyApp = class extends Wingman.App
-      one_child_at_a_time: true
-      routes:
-        '': 'main'
-        'user': 'user'
-    
     MyApp.RootController = class extends Wingman.Controller
-    MyApp.MainController = class extends Wingman.Controller
-    MyApp.UserController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
-    MyApp.MainView = class extends ViewWithTemplateSource
-    MyApp.UserView = class extends ViewWithTemplateSource
     
     Wingman.window.document.location.pathname = '/user'
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert app.controller.get('user').is_active
-  
-  'test route to nested controller': ->
-    MyApp = class extends Wingman.App
-      one_child_at_a_time: true
-      routes:
-        'test': 'main.sub'
-    
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
-    
-    MyApp.MainController = class extends ControllerWithView
-      one_child_at_a_time: true
-    
-    MyApp.MainController.SubController = class extends ControllerWithView
-    MyApp.MainController.SubView = class extends ViewWithTemplateSource
-    
-    app = new MyApp el: Wingman.document.createElement('div')
-    app.navigate 'test'
-    @assert app.controller.get('main.sub').is_active
+    @assertEqual 'user', app.session.get('path')
   
   'test controller finding matching view automatically': ->
     MyApp = class extends Wingman.App
-      @one_child_at_a_time: true
-    
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends Wingman.View
       templateSource: -> '{view main}'

@@ -19,7 +19,7 @@ module.exports = class extends Module
     
     @setupController()
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
-    @checkURL()
+    @updatePath()
     @ready?()
   
   buildView: ->
@@ -32,25 +32,10 @@ module.exports = class extends Module
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run
       @_first_run = true
     else
-      @checkURL()
+      @updatePath()
+  
+  updatePath: ->
+    @session.set path: Wingman.document.location.pathname.substr(1)
   
   findView: (path) ->
     @view.get path
-  
-  # This method should be refactored someday. Perhaps out into new class Router?
-  checkURL: ->
-    if @routes
-      path = Wingman.document.location.pathname.substr 1
-      chain = @routes[path]
-      if chain
-        chain_parts = chain.split '.'
-        child_key = chain_parts[0]
-        child = @controller.get child_key
-        if @one_child_at_a_time
-          child.activate()
-          # This is UGLY and should be refactored!
-          for name, controller of @controller
-            if controller instanceof Wingman.Controller && controller != child && name != 'parent'
-              controller.deactivate()
-          # #######################################
-        child.activateDescendant chain_parts.slice(1).join('.') unless chain_parts.length == 1

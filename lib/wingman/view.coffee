@@ -60,11 +60,3 @@ module.exports = class extends WingmanObject
       @setStyle 'display', ''
     else
       @setStyle 'display', 'none'
-  
-  activate: ->
-    @is_active = true
-    @addClass 'active'
-
-  deactivate: ->
-    @is_active = false
-    @removeClass 'active'

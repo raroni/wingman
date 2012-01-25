@@ -101,6 +101,19 @@ module.exports = class extends Janitor.TestCase
 
     @assertEqual result, 'Rasmus Nielsen'
 
+  'test property dependencies': ->
+    View = class extends WingmanObject
+      @addPropertyDependencies
+        isActive: ['session.user_id']
+
+      isActive: ->
+        !!@get('session.user_id')
+
+    view = new View
+    callback_fired = false
+    view.observe 'isActive', callback_fired = true
+    @assertEqual result, 'Rasmus Nielsen'
+
   'test nested observe combined with property dependencies': ->
     Country = class extends WingmanObject
       @CODES = 
