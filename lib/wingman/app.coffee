@@ -1,5 +1,6 @@
 Wingman = require '../wingman'
 Module = require './shared/module'
+WingmanObject = require './shared/object'
 FamilyMember = require './shared/family_member'
 Navigator = require './shared/navigator'
 
@@ -11,6 +12,8 @@ module.exports = class extends Module
     throw new Error 'You cannot instantiate two Wingman apps at the same time.' if @constructor.__super__.constructor.instance
     @constructor.__super__.constructor.instance = @
     
+    @session = new WingmanObject
+    
     @el = options.el if options.el?
     @view = options.view || @buildView()
     
@@ -20,10 +23,10 @@ module.exports = class extends Module
     @ready?()
   
   buildView: ->
-    new @constructor.RootView parent: @, child_source: @, el: @el
+    new @constructor.RootView parent: @, el: @el, children: { source: @, options: { session: @session } }
   
   setupController: ->
-    @controller = new @constructor.RootController parent: @, child_source: @
+    @controller = new @constructor.RootController parent: @, children: { source: @, options: { session: @session } }
 
   handlePopStateChange: (e) =>
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run

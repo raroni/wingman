@@ -33,6 +33,31 @@ module.exports = class extends Janitor.TestCase
     root_el = Wingman.document.createElement 'div'
     app = new App el: root_el
     @assert root_el.innerHTML.match('stubbing the source')
+
+  'test session': ->
+    App = class extends Wingman.App
+    App.RootView = class extends ViewWithTemplateSource
+    App.RootController = class extends Wingman.Controller
+
+    root_el = Wingman.document.createElement 'div'
+    app = new App el: root_el
+    app.session.set user_id: 27
+    @assertEqual 27, app.session.get('user_id')
+
+  'test session sharing': ->
+    App = class extends Wingman.App
+    App.RootController = class extends Wingman.Controller
+    App.RootView = class extends ViewWithTemplateSource
+    App.UserController = class extends Wingman.Controller
+    App.UserView = class extends ViewWithTemplateSource
+    
+    root_el = Wingman.document.createElement 'div'
+    app = new App el: root_el
+    @assertEqual app.session, app.view.get('user.session')
+    @assertEqual app.session, app.controller.get('user.session')
+    
+    app.controller.get('user.session').set user_id: 2
+    @assertEqual 2, app.session.get('user_id')
   
   'test singleton instance': ->
     class MyApp extends Wingman.App

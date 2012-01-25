@@ -22,7 +22,7 @@ module.exports = class extends WingmanObject
   constructor: (options) ->
     @parent = options.parent if options?.parent?
     @el = @dom_element = options?.el || Wingman.document.createElement 'div'
-    @createChildren 'View', child_source: options?.child_source
+    @familize 'View', (options?.children? && options.children || undefined)
     template = Wingman.Template.compile @templateSource()
     template @el, @
     @addClass @constructor._name

@@ -7,7 +7,7 @@ class DummyController extends WingmanObject
   
   constructor: (options) ->
     @parent = options.parent
-    @createChildren 'Controller', child_source: options?.child_source
+    @familize 'Controller', options.children
 
 SimpleController = class extends DummyController
 SimpleController.UserController = class extends DummyController
@@ -42,8 +42,14 @@ module.exports = class extends Janitor.TestCase
     DummyApp.RootController = class extends DummyController
     
     app = new DummyApp
-    controller = new DummyApp.RootController parent: app, child_source: app
+    controller = new DummyApp.RootController parent: app, children: { source: app }
     
     @assert controller.get('user') instanceof DummyApp.UserController
     @assert controller.get('main') instanceof DummyApp.MainController
     @assertEqual undefined, controller.get('root')
+
+  'test child options': ->
+    session = new WingmanObject
+    children_options = { options: { session } }
+    controller = new NestedController parent: {}, children: children_options
+    @assertEqual session, controller.get('logged_in.welcome.session')

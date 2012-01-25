@@ -1,5 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
+WingmanObject = require '../../lib/wingman/shared/object'
 View = Wingman.View
 document = require('jsdom').jsdom(null, null, features: {
         QuerySelector : true
@@ -157,3 +158,13 @@ module.exports = class extends Janitor.TestCase
     SomeView = class extends ViewWithTemplateSource
     view = new SomeView
     @assertEqual undefined, view.el.style.display
+
+  'test session sharing': ->
+    MainView = class extends ViewWithTemplateSource
+    MainView.UserView = class extends ViewWithTemplateSource
+    MainView.UserView.NameView = class extends ViewWithTemplateSource
+    MainView.UserView.NameView.FirstView = class extends ViewWithTemplateSource
+    
+    session = new WingmanObject
+    view = new MainView children: { options: { session} }
+    @assertEqual session, view.get('user.name.session')

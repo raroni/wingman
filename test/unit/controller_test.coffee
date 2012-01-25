@@ -1,5 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
+WingmanObject = require '../../lib/wingman/shared/object'
 Wingman.document = require('jsdom').jsdom()
 
 class DummyView extends Wingman.View
@@ -94,3 +95,13 @@ module.exports = class extends Janitor.TestCase
     @assertEqual undefined, controller.get('logged_in.status').is_active
     @assert controller.get('logged_in').is_active
     @assert !controller.get('login').is_active
+
+  'test session sharing': ->
+    MainController = class extends ControllerWithView
+    MainController.UserController = class extends ControllerWithView
+    MainController.UserController.NameController = class extends ControllerWithView
+    MainController.UserController.NameController.FirstController = class extends ControllerWithView
+
+    session = new WingmanObject
+    controller = new MainController children: { options: { session} }
+    @assertEqual session, controller.get('user.name.first.session')

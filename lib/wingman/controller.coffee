@@ -9,7 +9,7 @@ module.exports = class extends WingmanObject
   
   constructor: (options) ->
     @parent = options.parent if options?.parent?
-    @createChildren 'Controller', child_source: options?.child_source
+    @familize 'Controller', options.children
     @view = options?.view || @findView()
     @ready?()
   

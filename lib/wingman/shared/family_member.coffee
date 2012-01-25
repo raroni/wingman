@@ -14,14 +14,18 @@ module.exports =
     else
       @pathKeys().join '.'
   
+  familize: (type, options) ->
+    @setProperty key, value for key, value of options?.options
+    @createChildren type, options
+  
   createChildren: (type, options) ->
     for child_klass in @childClasses(type, options)
-      object = new child_klass parent: @
+      object = new child_klass parent: @, children: { options: options?.options }
       @setProperty child_klass._name, object
     
   childClasses: (type, options) ->
     classes = []
-    source = options?.child_source || @
+    source = options?.source || @
     for key, value of source.constructor
       match = key.match "(.*)#{type}$"
       if match && value != @constructor
