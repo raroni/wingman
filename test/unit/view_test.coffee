@@ -152,3 +152,8 @@ module.exports = class extends Janitor.TestCase
     @assertEqual '', view.el.style.display
     view.set logged_in: false
     @assertEqual 'none', view.el.style.display
+
+  'test show/hide via isActive when isActive is not implemented': ->
+    SomeView = class extends ViewWithTemplateSource
+    view = new SomeView
+    @assertEqual undefined, view.el.style.display

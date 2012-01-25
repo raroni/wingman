@@ -27,7 +27,7 @@ module.exports = class extends WingmanObject
     template @el, @
     @addClass @constructor._name
     @setupEvents() if @events?
-    @setupActiveListener()
+    @setupActiveListener() if @isActive
   
   templateSource: ->
     template_source = @constructor.template_sources[@path()]
