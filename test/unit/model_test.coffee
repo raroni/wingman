@@ -101,5 +101,14 @@ module.exports = class extends Janitor.TestCase
         callback_called = true
     
     @assert callback_called
+  
+  'test auto save with local storage': ->
+    User = class extends Wingman.Model
+      @storage 'local', namespace: 'users'
+    
+    user = new User { name: 'Rasmus' }
+    @assert !user.isDirty()
+    user.set name: 'John'
+    @assert !user.isDirty()
 
 # TODO: LOAD AND DESTROY

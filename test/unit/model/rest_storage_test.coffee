@@ -58,10 +58,10 @@ module.exports = class extends Janitor.TestCase
   'test success callback after successful update': ->
     Wingman.request.realRequest = (options) ->
       options.success()
-
+    
     user = new DummyUser
     storage = new RestStorage user, url: '/users'
-
+    
     callback_fired = false
     storage.update success: -> callback_fired = true
     @assert callback_fired
