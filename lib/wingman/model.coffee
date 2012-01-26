@@ -33,7 +33,7 @@ module.exports = class extends WingmanObject
       'POST'
   
   requestSuccess: (data) =>
-    @set id: data.id if data.id?
+    @set data
   
   persisted: ->
     !!@get('id')

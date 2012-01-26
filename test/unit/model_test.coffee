@@ -46,14 +46,15 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'Rasmus RN', first_argument.data.name
     @assertEqual 1, Object.keys(first_argument.data).length
 
-  'test setting id after succesfully persisting to server': ->
+  'test setting properties returned by server after succesfull save': ->
     Wingman.request.realRequest = (options) ->
-      options.success id: 123
+      options.success id: 123, gender: 'm'
     
     user = new User name: 'Rasmus', age: 25
     user.save()
     
-    @assert 123, user.get('id')
+    @assertEqual 123, user.get('id')
+    @assertEqual 'm', user.get('gender')
   
   'test success callback': ->
     Wingman.request.realRequest = (options) ->
