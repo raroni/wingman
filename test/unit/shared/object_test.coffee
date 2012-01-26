@@ -151,6 +151,32 @@ module.exports = class extends Janitor.TestCase
     session.set user_id: 2
     @assert callback_fired
   
+  'test several nested property dependencies': ->
+    session = new WingmanObject
+    session.set user_id: 1
+    
+    View = class extends WingmanObject
+      property_dependencies:
+        isActive: ['session.user_id']
+        canTrain: ['training.created_on']
+      
+      canTrain: ->
+        @get('training.created_on') != '2012-01-26'
+      
+      isActive: ->
+        !!@get('session.user_id')
+
+    view = new View
+    is_active_callback_fired = false
+    can_train_callback_fired = false
+    view.observe 'isActive', -> is_active_callback_fired = true
+    view.observe 'canTrain', -> can_train_callback_fired = true
+    view.set {session}
+    view.set training: { created_on: 'test' }
+    
+    @assert is_active_callback_fired
+    @assert can_train_callback_fired
+  
   'test nested observe combined with property dependencies': ->
     Country = class extends WingmanObject
       @CODES = 

@@ -5,13 +5,16 @@ WingmanObject = class extends Module
   @include Events
 
   constructor: ->
-    @initPropertyDependency()
+    @initPropertyDependencies()
   
-  initPropertyDependency: ->
+  initPropertyDependencies: ->
     for dependent_property_key, depending_properties_keys of @property_dependencies
       for depending_property_key in depending_properties_keys
-        @observe depending_property_key, =>
-          @triggerPropertyChange dependent_property_key
+        @initPropertyDependency dependent_property_key, depending_property_key
+  
+  initPropertyDependency: (dependent_property_key, depending_property_key) ->
+    @observe depending_property_key, =>
+        @triggerPropertyChange dependent_property_key
   
   set: (hash) ->
     @setProperties hash
