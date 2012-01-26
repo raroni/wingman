@@ -133,7 +133,8 @@ WingmanObject = class extends Module
     typeof(value) == 'object' &&
     value?.constructor? &&
     value.constructor.name == 'Object' &&
-    (!(value instanceof WingmanObject))
+    (!(value instanceof WingmanObject)) &&
+    !value?._ownerDocument? # the best way to detect a jsdom HTMLElement
   
   addTriggersToArray: (property_name) ->
     parent = @

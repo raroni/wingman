@@ -5,11 +5,11 @@ module.exports =
   pathKeys: ->
     return [] unless @constructor._name
     path_keys = [@constructor._name]
-    path_keys = @parent.pathKeys().concat path_keys if @parent?.pathKeys?
+    path_keys = @get('parent').pathKeys().concat path_keys if @get('parent')?.pathKeys?
     path_keys
 
   path: ->
-    if @parent instanceof Wingman.Application
+    if @get('parent') instanceof Wingman.Application
       'root'
     else
       @pathKeys().join '.'

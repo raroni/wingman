@@ -39,12 +39,12 @@ module.exports = class extends Janitor.TestCase
     App = class extends Wingman.Application
     App.RootView = class extends ViewWithTemplateSource
     App.RootController = class extends Wingman.Controller
-
+  
     root_el = Wingman.document.createElement 'div'
     app = new App el: root_el
     app.session.set user_id: 27
     @assertEqual 27, app.session.get('user_id')
-
+  
   'test session sharing': ->
     App = class extends Wingman.Application
     App.RootController = class extends Wingman.Controller
@@ -100,7 +100,7 @@ module.exports = class extends Janitor.TestCase
     root_view = new ViewWithTemplateSource
     app = new MyApp el: Wingman.document.createElement('div')
     @assert callback_fired
-
+  
   'test navigate and session': ->
     class MyApp extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller

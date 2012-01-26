@@ -168,3 +168,13 @@ module.exports = class extends Janitor.TestCase
     session = new WingmanObject
     view = new MainView children: { options: { session} }
     @assertEqual session, view.get('user.name.session')
+
+  'test access to parent': ->
+    MainView = class extends ViewWithTemplateSource
+    MainView.UserView = class extends ViewWithTemplateSource
+    MainView.UserView.NameView = class extends ViewWithTemplateSource
+
+    view = new MainView
+    @assert view.get('user.name').get('parent.parent') instanceof MainView
+    @assert view.get('user.name.parent.parent') instanceof MainView
+    

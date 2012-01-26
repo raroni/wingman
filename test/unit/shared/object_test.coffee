@@ -20,7 +20,7 @@ module.exports = class extends Janitor.TestCase
     Person = class extends WingmanObject
     person = new Person
     person.set name: 'Roger'
-
+  
     new_name_from_callback = ''
     old_name_from_callback = ''
     person.observe 'name', (new_name, old_name) ->
@@ -29,11 +29,11 @@ module.exports = class extends Janitor.TestCase
     person.set name: 'Rasmus'
     @assertEqual new_name_from_callback, 'Rasmus'
     @assertEqual old_name_from_callback, 'Roger'
-
+  
   'test observe of unset properties': ->
     Person = class extends WingmanObject
     person = new Person
-
+  
     new_name_from_callback = ''
     old_name_from_callback = ''
     person.observe 'name', (new_name, old_name) ->
@@ -42,13 +42,13 @@ module.exports = class extends Janitor.TestCase
     person.set name: 'Rasmus'
     @assertEqual new_name_from_callback, 'Rasmus'
     @assertEqual old_name_from_callback, undefined
-
+  
   'test observe of nested unset properties': ->
     Person = class extends WingmanObject
     rasmus = new Person
     john = new Person
     john.set name: 'John'
-
+  
     new_name_from_callback = ''
     old_name_from_callback = ''
     
@@ -59,7 +59,7 @@ module.exports = class extends Janitor.TestCase
     
     @assertEqual new_name_from_callback, 'John'
     @assertEqual old_name_from_callback, undefined
-
+  
   'test unobserve': ->
     Person = class extends WingmanObject
     person = new Person
@@ -70,7 +70,7 @@ module.exports = class extends Janitor.TestCase
     person.unobserve 'name', callback
     person.set name: 'Rasmus'
     @assert !callback_run
-
+  
   'test getting non existing nested property': ->
     Person = class extends WingmanObject
     person = new Person
@@ -165,7 +165,7 @@ module.exports = class extends Janitor.TestCase
       
       isActive: ->
         !!@get('session.user_id')
-
+    
     view = new View
     is_active_callback_fired = false
     can_train_callback_fired = false
