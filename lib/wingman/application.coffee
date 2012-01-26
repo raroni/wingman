@@ -4,6 +4,9 @@ WingmanObject = require './shared/object'
 FamilyMember = require './shared/family_member'
 Navigator = require './shared/navigator'
 
+class Session extends Wingman.Model
+  @storage 'local', namespace: 'sessions'
+
 module.exports = class extends Module
   @include FamilyMember
   @include Navigator
@@ -12,7 +15,7 @@ module.exports = class extends Module
     throw new Error 'You cannot instantiate two Wingman apps at the same time.' if @constructor.__super__.constructor.instance
     @constructor.__super__.constructor.instance = @
     
-    @session = new WingmanObject
+    @session = new Session id: 1
     
     @el = options.el if options.el?
     @view = options.view || @buildView()
@@ -20,6 +23,7 @@ module.exports = class extends Module
     @setupController()
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
     @updatePath()
+    @session.load()
     @ready?()
   
   buildView: ->

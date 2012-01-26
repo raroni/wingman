@@ -11,13 +11,17 @@ module.exports = class
     options?.success?()
     
   update: (options) ->
-    Wingman.localStorage.setItem @key(), JSON.stringify(@model.toJSON())
-    options?.success?()
+    @load success: (existing_properties) =>
+      new_properties = @model.toJSON()
+      for key, value of existing_properties
+        new_properties[key] = value unless new_properties[key]?
+      Wingman.localStorage.setItem @key(), JSON.stringify(new_properties)
+      options?.success?()
   
-  load: ->
+  load: (options) ->
     item_as_string = Wingman.localStorage.getItem @key()
     item_as_json = JSON.parse item_as_string
-    @model.set item_as_json
+    options.success item_as_json
   
   key: ->
     [@options.namespace, @model.get('id')].join '.'

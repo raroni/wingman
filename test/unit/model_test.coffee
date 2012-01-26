@@ -110,5 +110,16 @@ module.exports = class extends Janitor.TestCase
     @assert !user.isDirty()
     user.set name: 'John'
     @assert !user.isDirty()
+    
+  'test model load with local storage': ->
+    Wingman.localStorage.setItem "sessions.1", JSON.stringify({ user_id: 1 })
+    
+    User = class extends Wingman.Model
+      @storage 'local', namespace: 'users'
+
+    user = new User { name: 'Rasmus' }
+    @assert !user.isDirty()
+    user.set name: 'John'
+    @assert !user.isDirty()
 
 # TODO: LOAD AND DESTROY

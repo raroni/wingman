@@ -1,6 +1,7 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
 JSDomWindowPopStateDecorator = require '../jsdom_window_pop_state_decorator'
+Wingman.localStorage = require 'localStorage'
 
 Wingman.View.template_sources = {
   'user': '<div>stubbing the source</div>'
@@ -144,7 +145,15 @@ module.exports = class extends Janitor.TestCase
     
     app = new MyApp el: Wingman.document.createElement('div')
     @assert app.controller.get('main.user').view instanceof MyApp.MainView.UserView
-    
+  
+  'test automatic session load after init': ->
+    Wingman.localStorage.setItem "sessions.1", JSON.stringify({ user_id: 1 })
+    MyApp = class extends Wingman.Application
+    MyApp.RootController = class extends Wingman.Controller
+    MyApp.RootView = class extends ViewWithTemplateSource
+    app = new MyApp el: Wingman.document.createElement('div')
+    @assertEqual 1, app.session.get('user_id')
+  
   teardown: ->
     delete Wingman.Application.instance
     Wingman.View.template_sources = {}

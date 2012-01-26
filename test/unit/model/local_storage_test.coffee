@@ -25,7 +25,7 @@ module.exports = class extends Janitor.TestCase
     user = new User
     user.set id: 1
     storage = new LocalStorage user, namespace: 'users'
-    storage.load()
+    storage.load success: (hash) => user.set hash
     
     @assertEqual 'Rasmus', user.get('name')
     @assertEqual 25, user.get('age')
@@ -36,7 +36,7 @@ module.exports = class extends Janitor.TestCase
     user = new User
     user.set id: 1
     storage = new LocalStorage user, namespace: 'users'
-    storage.load()
+    storage.load success: (hash) => user.set hash
 
     user.set name: 'Razdaman'
     storage.update()
@@ -51,6 +51,22 @@ module.exports = class extends Janitor.TestCase
     storage.update()
     data = JSON.parse Wingman.localStorage.getItem("users.1")
     @assertEqual 'RAS', data.name
+  
+  'test updating already exisiting entry': ->
+    user = new User
+    user.set id: 1, name: 'RAS', age: 25
+    storage = new LocalStorage user, namespace: 'users'
+    storage.update()
+    
+    user = new User
+    user.set id: 1, name: 'RAS'
+    storage = new LocalStorage user, namespace: 'users'
+    storage.update()
+    
+    age_from_callback = undefined
+    storage.load success: (hash) => age_from_callback = hash.age
+    
+    @assertEqual 25, age_from_callback
   
   teardown: ->
     Wingman.localStorage.clear()

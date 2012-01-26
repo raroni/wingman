@@ -21,8 +21,9 @@ module.exports = class extends WingmanObject
     storage_options = @constructor.storage_options || { type: 'rest' }
     klass = @constructor.storage_types[storage_options.type]
     throw new Error "Storage engine #{storage_options.type} not supported." unless klass
-    delete storage_options.type
-    new klass @, storage_options
+    options = {}
+    options[key] = value for key, value of storage_options when key != 'type'
+    new klass @, options
   
   save: (options = {}) ->
     operation = if @isPersisted() then 'update' else 'create'
@@ -34,6 +35,9 @@ module.exports = class extends WingmanObject
   
   toParam: ->
     @get 'id'
+  
+  load: ->
+    @storage.load success: (hash) => @set hash
   
   clean: ->
     @dirty_static_property_names.length = 0
