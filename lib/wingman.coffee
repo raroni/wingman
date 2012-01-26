@@ -1,6 +1,7 @@
 if window?
   exports.document = window.document
   exports.window = window
+  exports.localStorage = localStorage
 exports.request = require('./wingman/request')
 exports.Template = require('./wingman/template')
 exports.View = require('./wingman/view')
