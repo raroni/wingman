@@ -21,7 +21,7 @@ module.exports = class extends Janitor.TestCase
     Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
     
   'test automatic children instantiation': ->
-    App = class extends Wingman.App
+    App = class extends Wingman.Application
     App.RootView = class extends Wingman.View
       templateSource: -> '{view user}'
     
@@ -35,7 +35,7 @@ module.exports = class extends Janitor.TestCase
     @assert root_el.innerHTML.match('stubbing the source')
 
   'test session': ->
-    App = class extends Wingman.App
+    App = class extends Wingman.Application
     App.RootView = class extends ViewWithTemplateSource
     App.RootController = class extends Wingman.Controller
 
@@ -45,7 +45,7 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 27, app.session.get('user_id')
 
   'test session sharing': ->
-    App = class extends Wingman.App
+    App = class extends Wingman.Application
     App.RootController = class extends Wingman.Controller
     App.RootView = class extends ViewWithTemplateSource
     App.UserController = class extends Wingman.Controller
@@ -60,16 +60,16 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 2, app.session.get('user_id')
   
   'test singleton instance': ->
-    class MyApp extends Wingman.App
+    class MyApp extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
     
-    @assert !Wingman.App.instance
+    @assert !Wingman.Application.instance
     new MyApp el: Wingman.document.createElement 'div'
-    @assert Wingman.App.instance
+    @assert Wingman.Application.instance
   
   'test instantiation of two apps': ->
-    class MyApp extends Wingman.App
+    class MyApp extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
     
@@ -78,18 +78,18 @@ module.exports = class extends Janitor.TestCase
     @assertThrows -> new App app_options
   
   'test reading config params on applications instance': ->
-    class MyApp extends Wingman.App
+    class MyApp extends Wingman.Application
       host: 'test-host.com'
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
     
     new MyApp el: Wingman.document.createElement('div')
     
-    @assertEqual 'test-host.com', Wingman.App.instance?.host
+    @assertEqual 'test-host.com', Wingman.Application.instance?.host
   
   'test ready callback': ->
     callback_fired = false
-    MyApp = class extends Wingman.App
+    MyApp = class extends Wingman.Application
       ready: ->
         callback_fired = true
     
@@ -101,7 +101,7 @@ module.exports = class extends Janitor.TestCase
     @assert callback_fired
 
   'test navigate and session': ->
-    class MyApp extends Wingman.App
+    class MyApp extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
     
@@ -110,7 +110,7 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'user', app.session.get('path')
   
   'test initial path': ->
-    MyApp = class extends Wingman.App
+    MyApp = class extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
     
@@ -119,7 +119,7 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'user', app.session.get('path')
   
   'test controller finding matching view automatically': ->
-    MyApp = class extends Wingman.App
+    MyApp = class extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends Wingman.View
       templateSource: -> '{view main}'
@@ -133,7 +133,7 @@ module.exports = class extends Janitor.TestCase
   'test nested controllers finding matching view automatically': ->
     Wingman.View.template_sources = { 'root': '{view main}' }
     
-    MyApp = class extends Wingman.App
+    MyApp = class extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends Wingman.View
       templateSource: -> '{view main}'
@@ -146,5 +146,5 @@ module.exports = class extends Janitor.TestCase
     @assert app.controller.get('main.user').view instanceof MyApp.MainView.UserView
     
   teardown: ->
-    delete Wingman.App.instance
+    delete Wingman.Application.instance
     Wingman.View.template_sources = {}

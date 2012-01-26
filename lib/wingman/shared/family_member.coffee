@@ -9,7 +9,7 @@ module.exports =
     path_keys
 
   path: ->
-    if @parent instanceof Wingman.App
+    if @parent instanceof Wingman.Application
       'root'
     else
       @pathKeys().join '.'

@@ -6,7 +6,7 @@ sinon = require 'sinon'
 module.exports = class extends Janitor.TestCase
   'test host addition': ->
     Wingman.request.realRequest = sinon.spy()
-    class FunkySocks extends Wingman.App
+    class FunkySocks extends Wingman.Application
       host: 'funkysocks.net'
     
     class FunkySocks.RootController extends Wingman.Controller
