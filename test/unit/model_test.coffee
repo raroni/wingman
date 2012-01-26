@@ -1,25 +1,33 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
 sinon = require 'sinon'
-
-User = class extends Wingman.Model
-  url: '/users'
+RestStorage = require '../../lib/wingman/model/rest_storage'
 
 module.exports = class extends Janitor.TestCase
   'test setting attributes via constructor': ->
+    User = class extends Wingman.Model
     user = new User name: 'Rasmus', age: 25
     
     @assertEqual 'Rasmus', user.get('name')
     @assertEqual 25, user.get('age')
   
   'test persistense check': ->
+    User = class extends Wingman.Model
     user = new User name: 'Rasmus', id: 1
-    @assert user.persisted()
+    @assert user.isPersisted()
     
     user = new User name: 'Rasmus'
-    @assert !user.persisted()
+    @assert !user.isPersisted()
+    
+  'test setting default storage adapter': ->
+    User = class extends Wingman.Model
+    user = new User
+    @assert user.storage instanceof RestStorage
   
-  'test request parameters when saving new model': ->
+  'test request parameters when saving new rest model': ->
+    User = class extends Wingman.Model
+      @storage 'rest', url: '/users'
+    
     Wingman.request.realRequest = sinon.spy()
     
     user = new User name: 'Rasmus', age: 25
@@ -32,7 +40,10 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 25, first_argument.data.age
     @assertEqual 2, Object.keys(first_argument.data).length
     
-  'test request parameters when updating existing model': ->
+  'test request parameters when updating existing rest model': ->
+    User = class extends Wingman.Model
+      @storage 'rest', url: '/users'
+    
     Wingman.request.realRequest = sinon.spy()
     
     user = new User id: 1, name: 'Rasmus', age: 25
@@ -45,8 +56,11 @@ module.exports = class extends Janitor.TestCase
     @assertEqual "/users/#{user.get('id')}", first_argument.url
     @assertEqual 'Rasmus RN', first_argument.data.name
     @assertEqual 1, Object.keys(first_argument.data).length
-
-  'test setting properties returned by server after succesfull save': ->
+  
+  'test setting properties returned by server after succesfull rest save': ->
+    User = class extends Wingman.Model
+      @storage 'rest', url: '/users'
+    
     Wingman.request.realRequest = (options) ->
       options.success id: 123, gender: 'm'
     
@@ -56,7 +70,10 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 123, user.get('id')
     @assertEqual 'm', user.get('gender')
   
-  'test success callback': ->
+  'test success callback with rest model': ->
+    User = class extends Wingman.Model
+      @storage 'rest', url: '/users'
+    
     Wingman.request.realRequest = (options) ->
       options.success id: 1
     
@@ -66,10 +83,13 @@ module.exports = class extends Janitor.TestCase
     user.save
       success: ->
         callback_called = true
-
+  
     @assert callback_called
     
-  'test error callback': ->
+  'test error callback for rest model': ->
+    User = class extends Wingman.Model
+      @storage 'rest', url: '/users'
+    
     Wingman.request.realRequest = (options) ->
       options.error()
     
