@@ -134,7 +134,7 @@ WingmanObject = class extends Module
     value?.constructor? &&
     value.constructor.name == 'Object' &&
     (!(value instanceof WingmanObject)) &&
-    !value?._ownerDocument? # the best way to detect a jsdom HTMLElement
+    !value?._ownerDocument? # need this to detect jsdom HTMLElement values - is there a better way?
   
   addTriggersToArray: (property_name) ->
     parent = @
