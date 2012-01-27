@@ -62,7 +62,7 @@ WingmanObject = class extends Module
           get_and_send_to_callback new_value.get(chain_except_first.join('.')), ov
           observeOnNested new_value
         if old_value
-          property.unobserve chain_except_first_as_string, type, get_and_send_to_callback
+          old_value.unobserve chain_except_first_as_string, type, get_and_send_to_callback
       else
         get_and_send_to_callback new_value, old_value
   

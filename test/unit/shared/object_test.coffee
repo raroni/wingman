@@ -60,6 +60,23 @@ module.exports = class extends Janitor.TestCase
     @assertEqual new_name_from_callback, 'John'
     @assertEqual old_name_from_callback, undefined
   
+  'test observing on deeply nested properties that are later changed': ->
+    view = new WingmanObject
+    latest_value_from_callback = undefined
+    view.observe 'user.car.kilometers_driven', (new_value) -> latest_value_from_callback = new_value
+
+    user = new WingmanObject
+    view.set { user }
+    car1 = new WingmanObject
+    car1.set kilometers_driven: 200000
+    car2 = new WingmanObject
+    car2.set kilometers_driven: 10000
+    
+    user.set car: car1
+    user.set car: car2
+    
+    @assertEqual 10000, latest_value_from_callback
+  
   'test unobserve': ->
     Person = class extends WingmanObject
     person = new Person
