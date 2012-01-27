@@ -178,3 +178,10 @@ module.exports = class extends Janitor.TestCase
     @assert view.get('user.name').get('parent.parent') instanceof MainView
     @assert view.get('user.name.parent.parent') instanceof MainView
     
+  'test ready callback': ->
+    callback_fired = false
+    MainView = class extends ViewWithTemplateSource
+      ready: -> callback_fired = true
+
+    view = new MainView
+    @assert callback_fired
