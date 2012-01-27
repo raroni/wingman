@@ -171,7 +171,7 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'element', input.type
     @assertEqual 'input', input.tag
 
-  'test non closing tag': ->
+  'test tag combined with sub view': ->
     tree = @parse '<h1>Some title</h1>{view user}'
 
     nodes = tree.children
