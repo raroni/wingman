@@ -265,6 +265,11 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'eu', country.toJSON().region
     @assertEqual 2, Object.keys(country.toJSON()).length
   
+  'test export to JSON with object with no set attributes': ->
+    obj = new WingmanObject
+    json = obj.toJSON()
+    @assertEqual 0, Object.keys(json).length
+  
   'test export to JSON with only options': ->
     country = new WingmanObject
     country.set code: 'dk', region: 'eu', population: 5000000

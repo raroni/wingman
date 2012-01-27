@@ -92,8 +92,10 @@ WingmanObject = class extends Module
   
   # Without this, we wouldn't be able to make an appropriate #toJSON.
   registerPropertySet: (property_name) ->
-    @setPropertyNames ||= []
-    @setPropertyNames.push property_name
+    @setPropertyNames().push property_name
+  
+  setPropertyNames: ->
+    @set_property_names ||= []
   
   get: (chain_as_string) ->
     chain = chain_as_string.split '.'
@@ -117,7 +119,7 @@ WingmanObject = class extends Module
     options.only = [options.only] if options.only && !Array.isArray options.only
     
     json = {}
-    for property_name in @setPropertyNames
+    for property_name in @setPropertyNames()
       json[property_name] = @get property_name if !options.only || options.only.indexOf(property_name) != -1
     json
   
