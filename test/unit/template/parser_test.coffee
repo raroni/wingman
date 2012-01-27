@@ -159,10 +159,10 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'funny_class', classes[0].get()
     @assertEqual 'another_funny_class', classes[1].get()
     @assert klass.is_dynamic for klass in classes
-
+  
   'test non closing tag': ->
     tree = @parse '<div><input></div><div>something else</div>'
-
+    
     divs = tree.children
     @assertEqual 2, divs.length
     @assertEqual 1, divs[0].children.length
@@ -170,10 +170,10 @@ module.exports = class extends Janitor.TestCase
     input = divs[0].children[0]
     @assertEqual 'element', input.type
     @assertEqual 'input', input.tag
-
+  
   'test tag combined with sub view': ->
     tree = @parse '<h1>Some title</h1>{view user}'
-
+    
     nodes = tree.children
     @assertEqual 2, nodes.length
     
@@ -181,3 +181,16 @@ module.exports = class extends Janitor.TestCase
     
     @assertEqual 'sub_view', sub_view_node.type
     @assertEqual 'user', sub_view_node.name
+  
+  'test regular properties': ->
+    tree = @parse '<input name="email" placeholder="Email...">'
+    nodes = tree.children
+    
+    @assertEqual 1, nodes.length
+    input = nodes[0]
+    @assertEqual 'element', input.type
+    @assertEqual 'input', input.tag
+    @assert input.attributes
+    @assertEqual 2, Object.keys(input.attributes).length
+    @assertEqual 'email', input.attributes.name
+    @assertEqual 'Email...', input.attributes.placeholder

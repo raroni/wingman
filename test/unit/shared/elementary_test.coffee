@@ -24,3 +24,7 @@ module.exports = class extends Janitor.TestCase
   'test adding two identical classes': ->
     @dummy_object.addClass 'user' for [1..2]
     @assertEqual 'user', @dummy_object.dom_element.className
+  
+  'test setting attribute': ->
+    @dummy_object.setAttribute 'name', 'rasmus'
+    @assertEqual 'rasmus', @dummy_object.dom_element.getAttribute('name')

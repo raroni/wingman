@@ -255,3 +255,15 @@ module.exports = class extends Janitor.TestCase
     
     @assertDOMElementHasClass element.dom_element, 'user'
     @assertDOMElementHasClass element.dom_element, 'premium'
+
+  'test regular attributes': ->
+    element_node =
+      type: 'element'
+      tag: 'input'
+      attributes:
+        name: 'email'
+        placeholder: 'Email...'
+    
+    element = new Element(element_node, @parent).dom_element
+    @assertEqual 'email', element.getAttribute('name')
+    @assertEqual 'Email...', element.getAttribute('placeholder')

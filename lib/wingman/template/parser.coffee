@@ -3,6 +3,10 @@ Value = require "./parser/value"
 
 self_closing_tags = ['input', 'img', 'br', 'hr']
 
+# REFACTORING IDEA: Let each individual node type have its own class.
+# That would make it possible to extract parseStyle, parseClass and so on into a ElementNode class or the like
+# This would in turn make this class simpler :)
+
 module.exports = class
   @parse: (source) ->
     parser = new @ source
@@ -47,11 +51,8 @@ module.exports = class
         type: 'element'
 
       if @scanner.getCapture(1)
-        properties = @parseProperties @scanner.getCapture(1)
-        if properties.style
-          new_node.styles = @parseStyle properties.style
-        if properties.class
-          new_node.classes = @parseClass properties.class
+        attributes = @parseAttributes @scanner.getCapture(1)
+        @addAttributes new_node, attributes
 
       @current_scope.children.push new_node
       @current_scope = new_node unless self_closing_tags.indexOf(new_node.tag) != -1
@@ -91,14 +92,14 @@ module.exports = class
     @scanner.head -= 1
     result
 
-  parseProperties: (properties_as_string) ->
-    properties = {}
-    properties_as_string.replace(
+  parseAttributes: (attributes_as_string) ->
+    attributes = {}
+    attributes_as_string.replace(
       new RegExp('([a-z]+)="(.*?)"', "g"),
       ($0, $1, $2) ->
-        properties[$1] = $2
+        attributes[$1] = $2
     )
-    properties
+    attributes
   
   parseStyle: (styles_as_string) ->
     re = new RegExp(' ', 'g')
@@ -113,3 +114,15 @@ module.exports = class
     for klass in classes_as_string.split(' ')
       classes.push new Value(klass)
     classes
+  
+  addAttributes: (node, attributes) ->
+    if attributes.style
+      node.styles = @parseStyle attributes.style
+      delete attributes.style
+    if attributes.class
+      node.classes = @parseClass attributes.class
+      delete attributes.class
+    if Object.keys(attributes).length != 0
+      node.attributes = {}
+      for key, value of attributes
+        node.attributes[key] = value

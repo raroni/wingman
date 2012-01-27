@@ -9,7 +9,8 @@ module.exports = class extends Module
     @addToScope()
     @setupStyles() if @element_data.styles
     @setupClasses() if @element_data.classes
-  
+    @setupAttributes() if @element_data.attributes
+    
     if @element_data.value
       @setupInnerHTML()
     else if @element_data.children
@@ -22,6 +23,9 @@ module.exports = class extends Module
     for class_name in @element_data.classes
       @observeClass class_name if class_name.is_dynamic
       @addClass class_name.get @context
+  
+  setupAttributes: ->
+    @setAttribute key, value for key, value of @element_data.attributes
   
   observeClass: (class_name) ->
     @context.observe class_name.get(), (new_class_name, old_class_name) =>
