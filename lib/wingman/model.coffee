@@ -1,35 +1,9 @@
 Wingman = require '../wingman'
 WingmanObject = require './shared/object'
-RestStorage = require './model/storage_adapters/rest'
-LocalStorage = require './model/storage_adapters/local'
+StorageAdapter = require './model/storage_adapter'
 
 module.exports = class extends WingmanObject
-  @storage_types:
-    'rest': RestStorage
-    'local': LocalStorage
-  
-  @storage: (type, options = {}) ->
-    throw new Error "Storage engine #{type} not supported." unless @storageAdapterTypeSupported(type)
-    options.type = type
-    @storage_adapter_options = options
-  
-  @storageAdapterTypeSupported: (type) ->
-    !!@storage_types[type]
-  
-  @storageAdapter: ->
-    @storage_adapter ||= @buildStorageAdapter()
-  
-  @buildStorageAdapter: ->
-    @storage_adapter_options ||= { type: 'rest' }
-    klass = @storage_types[@storage_adapter_options.type]
-    options = {}
-    options[key] = value for key, value of @storage_adapter_options when key != 'type'
-    new klass options
-  
-  @load: (id, callback) ->
-    @storageAdapter().load id, success: (hash) =>
-      model = new @ hash
-      callback model
+  @extend StorageAdapter
   
   constructor: (properties, options) ->
     @storage_adapter = @constructor.storageAdapter()
