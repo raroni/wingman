@@ -26,6 +26,11 @@ module.exports = class extends WingmanObject
     options[key] = value for key, value of @storage_adapter_options when key != 'type'
     new klass options
   
+  @load: (id, callback) ->
+    @storageAdapter().load id, success: (hash) =>
+      model = new @ hash
+      callback model
+  
   constructor: (properties, options) ->
     @storage_adapter = @constructor.storageAdapter()
     @dirty_static_property_names = []
@@ -43,7 +48,7 @@ module.exports = class extends WingmanObject
     @get 'id'
   
   load: ->
-    @storage_adapter.load @, success: (hash) => @set hash
+    @storage_adapter.load @get('id'), success: (hash) => @set hash
   
   clean: ->
     @dirty_static_property_names.length = 0

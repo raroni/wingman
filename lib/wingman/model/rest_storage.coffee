@@ -25,3 +25,10 @@ module.exports = class
   
   requestSuccess: (model, data) =>
     model.set data
+  
+  load: (id, options) ->
+    Wingman.request
+      type: 'GET'
+      url: "#{@options.url}/#{id}"
+      error: options?.error
+      success: options?.success

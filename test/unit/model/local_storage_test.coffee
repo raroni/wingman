@@ -25,7 +25,7 @@ module.exports = class LocalStorageTest extends Janitor.TestCase
     user = new User
     user.set id: 1
     storage = new LocalStorage namespace: 'users'
-    storage.load user, success: (hash) => user.set hash
+    storage.load user.get('id'), success: (hash) => user.set hash
     
     @assertEqual 'Rasmus', user.get('name')
     @assertEqual 25, user.get('age')
@@ -36,7 +36,7 @@ module.exports = class LocalStorageTest extends Janitor.TestCase
     user = new User
     user.set id: 1
     storage = new LocalStorage namespace: 'users'
-    storage.load user, success: (hash) => user.set hash
+    storage.load user.get('id'), success: (hash) => user.set hash
     
     user.set name: 'Razdaman'
     storage.update user
@@ -63,7 +63,7 @@ module.exports = class LocalStorageTest extends Janitor.TestCase
     storage.update user
     
     age_from_callback = undefined
-    storage.load user, success: (hash) => age_from_callback = hash.age
+    storage.load user.get('id'), success: (hash) => age_from_callback = hash.age
     
     @assertEqual 25, age_from_callback
   

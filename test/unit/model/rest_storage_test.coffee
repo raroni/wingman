@@ -65,3 +65,14 @@ module.exports = class extends Janitor.TestCase
     callback_fired = false
     storage.update user, success: -> callback_fired = true
     @assert callback_fired
+  
+  'test load': ->
+    Wingman.request.realRequest = (options) ->
+      options.success name: 'Rasmus' if options.url == '/users/21' && options.type == 'GET'
+    
+    storage = new RestStorage url: '/users'
+    name_from_callback = undefined
+    storage.load 21, success: (hash) ->
+      name_from_callback = hash.name
+    
+    @assertEqual 'Rasmus', name_from_callback
