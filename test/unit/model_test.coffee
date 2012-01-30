@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
 sinon = require 'sinon'
-RestStorage = require '../../lib/wingman/model/rest_storage'
+RestStorage = require '../../lib/wingman/model/storage_adapters/rest'
 
 module.exports = class ModelTest extends Janitor.TestCase
   'test setting attributes via constructor': ->

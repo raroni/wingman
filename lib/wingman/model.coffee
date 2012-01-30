@@ -1,7 +1,7 @@
 Wingman = require '../wingman'
 WingmanObject = require './shared/object'
-RestStorage = require './model/rest_storage'
-LocalStorage = require './model/local_storage'
+RestStorage = require './model/storage_adapters/rest'
+LocalStorage = require './model/storage_adapters/local'
 
 module.exports = class extends WingmanObject
   @storage_types:

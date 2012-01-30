@@ -1,8 +1,8 @@
 Janitor = require 'janitor'
-Wingman = require '../../../.'
+Wingman = require '../../../../.'
 Wingman.localStorage = require 'localStorage'
-WingmanObject = require '../../../lib/wingman/shared/object'
-LocalStorage = require '../../../lib/wingman/model/local_storage'
+WingmanObject = require '../../../../lib/wingman/shared/object'
+LocalStorage = require '../../../../lib/wingman/model/storage_adapters/local'
 
 User = class extends WingmanObject
 

@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
-Wingman = require '../../../.'
-WingmanObject = require '../../../lib/wingman/shared/object'
-RestStorage = require '../../../lib/wingman/model/rest_storage'
+Wingman = require '../../../../.'
+WingmanObject = require '../../../../lib/wingman/shared/object'
+RestStorage = require '../../../../lib/wingman/model/storage_adapters/rest'
 sinon = require 'sinon'
 
 class DummyUser extends WingmanObject

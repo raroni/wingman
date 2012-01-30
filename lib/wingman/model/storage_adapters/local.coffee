@@ -1,4 +1,4 @@
-Wingman = require '../../wingman'
+Wingman = require '../../../wingman'
 
 module.exports = class
   auto_save: true
