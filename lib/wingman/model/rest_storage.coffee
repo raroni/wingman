@@ -1,27 +1,27 @@
 Wingman = require '../../wingman'
 
 module.exports = class
-  constructor: (@model, @options) ->
+  constructor: (@options) ->
   
-  create: (options = {}) ->
+  create: (model, options = {}) ->
     Wingman.request
       type: 'POST'
       url: @options.url
-      data: @model.dirtyStaticProperties()
+      data: model.dirtyStaticProperties()
       error: options.error
       success: (data) =>
-        @requestSuccess data
+        @requestSuccess model, data
         options.success?()
   
-  update: (options = {}) ->
+  update: (model, options = {}) ->
     Wingman.request
       type: 'PUT'
-      url: "#{@options.url}/#{@model.get('id')}"
-      data: @model.dirtyStaticProperties()
+      url: "#{@options.url}/#{model.get('id')}"
+      data: model.dirtyStaticProperties()
       error: options.error
       success: (data) =>
-        @requestSuccess data
+        @requestSuccess model, data
         options.success?()
   
-  requestSuccess: (data) =>
-    @model.set data
+  requestSuccess: (model, data) =>
+    model.set data

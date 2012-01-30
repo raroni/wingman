@@ -6,12 +6,12 @@ LocalStorage = require '../../../lib/wingman/model/local_storage'
 
 User = class extends WingmanObject
 
-module.exports = class extends Janitor.TestCase
+module.exports = class LocalStorageTest extends Janitor.TestCase
   'test create': ->
     user = new User
     user.set name: 'Rasmus', age: 25
-    storage = new LocalStorage user, namespace: 'users'
-    storage.create()
+    storage = new LocalStorage namespace: 'users'
+    storage.create user
     
     data = JSON.parse Wingman.localStorage.getItem("users.#{user.get('id')}")
     
@@ -24,22 +24,22 @@ module.exports = class extends Janitor.TestCase
     
     user = new User
     user.set id: 1
-    storage = new LocalStorage user, namespace: 'users'
-    storage.load success: (hash) => user.set hash
+    storage = new LocalStorage namespace: 'users'
+    storage.load user, success: (hash) => user.set hash
     
     @assertEqual 'Rasmus', user.get('name')
     @assertEqual 25, user.get('age')
-
+  
   'test update': ->
     Wingman.localStorage.setItem "users.1", JSON.stringify({ name: 'Rasmus', age: 25 })
-
+    
     user = new User
     user.set id: 1
-    storage = new LocalStorage user, namespace: 'users'
-    storage.load success: (hash) => user.set hash
-
+    storage = new LocalStorage namespace: 'users'
+    storage.load user, success: (hash) => user.set hash
+    
     user.set name: 'Razdaman'
-    storage.update()
+    storage.update user
     
     data = JSON.parse Wingman.localStorage.getItem("users.#{user.get('id')}")
     @assertEqual 'Razdaman', data.name
@@ -47,24 +47,23 @@ module.exports = class extends Janitor.TestCase
   'test updating when manually setting id': ->
     user = new User
     user.set id: 1, name: 'RAS'
-    storage = new LocalStorage user, namespace: 'users'
-    storage.update()
+    storage = new LocalStorage namespace: 'users'
+    storage.update user
     data = JSON.parse Wingman.localStorage.getItem("users.1")
     @assertEqual 'RAS', data.name
   
   'test updating already exisiting entry': ->
     user = new User
     user.set id: 1, name: 'RAS', age: 25
-    storage = new LocalStorage user, namespace: 'users'
-    storage.update()
+    storage = new LocalStorage namespace: 'users'
+    storage.update user
     
     user = new User
     user.set id: 1, name: 'RAS'
-    storage = new LocalStorage user, namespace: 'users'
-    storage.update()
+    storage.update user
     
     age_from_callback = undefined
-    storage.load success: (hash) => age_from_callback = hash.age
+    storage.load user, success: (hash) => age_from_callback = hash.age
     
     @assertEqual 25, age_from_callback
   

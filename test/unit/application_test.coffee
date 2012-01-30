@@ -34,7 +34,7 @@ module.exports = class extends Janitor.TestCase
     root_el = Wingman.document.createElement 'div'
     app = new App el: root_el
     @assert root_el.innerHTML.match('stubbing the source')
-
+  
   'test session': ->
     App = class extends Wingman.Application
     App.RootView = class extends ViewWithTemplateSource

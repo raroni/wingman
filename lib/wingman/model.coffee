@@ -9,25 +9,31 @@ module.exports = class extends WingmanObject
     'local': LocalStorage
   
   @storage: (type, options = {}) ->
+    throw new Error "Storage engine #{type} not supported." unless @storageAdapterTypeSupported(type)
     options.type = type
-    @storage_options = options
+    @storage_adapter_options = options
+  
+  @storageAdapterTypeSupported: (type) ->
+    !!@storage_types[type]
+  
+  @storageAdapter: ->
+    @storage_adapter ||= @buildStorageAdapter()
+  
+  @buildStorageAdapter: ->
+    @storage_adapter_options ||= { type: 'rest' }
+    klass = @storage_types[@storage_adapter_options.type]
+    options = {}
+    options[key] = value for key, value of @storage_adapter_options when key != 'type'
+    new klass options
   
   constructor: (properties, options) ->
-    @storage = @buildStorage()
+    @storage_adapter = @constructor.storageAdapter()
     @dirty_static_property_names = []
     @set properties
   
-  buildStorage: ->
-    storage_options = @constructor.storage_options || { type: 'rest' }
-    klass = @constructor.storage_types[storage_options.type]
-    throw new Error "Storage engine #{storage_options.type} not supported." unless klass
-    options = {}
-    options[key] = value for key, value of storage_options when key != 'type'
-    new klass @, options
-  
   save: (options = {}) ->
     operation = if @isPersisted() then 'update' else 'create'
-    @storage[operation]
+    @storage_adapter[operation] @,
       success: =>
         @clean()
         options.success?()
@@ -37,7 +43,7 @@ module.exports = class extends WingmanObject
     @get 'id'
   
   load: ->
-    @storage.load success: (hash) => @set hash
+    @storage_adapter.load @, success: (hash) => @set hash
   
   clean: ->
     @dirty_static_property_names.length = 0
@@ -51,7 +57,7 @@ module.exports = class extends WingmanObject
   setProperty: (property_name, values) ->
     @dirty_static_property_names.push property_name
     super property_name, values
-    @save() if @storage.auto_save
+    @save() if @storage_adapter.auto_save
   
   isPersisted: ->
     !!@get('id')

@@ -3,7 +3,7 @@ Wingman = require '../../.'
 sinon = require 'sinon'
 RestStorage = require '../../lib/wingman/model/rest_storage'
 
-module.exports = class extends Janitor.TestCase
+module.exports = class ModelTest extends Janitor.TestCase
   'test setting attributes via constructor': ->
     User = class extends Wingman.Model
     user = new User name: 'Rasmus', age: 25
@@ -22,7 +22,7 @@ module.exports = class extends Janitor.TestCase
   'test setting default storage adapter': ->
     User = class extends Wingman.Model
     user = new User
-    @assert user.storage instanceof RestStorage
+    @assert user.storage_adapter instanceof RestStorage
   
   'test request parameters when saving new rest model': ->
     User = class extends Wingman.Model

@@ -4,7 +4,7 @@ WingmanObject = require '../../../lib/wingman/shared/object'
 RestStorage = require '../../../lib/wingman/model/rest_storage'
 sinon = require 'sinon'
 
-DummyUser = class extends WingmanObject
+DummyUser = class RestStorageTest extends WingmanObject
   get: (key) -> @[key]
   set: (hash) ->
     @[key] = value for key, value of hash
@@ -17,9 +17,9 @@ module.exports = class extends Janitor.TestCase
     
     user = new DummyUser
     user.dirty_static_properties = { name: 'Rasmus', age: 25 }
-    storage = new RestStorage user, url: '/users'
+    storage = new RestStorage url: '/users'
     
-    storage.create()
+    storage.create user
     
     first_argument = Wingman.request.realRequest.args[0][0]
     @assertEqual 'POST', first_argument.type
@@ -33,10 +33,10 @@ module.exports = class extends Janitor.TestCase
       options.success()
     
     user = new DummyUser
-    storage = new RestStorage user, url: '/users'
+    storage = new RestStorage url: '/users'
     
     callback_fired = false
-    storage.create success: -> callback_fired = true
+    storage.create user, success: -> callback_fired = true
     @assert callback_fired
   
   'test succesful update': ->
@@ -45,8 +45,8 @@ module.exports = class extends Janitor.TestCase
     user = new DummyUser
     user.set id: 1
     user.dirty_static_properties = { name: 'Rasmus', age: 25 }
-    storage = new RestStorage user, url: '/users'
-    storage.update()
+    storage = new RestStorage url: '/users'
+    storage.update user
   
     first_argument = Wingman.request.realRequest.args[0][0]
     @assertEqual 'PUT', first_argument.type
@@ -60,8 +60,8 @@ module.exports = class extends Janitor.TestCase
       options.success()
     
     user = new DummyUser
-    storage = new RestStorage user, url: '/users'
+    storage = new RestStorage url: '/users'
     
     callback_fired = false
-    storage.update success: -> callback_fired = true
+    storage.update user, success: -> callback_fired = true
     @assert callback_fired
