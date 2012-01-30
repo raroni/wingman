@@ -39,7 +39,8 @@ module.exports = class extends WingmanObject
   save: (options = {}) ->
     operation = if @isPersisted() then 'update' else 'create'
     @storage_adapter[operation] @,
-      success: =>
+      success: (data) =>
+        @set data
         @clean()
         options.success?()
       error: -> options.error?()

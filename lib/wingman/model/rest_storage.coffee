@@ -9,9 +9,7 @@ module.exports = class
       url: @options.url
       data: model.dirtyStaticProperties()
       error: options.error
-      success: (data) =>
-        @requestSuccess model, data
-        options.success?()
+      success: options.success
   
   update: (model, options = {}) ->
     Wingman.request
@@ -19,12 +17,7 @@ module.exports = class
       url: "#{@options.url}/#{model.get('id')}"
       data: model.dirtyStaticProperties()
       error: options.error
-      success: (data) =>
-        @requestSuccess model, data
-        options.success?()
-  
-  requestSuccess: (model, data) =>
-    model.set data
+      success: options.success
   
   load: (id, options) ->
     Wingman.request
