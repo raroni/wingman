@@ -11,7 +11,7 @@ class DummyUser extends WingmanObject
   dirtyStaticProperties: ->
     @dirty_static_properties
 
-module.exports = class RestStorageTest extends Janitor.TestCase
+module.exports = class RestTest extends Janitor.TestCase
   teardown: -> delete Wingman.request.realRequest
   
   'test succesful create': ->
@@ -100,3 +100,14 @@ module.exports = class RestStorageTest extends Janitor.TestCase
     @assertEqual 2, array_from_callback.length
     @assertContains array_from_callback, car1
     @assertContains array_from_callback, car2
+
+  'test delete': ->
+    correct_request = undefined
+    Wingman.request.realRequest = (options) ->
+      correct_request = options.url == '/cars/1' && options.type == 'DELETE'
+    
+    storage = new RestStorage url: '/cars'
+    storage.delete 1
+    
+
+    @assert correct_request

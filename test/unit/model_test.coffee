@@ -134,7 +134,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
   'test load via id without an instance with rest storage': ->
     Wingman.request.realRequest = (options) ->
-      options.success name: 'Ras' if options.url == '/users/10'
+      options.success id: 10, name: 'Ras' if options.url == '/users/10'
     
     class User extends Wingman.Model
       @storage 'rest', url: '/users'
@@ -146,8 +146,8 @@ module.exports = class ModelTest extends Janitor.TestCase
   
   'test count when loading by id with rest storage': ->
     Wingman.request.realRequest = (options) ->
-      options.success name: 'Ras' if options.url == '/users/10'
-      options.success name: 'John' if options.url == '/users/11'
+      options.success id: 10, name: 'Ras' if options.url == '/users/10'
+      options.success id: 11, name: 'John' if options.url == '/users/11'
     
     class User extends Wingman.Model
       @storage 'rest', url: '/users'
@@ -161,8 +161,8 @@ module.exports = class ModelTest extends Janitor.TestCase
   'test load many with rest storage': ->
     Wingman.request.realRequest = (options) ->
       data = [
-        { name: 'McQueen' }
-        { name: 'Mater' }
+        { id: 1, name: 'McQueen' }
+        { id: 2, name: 'Mater' }
       ]
       options.success data if options.url == '/cars' && options.type == 'GET'
     
@@ -181,8 +181,8 @@ module.exports = class ModelTest extends Janitor.TestCase
   'test count when loading many with rest storage': ->
     Wingman.request.realRequest = (options) ->
       data = [
-        { name: 'McQueen' }
-        { name: 'Mater' }
+        { id: 1, name: 'McQueen' }
+        { id: 2, name: 'Mater' }
       ]
       options.success data if options.url == '/cars' && options.type == 'GET'
     
@@ -194,5 +194,21 @@ module.exports = class ModelTest extends Janitor.TestCase
     @assertEqual 0, Car.count()
     Car.load (array) -> array_from_callback = array
     @assertEqual 2, Car.count()
-
+  
+  'test destroy': ->
+    correct_request = undefined
+    Wingman.request.realRequest = (options) ->
+      correct_request = options.url == '/cars/1' && options.type == 'DELETE'
+    
+    class Car extends Wingman.Model
+      @storage 'rest', url: '/cars'
+      
+    car = new Car id: 1, name: 'Toyota'
+    
+    value_from_callback = undefined
+    car.bind 'destroy', (model) -> value_from_callback = model
+    car.destroy()
+    @assertEqual 'Toyota', value_from_callback.get('name')
+    @assert correct_request
+  
 # TODO: LOAD AND DESTROY

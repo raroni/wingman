@@ -6,10 +6,8 @@ Store = require './model/store'
 module.exports = class Model extends WingmanObject
   @extend StorageAdapter
   
-  @blah: 'test'
-  
   @store: ->
-    @_store ||= new Store()
+    @_store ||= new Store
   
   @count: ->
     @store().count()
@@ -48,6 +46,10 @@ module.exports = class Model extends WingmanObject
         @clean()
         options.success?()
       error: -> options.error?()
+  
+  destroy: ->
+    @trigger 'destroy', @
+    @storage_adapter.delete @get('id')
   
   toParam: ->
     @get 'id'

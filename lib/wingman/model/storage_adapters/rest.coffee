@@ -29,3 +29,8 @@ module.exports = class
     
     options.type = 'GET'
     Wingman.request options
+  
+  delete: (id) ->
+    Wingman.request
+      url: [@options.url, id].join('/')
+      type: 'DELETE'
