@@ -74,7 +74,7 @@ module.exports = class RestStorageTest extends Janitor.TestCase
     storage.update user, success: -> callback_fired = true
     @assert callback_fired
   
-  'test load': ->
+  'test load by id': ->
     Wingman.request.realRequest = (options) ->
       options.success name: 'Rasmus' if options.url == '/users/21' && options.type == 'GET'
     
@@ -84,3 +84,19 @@ module.exports = class RestStorageTest extends Janitor.TestCase
       name_from_callback = hash.name
     
     @assertEqual 'Rasmus', name_from_callback
+
+  'test load all': ->
+    car1 = { name: 'McQueen' }
+    car2 = { name: 'Mater' }
+    Wingman.request.realRequest = (options) ->
+      data = [car1, car2]
+      options.success data if options.url == '/cars' && options.type == 'GET'
+    
+    storage = new RestStorage url: '/cars'
+    array_from_callback = undefined
+    storage.load success: (array) ->
+      array_from_callback = array
+    
+    @assertEqual 2, array_from_callback.length
+    @assertContains array_from_callback, car1
+    @assertContains array_from_callback, car2

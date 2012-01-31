@@ -138,10 +138,30 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     class User extends Wingman.Model
       @storage 'rest', url: '/users'
-
+    
     name_from_callback = undefined
     User.load 10, (user) -> name_from_callback = user.get('name')
-
+    
     @assertEqual 'Ras', name_from_callback
-      
+  
+  'test load many with rest storage': ->
+    Wingman.request.realRequest = (options) ->
+      data = [
+        { name: 'McQueen' }
+        { name: 'Mater' }
+      ]
+      options.success data if options.url == '/cars' && options.type == 'GET'
+    
+    class Car extends Wingman.Model
+      @storage 'rest', url: '/cars'
+    
+    array_from_callback = undefined
+    Car.load (array) -> array_from_callback = array
+    
+    @assertEqual 2, array_from_callback.length
+    @assertEqual 'McQueen', array_from_callback[0].get('name')
+    @assertEqual 'Mater', array_from_callback[1].get('name')
+    @assert array_from_callback[0] instanceof Car
+    @assert array_from_callback[1] instanceof Car
+
 # TODO: LOAD AND DESTROY

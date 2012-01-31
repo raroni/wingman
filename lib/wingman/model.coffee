@@ -5,10 +5,24 @@ StorageAdapter = require './model/storage_adapter'
 module.exports = class extends WingmanObject
   @extend StorageAdapter
   
-  @load: (id, callback) ->
+  @load: (args...) ->
+    if args.length == 1
+      @loadMany args[0]
+    else
+      @loadOne args[0], args[1]
+  
+  @loadOne: (id, callback) ->
     @storageAdapter().load id, success: (hash) =>
       model = new @ hash
       callback model
+
+  @loadMany: (callback) ->
+    @storageAdapter().load success: (array) =>
+      models = []
+      for model_data in array
+        model = new @ model_data
+        models.push model
+      callback models
   
   constructor: (properties, options) ->
     @storage_adapter = @constructor.storageAdapter()

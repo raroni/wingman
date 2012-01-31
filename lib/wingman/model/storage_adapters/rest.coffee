@@ -19,9 +19,13 @@ module.exports = class
       error: options.error
       success: options.success
   
-  load: (id, options) ->
-    Wingman.request
-      type: 'GET'
-      url: "#{@options.url}/#{id}"
-      error: options?.error
-      success: options?.success
+  load: (args...) ->
+    if args.length == 2
+      options = args[1]
+      options.url = [@options.url, args[0]].join '/'
+    else
+      options = args[0]
+      options.url = @options.url
+    
+    options.type = 'GET'
+    Wingman.request options
