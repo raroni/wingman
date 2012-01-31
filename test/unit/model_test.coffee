@@ -211,4 +211,30 @@ module.exports = class ModelTest extends Janitor.TestCase
     @assertEqual 'Toyota', value_from_callback.get('name')
     @assert correct_request
   
+  'test scope with rest': ->
+    Wingman.request.realRequest = (options) ->
+      data = [
+        { id: 1, name: 'McQueen', user_id: 1 }
+        { id: 2, name: 'Mater', user_id: 1 }
+        { id: 3, name: 'Batmobile', user_id: 2 }
+      ]
+      options.success data
+    
+    class Car extends Wingman.Model
+      @storage 'rest', url: '/cars'
+    
+    scope = Car.scoped user_id: 1
+    values_from_callback = []
+    scope.bind 'add', (model) ->
+      values_from_callback.push(model)
+    Car.load()
+    
+
+    @assertEqual 2, scope.count()
+    @assertEqual 'McQueen', values_from_callback[0].get('name')
+    @assertEqual 'Mater', values_from_callback[1].get('name')
+  
+  teardown: ->
+    delete Wingman.request.realRequest
+
 # TODO: LOAD AND DESTROY

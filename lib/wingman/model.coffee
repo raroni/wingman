@@ -2,6 +2,7 @@ Wingman = require '../wingman'
 WingmanObject = require './shared/object'
 StorageAdapter = require './model/storage_adapter'
 Store = require './model/store'
+Scope = require './model/scope'
 
 module.exports = class Model extends WingmanObject
   @extend StorageAdapter
@@ -31,7 +32,10 @@ module.exports = class Model extends WingmanObject
         model = new @ model_data
         @store().add model
         models.push model
-      callback models
+      callback models if callback
+  
+  @scoped: (params) ->
+    new Scope @store(), params
   
   constructor: (properties, options) ->
     @storage_adapter = @constructor.storageAdapter()
