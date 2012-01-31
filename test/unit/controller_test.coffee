@@ -42,3 +42,13 @@ module.exports = class extends Janitor.TestCase
     session = new WingmanObject
     controller = new MainController children: { options: { session} }
     @assertEqual session, controller.get('user.name.first.session')
+
+  'test sharing of shared context object': ->
+    MainController = class extends ControllerWithView
+    MainController.UserController = class extends ControllerWithView
+    MainController.UserController.NameController = class extends ControllerWithView
+    MainController.UserController.NameController.FirstController = class extends ControllerWithView
+
+    shared = new WingmanObject
+    controller = new MainController children: { options: { shared } }
+    @assertEqual shared, controller.get('user.name.first.shared')

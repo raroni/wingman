@@ -44,7 +44,7 @@ module.exports = class extends Janitor.TestCase
     app = new App el: root_el
     app.session.set user_id: 27
     @assertEqual 27, app.session.get('user_id')
-  
+    
   'test session sharing': ->
     App = class extends Wingman.Application
     App.RootController = class extends Wingman.Controller
@@ -59,6 +59,31 @@ module.exports = class extends Janitor.TestCase
     
     app.controller.get('user.session').set user_id: 2
     @assertEqual 2, app.session.get('user_id')
+    
+  'test shared context object': ->
+    App = class extends Wingman.Application
+    App.RootView = class extends ViewWithTemplateSource
+    App.RootController = class extends Wingman.Controller
+    
+    root_el = Wingman.document.createElement 'div'
+    app = new App el: root_el
+    app.shared.set user_id: 28
+    @assertEqual 28, app.shared.get('user_id')
+  
+  'test sharing of shared context object': ->
+    App = class extends Wingman.Application
+    App.RootController = class extends Wingman.Controller
+    App.RootView = class extends ViewWithTemplateSource
+    App.UserController = class extends Wingman.Controller
+    App.UserView = class extends ViewWithTemplateSource
+
+    root_el = Wingman.document.createElement 'div'
+    app = new App el: root_el
+    @assertEqual app.shared, app.view.get('user.shared')
+    @assertEqual app.shared, app.controller.get('user.shared')
+
+    app.controller.get('user.shared').set my_test: 'Ongo bo tonko'
+    @assertEqual 'Ongo bo tonko', app.view.get('user.shared').get('my_test')
   
   'test singleton instance': ->
     class MyApp extends Wingman.Application

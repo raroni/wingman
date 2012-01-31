@@ -16,6 +16,7 @@ module.exports = class extends Module
     @constructor.__super__.constructor.instance = @
     
     @session = new Session id: 1
+    @shared = new WingmanObject
     
     @el = options.el if options.el?
     @view = options.view || @buildView()
@@ -27,16 +28,25 @@ module.exports = class extends Module
     @ready?()
   
   buildView: ->
-    new @constructor.RootView parent: @, el: @el, children: { source: @, options: { session: @session } }
+    new @constructor.RootView parent: @, el: @el, children: @childOptions()
   
   setupController: ->
-    @controller = new @constructor.RootController parent: @, children: { source: @, options: { session: @session } }
+    @controller = new @constructor.RootController parent: @, children: @childOptions()
 
   handlePopStateChange: (e) =>
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run
       @_first_run = true
     else
       @updatePath()
+  
+  childOptions: ->
+    {
+      source: @,
+      options: {
+        session: @session,
+        shared: @shared
+      }
+    }
   
   updatePath: ->
     @session.set path: Wingman.document.location.pathname.substr(1)

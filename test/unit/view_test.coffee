@@ -14,7 +14,7 @@ clickElement = (elm) ->
   event.initMouseEvent "click", true, true
   elm.dispatchEvent event
 
-module.exports = class extends Janitor.TestCase
+module.exports = class ViewTest extends Janitor.TestCase
   setup: ->
     Wingman.document = document
     View.template_sources = {}
@@ -158,7 +158,7 @@ module.exports = class extends Janitor.TestCase
     SomeView = class extends ViewWithTemplateSource
     view = new SomeView
     @assertEqual undefined, view.el.style.display
-
+  
   'test session sharing': ->
     MainView = class extends ViewWithTemplateSource
     MainView.UserView = class extends ViewWithTemplateSource
@@ -168,12 +168,22 @@ module.exports = class extends Janitor.TestCase
     session = new WingmanObject
     view = new MainView children: { options: { session} }
     @assertEqual session, view.get('user.name.session')
-
+  
+  'test sharing of shared context object': ->
+    MainView = class extends ViewWithTemplateSource
+    MainView.UserView = class extends ViewWithTemplateSource
+    MainView.UserView.NameView = class extends ViewWithTemplateSource
+    MainView.UserView.NameView.FirstView = class extends ViewWithTemplateSource
+    
+    shared = new WingmanObject
+    view = new MainView children: { options: { shared } }
+    @assertEqual shared, view.get('user.name.shared')
+  
   'test access to parent': ->
     MainView = class extends ViewWithTemplateSource
     MainView.UserView = class extends ViewWithTemplateSource
     MainView.UserView.NameView = class extends ViewWithTemplateSource
-
+    
     view = new MainView
     @assert view.get('user.name').get('parent.parent') instanceof MainView
     @assert view.get('user.name.parent.parent') instanceof MainView
@@ -182,6 +192,6 @@ module.exports = class extends Janitor.TestCase
     callback_fired = false
     MainView = class extends ViewWithTemplateSource
       ready: -> callback_fired = true
-
+    
     view = new MainView
     @assert callback_fired
