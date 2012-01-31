@@ -5,7 +5,7 @@ document = require('jsdom').jsdom()
 CustomAssertions = require '../custom_assertions'
 Wingman.document = document
 
-module.exports = class extends Janitor.TestCase
+module.exports = class TemplateTest extends Janitor.TestCase
   setup: ->
     @parent = Wingman.document.createElement 'div'
   
@@ -234,3 +234,20 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 2, @parent.childNodes.length
     @assertEqual '<div>tester</div>', @parent.childNodes[1].innerHTML
   
+  'test regular attributes': ->
+    template = Wingman.Template.compile '<img src="my_pic.jpg">'
+    template @parent
+    @assertEqual 1, @parent.childNodes.length
+    @assertEqual 'my_pic.jpg', @parent.childNodes[0].getAttribute('src')
+  
+  'test regular attributes with dynamic values': ->
+    template = Wingman.Template.compile '<img src="{mySrc}">'
+    context = new WingmanObject
+    context.set mySrc: 'my_pic.png'
+    
+    template @parent, context
+    
+    @assertEqual 1, @parent.childNodes.length
+    @assertEqual 'my_pic.png', @parent.childNodes[0].getAttribute('src')
+    context.set mySrc: 'my_pic2.png'
+    @assertEqual 'my_pic2.png', @parent.childNodes[0].getAttribute('src')

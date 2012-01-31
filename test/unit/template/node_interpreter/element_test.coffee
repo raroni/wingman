@@ -6,7 +6,7 @@ WingmanObject = require '../../../../lib/wingman/shared/object'
 CustomAssertions = require '../../../custom_assertions'
 Wingman.document = require('jsdom').jsdom()
 
-module.exports = class extends Janitor.TestCase
+module.exports = class ElementTest extends Janitor.TestCase
   setup: ->
     @parent = Wingman.document.createElement 'div'
   
@@ -261,9 +261,24 @@ module.exports = class extends Janitor.TestCase
       type: 'element'
       tag: 'input'
       attributes:
-        name: 'email'
-        placeholder: 'Email...'
+        name: new Value('email')
+        placeholder: new Value('Email...')
     
     element = new Element(element_node, @parent).dom_element
     @assertEqual 'email', element.getAttribute('name')
     @assertEqual 'Email...', element.getAttribute('placeholder')
+
+  'test regular attributes with a dynamic value': ->
+    element_node =
+      type: 'element'
+      tag: 'img'
+      attributes:
+        src: new Value('{mySrc}')
+    
+    context = new WingmanObject
+    context.set mySrc: 'funny_pic.png'
+    
+    element = new Element(element_node, @parent, context).dom_element
+    @assertEqual 'funny_pic.png', element.getAttribute('src')
+    context.set mySrc: 'funny_pic2.png'
+    @assertEqual 'funny_pic2.png', element.getAttribute('src')

@@ -25,7 +25,13 @@ module.exports = class extends Module
       @addClass class_name.get @context
   
   setupAttributes: ->
-    @setAttribute key, value for key, value of @element_data.attributes
+    for key, value of @element_data.attributes
+      @setAttribute key, value.get(@context)
+      @observeAttribute key, value if value.is_dynamic
+  
+  observeAttribute: (key, value) ->
+    @context.observe value.get(), (new_value) =>
+      @setAttribute key, new_value
   
   observeClass: (class_name) ->
     @context.observe class_name.get(), (new_class_name, old_class_name) =>

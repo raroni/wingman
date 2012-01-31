@@ -125,4 +125,4 @@ module.exports = class
     if Object.keys(attributes).length != 0
       node.attributes = {}
       for key, value of attributes
-        node.attributes[key] = value
+        node.attributes[key] = new Value(value)

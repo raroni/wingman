@@ -182,7 +182,7 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'sub_view', sub_view_node.type
     @assertEqual 'user', sub_view_node.name
   
-  'test regular properties': ->
+  'test regular attributes': ->
     tree = @parse '<input name="email" placeholder="Email...">'
     nodes = tree.children
     
@@ -192,5 +192,18 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'input', input.tag
     @assert input.attributes
     @assertEqual 2, Object.keys(input.attributes).length
-    @assertEqual 'email', input.attributes.name
-    @assertEqual 'Email...', input.attributes.placeholder
+    @assertEqual 'email', input.attributes.name.get()
+    @assertEqual 'Email...', input.attributes.placeholder.get()
+
+  'test regular attributes with dynamic values': ->
+    tree = @parse '<img src="{mySrc}">'
+    nodes = tree.children
+    
+    @assertEqual 1, nodes.length
+    input = nodes[0]
+    @assertEqual 'element', input.type
+    @assertEqual 'img', input.tag
+    @assert input.attributes
+    @assertEqual 1, Object.keys(input.attributes).length
+    @assertEqual 'mySrc', input.attributes.src.get()
+    @assert input.attributes.src.is_dynamic
