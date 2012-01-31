@@ -116,7 +116,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     class Session extends Wingman.Model
       @storage 'local', namespace: 'sessions'
-
+  
     session = new Session id: 1, name: 'Rasmus'
     session.load()
     @assertEqual 27, session.get('user_id')
@@ -144,6 +144,20 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     @assertEqual 'Ras', name_from_callback
   
+  'test count when loading by id with rest storage': ->
+    Wingman.request.realRequest = (options) ->
+      options.success name: 'Ras' if options.url == '/users/10'
+      options.success name: 'John' if options.url == '/users/11'
+    
+    class User extends Wingman.Model
+      @storage 'rest', url: '/users'
+    
+    @assertEqual 0, User.count()
+    User.load 10
+    @assertEqual 1, User.count()
+    User.load 11
+    @assertEqual 2, User.count()
+  
   'test load many with rest storage': ->
     Wingman.request.realRequest = (options) ->
       data = [
@@ -163,5 +177,22 @@ module.exports = class ModelTest extends Janitor.TestCase
     @assertEqual 'Mater', array_from_callback[1].get('name')
     @assert array_from_callback[0] instanceof Car
     @assert array_from_callback[1] instanceof Car
+    
+  'test count when loading many with rest storage': ->
+    Wingman.request.realRequest = (options) ->
+      data = [
+        { name: 'McQueen' }
+        { name: 'Mater' }
+      ]
+      options.success data if options.url == '/cars' && options.type == 'GET'
+    
+    class Car extends Wingman.Model
+      @storage 'rest', url: '/cars'
+    
+    array_from_callback = undefined
+    
+    @assertEqual 0, Car.count()
+    Car.load (array) -> array_from_callback = array
+    @assertEqual 2, Car.count()
 
 # TODO: LOAD AND DESTROY
