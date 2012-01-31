@@ -5,6 +5,11 @@ StorageAdapter = require './model/storage_adapter'
 module.exports = class extends WingmanObject
   @extend StorageAdapter
   
+  @load: (id, callback) ->
+    @storageAdapter().load id, success: (hash) =>
+      model = new @ hash
+      callback model
+  
   constructor: (properties, options) ->
     @storage_adapter = @constructor.storageAdapter()
     @dirty_static_property_names = []

@@ -23,8 +23,3 @@ module.exports =
     options = {}
     options[key] = value for key, value of @storage_adapter_options when key != 'type'
     new klass options
-  
-  load: (id, callback) ->
-    @storageAdapter().load id, success: (hash) =>
-      model = new @ hash
-      callback model
