@@ -28,22 +28,22 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'John', child_elements[1].innerHTML
   
   'test for node with deferred push': ->
-      node_data =
-        type: 'element'
-        tag: 'li'
-        value: new Value('{user}')
-      
-      context = new WingmanObject
-      context.set users: ['Rasmus', 'John']
-  
-      parent_element = document.createElement 'ol'
-      new ForChildElement node_data, parent_element, context, 'users'
-      
-      child_elements = parent_element.childNodes
-      @assertEqual 2, child_elements.length
-      context.get('users').push 'Joe'
-      @assertEqual 3, child_elements.length
-      @assertEqual 'Joe', child_elements[2].innerHTML
+    node_data =
+      type: 'element'
+      tag: 'li'
+      value: new Value('{user}')
+    
+    context = new WingmanObject
+    context.set users: ['Rasmus', 'John']
+
+    parent_element = document.createElement 'ol'
+    new ForChildElement node_data, parent_element, context, 'users'
+    
+    child_elements = parent_element.childNodes
+    @assertEqual 2, child_elements.length
+    context.get('users').push 'Joe'
+    @assertEqual 3, child_elements.length
+    @assertEqual 'Joe', child_elements[2].innerHTML
   
   'test for node with deferred remove': ->
     node_data =

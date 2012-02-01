@@ -57,6 +57,8 @@ module.exports = class Model extends WingmanObject
       klass = Wingman.Application.instance.constructor[klass_name]
       association = new HasManyAssociation @, klass
       @setProperty has_many_name, association
+      association.bind 'add', (model) => @trigger "add:#{has_many_name}", model
+      association.bind 'remove', (model) => @trigger "remove:#{has_many_name}", model
   
   save: (options = {}) ->
     operation = if @isPersisted() then 'update' else 'create'

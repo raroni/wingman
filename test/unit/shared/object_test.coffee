@@ -258,7 +258,22 @@ module.exports = class extends Janitor.TestCase
     context.get('user.notifications').push 'Hello'
     
     @assertEqual 'Hello', added[0]
-  
+
+  'test deeply nested observe of array add of yet to be set properties': ->
+    context = new WingmanObject
+    shared = new WingmanObject
+    added = []
+    context.observe 'shared.current_club.notifications', 'add', (new_value) -> added.push(new_value)
+
+    context.set { shared }
+    
+    current_club = new WingmanObject
+    current_club.set notifications: []
+    shared.set { current_club }
+    
+    context.get('shared.current_club.notifications').push 'Hello'
+    @assertEqual 'Hello', added[0]
+    
   'test observe array property remove': ->
     country = new WingmanObject
     country.set cities: ['London', 'Manchester']
@@ -358,4 +373,3 @@ module.exports = class extends Janitor.TestCase
     context.observe 'name', -> callback_fired = true
     context.set name: 'Rasmus'
     @assert callback_fired
-  

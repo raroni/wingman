@@ -1,5 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
+WingmanObject = require '../../lib/wingman/shared/object'
 sinon = require 'sinon'
 RestStorage = require '../../lib/wingman/model/storage_adapters/rest'
 
@@ -256,6 +257,43 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     @assertEqual 2, user.get('notifications').count()
     delete Wingman.Application.instance
+  
+  
+  'test has many association add event': ->
+    id = 1
+    Wingman.request.realRequest = (options) ->
+      options.data.id = id++
+      options.success options.data
+
+    class User extends Wingman.Model
+      @hasMany 'notifications'
+
+    class Notification extends Wingman.Model
+
+    # For now we have no better solution than 
+    Wingman.Application.instance = { constructor: {} }
+    Wingman.Application.instance.constructor.Notification = Notification
+    
+    context = new WingmanObject
+    callback_values = []
+    context.observe 'user.notifications', 'add', (model) -> callback_values.push model
+    
+    user = new User()
+    user.save()
+    context.set { user }
+    
+    notifications = [
+      new Notification(user_id: 1)
+      new Notification(user_id: 2)
+      new Notification(user_id: 1)
+    ]
+    notification.save() for notification in notifications
+    
+    @assertEqual 2, callback_values.length
+    @assertEqual notifications[0], callback_values[0]
+    @assertEqual notifications[2], callback_values[1]
+    delete Wingman.Application.instance
+
   
   'test store add': ->
     class User extends Wingman.Model
