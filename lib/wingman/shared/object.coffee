@@ -44,29 +44,32 @@ WingmanObject = class extends Module
     # Beware, all ye who enter, for here be dragons!
     callback = args.pop()
     type = args.pop() || 'change'
-
+    
     chain = chain_as_string.split '.'
     chain_except_first = chain.slice 1, chain.length
     chain_except_first_as_string = chain_except_first.join '.'
     nested = chain_except_first.length != 0
-
+    
     get_and_send_to_callback = (new_value, old_value) =>
       if type == 'change'
         callback new_value, old_value
       else
         callback new_value
-
+    
     property = @get chain[0]
-
+    
     observeOnNested = (p) =>
       p.observe chain_except_first_as_string, type, (new_value, old_value) ->
         get_and_send_to_callback new_value, old_value
+    
     observeOnNested(property) if nested && property
-    @observeProperty chain[0], type, (new_value, old_value) ->
+    
+    observe_type = if nested then 'change' else type
+    @observeProperty chain[0], observe_type, (new_value, old_value) ->
       if nested
         if new_value
           ov = if old_value then old_value.get(chain_except_first.join('.')) else undefined
-          get_and_send_to_callback new_value.get(chain_except_first.join('.')), ov
+          get_and_send_to_callback new_value.get(chain_except_first.join('.')), ov if type == 'change'
           observeOnNested new_value
         if old_value
           old_value.unobserve chain_except_first_as_string, type, get_and_send_to_callback

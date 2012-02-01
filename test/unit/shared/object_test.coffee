@@ -64,7 +64,7 @@ module.exports = class extends Janitor.TestCase
     view = new WingmanObject
     latest_value_from_callback = undefined
     view.observe 'user.car.kilometers_driven', (new_value) -> latest_value_from_callback = new_value
-
+  
     user = new WingmanObject
     view.set { user }
     car1 = new WingmanObject
@@ -247,6 +247,18 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'Jack', added[2]
     @assertEqual 1, instance.get('users').length
   
+  'test nested observe of array add of yet to be set properties': ->
+    context = new WingmanObject
+    added = []
+    context.observe 'user.notifications', 'add', (new_value) -> added.push(new_value)
+    
+    user = new WingmanObject
+    context.set { user }
+    user.set notifications: []
+    context.get('user.notifications').push 'Hello'
+    
+    @assertEqual 'Hello', added[0]
+  
   'test observe array property remove': ->
     country = new WingmanObject
     country.set cities: ['London', 'Manchester']
@@ -338,7 +350,7 @@ module.exports = class extends Janitor.TestCase
     
     @assertEqual 1, values_from_callback.length
     @assertEqual 'Rasmus', values_from_callback[0]
-
+  
   'test observe once in combination with normal observe': ->
     context = new WingmanObject
     context.observeOnce 'name', -> 'test'
@@ -346,3 +358,4 @@ module.exports = class extends Janitor.TestCase
     context.observe 'name', -> callback_fired = true
     context.set name: 'Rasmus'
     @assert callback_fired
+  
