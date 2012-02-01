@@ -27,6 +27,25 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'Rasmus', child_elements[0].innerHTML
     @assertEqual 'John', child_elements[1].innerHTML
   
+  'test for node with nested source path': ->
+    node_data =
+      type: 'element'
+      tag: 'li'
+      value: new Value('{notification}')
+
+    context = new WingmanObject
+    user = new WingmanObject
+    user.set notifications: ['Hello', 'Hi']
+    context.set { user }
+
+    parent_element = document.createElement 'ol'
+    new ForChildElement node_data, parent_element, context, 'user.notifications'
+
+    child_elements = parent_element.childNodes
+    @assertEqual 2, child_elements.length
+    @assertEqual 'Hello', child_elements[0].innerHTML
+    @assertEqual 'Hi', child_elements[1].innerHTML
+  
   'test for node with deferred push': ->
     node_data =
       type: 'element'

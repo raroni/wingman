@@ -12,7 +12,7 @@ module.exports = class
   
   add: (value) =>
     new_context = new WingmanObject
-    key = Fleck.singularize @source_path
+    key = Fleck.singularize @source_path.split('.').pop()
     hash = {}
     hash[key] = value
     new_context.set hash
