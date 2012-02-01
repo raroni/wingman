@@ -53,3 +53,6 @@ module.exports = class Scope extends Module
   
   exists: (model) ->
     !!@models[model.get('id')]
+  
+  forEach: (callback) ->
+    callback value for key, value of @models

@@ -58,7 +58,19 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     notification = new @Notification id: 1, user_id: 27, text: 'Hello'
     
     @assertEqual notification, value_from_callback
-  
+
+  'test add event for models added prior to model getting an ID': ->
+    user = new @User
+    association = new HasManyAssociation user, @Notification
+    notification = new @Notification id: 1, user_id: 27, text: 'Hello'
+    
+    value_from_callback = undefined
+    association.bind 'add', (model) -> value_from_callback = model
+    
+    user.set id: 27
+    
+    @assertEqual notification, value_from_callback
+
   'test remove event': ->
     Wingman.request.realRequest = ->
     user = new @User
@@ -71,3 +83,4 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     notification.destroy()
     
     @assertEqual notification, value_from_callback
+

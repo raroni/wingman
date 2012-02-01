@@ -32,6 +32,19 @@ module.exports = class StoreTest extends Janitor.TestCase
     @assertEqual 'Goddag', values_from_callback[0].get('text')
     @assertEqual 'Bonsoir', values_from_callback[1].get('text')
   
+  'test for each': ->
+    scope = new Scope @Notification.store(), user_id: 1
+
+    notifications = [
+      new @Notification id: 1, user_id: 1, text: 'Goddag'
+      new @Notification id: 3, user_id: 2, text: 'Goddag'
+    ]
+    
+    callback_values = []
+    scope.forEach (model) => callback_values.push(model)
+    @assertEqual 1, callback_values.length
+    @assertEqual notifications[0], callback_values[0]
+  
   'test remove': ->
     Wingman.request.realRequest = (options) ->
     scope = new Scope @Notification.store(), user_id: 1

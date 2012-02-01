@@ -10,6 +10,7 @@ module.exports = class HasManyAssociation extends Module
   
   setupScope: =>
     @scope = @associated_class.scoped @scopeOptions()
+    @scope.forEach (model) => @trigger 'add', model
     @scope.bind 'add', (args...) => @trigger 'add', args...
     @scope.bind 'remove', (args...) => @trigger 'remove', args...
   
