@@ -232,6 +232,25 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'England', names[1]
     @assertEqual 'Sweden', names[2]
   
+  'test property dependency for array-like property': ->
+    Person = class extends WingmanObject
+      property_dependencies:
+        fullName: ['names']
+      
+      fullName: ->
+        @get('names').join(' ') if @get('names')
+    
+    person = new Person
+    callback_values = []
+    person.observe 'fullName', (value) -> callback_values.push value
+    person.set names: []
+    person.get('names').push 'Rasmus'
+    person.get('names').push 'Nielsen'
+    
+    @assertEqual '', callback_values[0]
+    @assertEqual 'Rasmus', callback_values[1]
+    @assertEqual 'Rasmus Nielsen', callback_values[2]
+  
   'test observe array property add': ->
     instance = new WingmanObject
     added = []

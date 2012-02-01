@@ -13,8 +13,22 @@ WingmanObject = class extends Module
         @initPropertyDependency dependent_property_key, depending_property_key
   
   initPropertyDependency: (dependent_property_key, depending_property_key) ->
-    @observe depending_property_key, =>
-        @triggerPropertyChange dependent_property_key
+    trigger = => @triggerPropertyChange dependent_property_key
+    @observe depending_property_key, (new_value, old_value) =>
+      trigger()
+      
+      if !old_value?.forEach && new_value?.forEach
+        observeArrayLike()
+      else if old_value?.forEach
+        unobserveArrayLike()
+    
+    observeArrayLike = =>
+      @observe depending_property_key, 'add', trigger
+      @observe depending_property_key, 'remove', trigger
+    
+    unobserveArrayLike = =>
+      @unobserve depending_property_key, 'add', trigger
+      @unobserve depending_property_key, 'remove', trigger
   
   set: (hash) ->
     @setProperties hash
