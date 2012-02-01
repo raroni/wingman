@@ -24,9 +24,8 @@ module.exports = class
     delete @elements[value]
   
   addAll: ->
-    for value in @context.get(@source_path)
-      @add value
-
+    @context.get(@source_path).forEach (value) => @add value
+  
   removeAll: ->
     @remove value for value, element of @elements
   
