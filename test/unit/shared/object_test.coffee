@@ -150,13 +150,29 @@ module.exports = class extends Janitor.TestCase
     person.observe 'fullName', (new_value) -> result = new_value
     person.set firstName: 'Rasmus', lastName: 'Nielsen'
     
-    @assertEqual result, 'Rasmus Nielsen'
+    @assertEqual 'Rasmus Nielsen', result
+    
+  'test property dependencies with single depending property': ->
+    Country = class extends WingmanObject
+      @NAMES: { dk: 'Denmark', se: 'Sweden' }
+      
+      property_dependencies:
+        countryName: 'country_code'
+
+      countryName: -> @constructor.NAMES[@get('country_code')]
+
+    country = new Country
+    result = undefined
+    country.observe 'countryName', (new_value) -> result = new_value
+    country.set country_code: 'dk'
+
+    @assertEqual 'Denmark', result
   
   'test nested property dependencies': ->
     session = new WingmanObject
     View = class extends WingmanObject
       property_dependencies:
-        isActive: ['session.user_id']
+        isActive: 'session.user_id'
       
       isActive: ->
         !!@get('session.user_id')

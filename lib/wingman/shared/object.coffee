@@ -5,10 +5,11 @@ WingmanObject = class extends Module
   @include Events
 
   constructor: ->
-    @initPropertyDependencies()
+    @initPropertyDependencies() if @property_dependencies
   
   initPropertyDependencies: ->
     for dependent_property_key, depending_properties_keys of @property_dependencies
+      depending_properties_keys = [depending_properties_keys] unless Array.isArray(depending_properties_keys)
       for depending_property_key in depending_properties_keys
         @initPropertyDependency dependent_property_key, depending_property_key
   
