@@ -47,3 +47,27 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     callback_fired = false
     association.forEach -> callback_fired = true
     @assert !callback_fired
+  
+  'test add event': ->
+    user = new @User
+    association = new HasManyAssociation user, @Notification
+    user.set id: 27
+    value_from_callback = undefined
+    association.bind 'add', (model) -> value_from_callback = model
+    
+    notification = new @Notification id: 1, user_id: 27, text: 'Hello'
+    
+    @assertEqual notification, value_from_callback
+  
+  'test remove event': ->
+    Wingman.request.realRequest = ->
+    user = new @User
+    association = new HasManyAssociation user, @Notification
+    user.set id: 27
+    value_from_callback = undefined
+    association.bind 'remove', (model) -> value_from_callback = model
+    
+    notification = new @Notification id: 1, user_id: 27, text: 'Hello'
+    notification.destroy()
+    
+    @assertEqual notification, value_from_callback

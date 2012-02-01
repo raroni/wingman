@@ -1,11 +1,17 @@
 Fleck = require 'fleck'
+Module = require './../shared/module'
+Events = require './../shared/events'
 
-module.exports = class HasManyAssociation
+module.exports = class HasManyAssociation extends Module
+  @include Events
+  
   constructor: (@model, @associated_class) ->
     @model.observeOnce 'id', @setupScope
   
   setupScope: =>
     @scope = @associated_class.scoped @scopeOptions()
+    @scope.bind 'add', (args...) => @trigger 'add', args...
+    @scope.bind 'remove', (args...) => @trigger 'remove', args...
   
   scopeOptions: ->
     options = {}
