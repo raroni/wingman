@@ -14,6 +14,19 @@ module.exports = class StoreTest extends Janitor.TestCase
     @store.add user
     @assertEqual 1, @store.count()
   
+  'test forEach': ->
+    user1 = new @User id: 1
+    user2 = new @User id: 2
+    @store.add user1
+    @store.add user2
+    
+    callback_values = []
+    @store.forEach (model) -> callback_values.push(model)
+    
+    @assertEqual 2, callback_values.length
+    @assertEqual user1, callback_values[0]
+    @assertEqual user2, callback_values[1]
+    
   'test add event': ->
     value_from_callback = undefined
     @store.bind 'add', (model) -> value_from_callback = model

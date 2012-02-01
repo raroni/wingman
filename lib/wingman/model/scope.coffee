@@ -6,6 +6,7 @@ module.exports = class Scope extends Module
   
   constructor: (store, @params) ->
     @models = {}
+    store.forEach (model) => @check model
     store.bind 'add', @listen
   
   listen: (model) =>
@@ -23,10 +24,10 @@ module.exports = class Scope extends Module
       @remove model
   
   shouldBeAdded: (model) ->
-    @isValid(model) && !@exists(model)
+    @matches(model) && !@exists(model)
   
   shouldBeRemoved: (model) ->
-    !@isValid(model) && @exists(model)
+    !@matches(model) && @exists(model)
   
   add: (model) ->
     throw new Error('Model must have ID to be stored.') unless model.get('id')
@@ -35,7 +36,7 @@ module.exports = class Scope extends Module
     @trigger 'add', model
     model.bind 'destroy', @remove
   
-  isValid: (model) ->
+  matches: (model) ->
     Object.keys(@params).every (key) =>
       model.get(key) == @params[key]
   
@@ -47,7 +48,7 @@ module.exports = class Scope extends Module
   
   remove: (model) =>
     delete @models[model.get('id')]
-    model.unbind @remove
+    model.unbind 'destroy', @remove
     @trigger 'remove', model
   
   exists: (model) ->

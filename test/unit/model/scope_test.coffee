@@ -66,3 +66,11 @@ module.exports = class StoreTest extends Janitor.TestCase
     notification.set user_id: 2
     @assertEqual 1, scope.count()
     @assertThrows -> scope.find(1)
+  
+  'test creating scope when theres already matches in the store': ->
+    new @Notification id: 1, user_id: 1, text: 'Goddag'
+    new @Notification id: 2, user_id: 2, text: 'Bonsoir'
+    
+    scope = new Scope @Notification.store(), user_id: 1
+    @assertEqual 1, scope.count()
+    @assertEqual 'Goddag', scope.find(1).get('text')

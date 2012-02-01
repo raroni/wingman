@@ -24,3 +24,6 @@ module.exports = class Store extends Module
   
   exists: (model) ->
     !!@models[model.get('id')]
+  
+  forEach: (callback) ->
+    callback(value) for key, value of @models
