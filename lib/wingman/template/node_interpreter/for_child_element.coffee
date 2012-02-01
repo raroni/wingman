@@ -5,7 +5,7 @@ NodeInterpreter = require '../node_interpreter'
 module.exports = class
   constructor: (@element_data, @scope, @context, @source_path) ->
     @elements = {}
-    @addAll()
+    @addAll() if @source()
     @context.observe @source_path, @rebuild
     @context.observe @source_path, 'add', @add
     @context.observe @source_path, 'remove', @remove
@@ -23,12 +23,15 @@ module.exports = class
     @elements[value].parentNode.removeChild @elements[value]
     delete @elements[value]
   
+  source: ->
+    @context.get @source_path
+  
   addAll: ->
-    @context.get(@source_path).forEach (value) => @add value
+    @source().forEach (value) => @add value
   
   removeAll: ->
     @remove value for value, element of @elements
   
   rebuild: =>
     @removeAll()
-    @addAll()
+    @addAll() if @source()
