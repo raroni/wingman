@@ -9,6 +9,7 @@ module.exports = class Store extends Module
   
   add: (model) ->
     throw new Error('Model must have ID to be stored.') unless model.get('id')
+    throw new Error("#{model.constructor.name} model with ID #{model.get('id')} already in store.") if @exists(model)
     @models[model.get('id')] = model
     @trigger 'add', model
     model.bind 'destroy', @remove
@@ -20,3 +21,6 @@ module.exports = class Store extends Module
     delete @models[model.get('id')]
     model.unbind @remove
     @trigger 'remove', model
+  
+  exists: (model) ->
+    !!@models[model.get('id')]

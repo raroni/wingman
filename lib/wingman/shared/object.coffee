@@ -33,6 +33,13 @@ WingmanObject = class extends Module
   triggerPropertyChange: (property_name, old_value) ->
     @trigger "change:#{property_name}", @get(property_name), old_value
   
+  observeOnce: (chain_as_string, callback) ->
+    observer = (args...) =>
+      callback args...
+      @unobserve chain_as_string, observer
+      
+    @observe chain_as_string, observer
+  
   observe: (chain_as_string, args...) ->
     # Beware, all ye who enter, for here be dragons!
     callback = args.pop()

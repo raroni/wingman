@@ -116,7 +116,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     class Session extends Wingman.Model
       @storage 'local', namespace: 'sessions'
-  
+    
     session = new Session id: 1, name: 'Rasmus'
     session.load()
     @assertEqual 27, session.get('user_id')
@@ -229,10 +229,45 @@ module.exports = class ModelTest extends Janitor.TestCase
       values_from_callback.push(model)
     Car.load()
     
-
     @assertEqual 2, scope.count()
     @assertEqual 'McQueen', values_from_callback[0].get('name')
     @assertEqual 'Mater', values_from_callback[1].get('name')
+  
+  'test has many association': ->
+    id = 1
+    Wingman.request.realRequest = (options) ->
+      options.data.id = id++
+      options.success options.data
+    
+    class User extends Wingman.Model
+      @hasMany 'notifications'
+    
+    class Notification extends Wingman.Model
+    
+    # For now we have no better solution than 
+    Wingman.Application.instance = { constructor: {} }
+    Wingman.Application.instance.constructor.Notification = Notification
+    
+    user = new User()
+    user.save()
+    
+    new Notification(user_id: 1).save() for [1..2]
+    new Notification(user_id: 2).save()
+    
+    @assertEqual 2, user.get('notifications').count()
+    delete Wingman.Application.instance
+  
+  'test store add': ->
+    class User extends Wingman.Model
+    user = new User
+    @assertEqual 0, User.store().count()
+    user.set id: 1
+    @assertEqual 1, User.store().count()
+  
+  'test exception when attempting to change id': ->
+    class User extends Wingman.Model
+    user = new User id: 1
+    @assertThrows -> user.set id: 2
   
   teardown: ->
     delete Wingman.request.realRequest

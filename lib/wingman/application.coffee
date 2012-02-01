@@ -4,8 +4,9 @@ WingmanObject = require './shared/object'
 FamilyMember = require './shared/family_member'
 Navigator = require './shared/navigator'
 
-class Session extends Wingman.Model
-  @storage 'local', namespace: 'sessions'
+createSessionClass = ->
+  class Session extends Wingman.Model
+    @storage 'local', namespace: 'sessions'
 
 module.exports = class extends Module
   @include FamilyMember
@@ -15,7 +16,8 @@ module.exports = class extends Module
     throw new Error 'You cannot instantiate two Wingman apps at the same time.' if @constructor.__super__.constructor.instance
     @constructor.__super__.constructor.instance = @
     
-    @session = new Session id: 1
+    session_class = createSessionClass()
+    @session = new session_class id: 1
     @shared = new WingmanObject
     
     @el = options.el if options.el?

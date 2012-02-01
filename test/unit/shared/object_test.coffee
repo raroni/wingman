@@ -326,3 +326,23 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 26, context.get('friends')[0].get('age')
     @assertEqual 'John', context.get('friends')[1].get('name')
     @assertEqual 27, context.get('friends')[1].get('age')
+  
+  'test observe once': ->
+    context = new WingmanObject
+    values_from_callback = []
+    context.observeOnce 'name', (value) -> values_from_callback.push(value)
+    
+    context.set name: 'Rasmus'
+    context.set name: 'Lou Bega'
+    context.set name: 'Hendrix'
+    
+    @assertEqual 1, values_from_callback.length
+    @assertEqual 'Rasmus', values_from_callback[0]
+
+  'test observe once in combination with normal observe': ->
+    context = new WingmanObject
+    context.observeOnce 'name', -> 'test'
+    callback_fired = false
+    context.observe 'name', -> callback_fired = true
+    context.set name: 'Rasmus'
+    @assert callback_fired

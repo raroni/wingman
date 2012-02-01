@@ -76,12 +76,12 @@ module.exports = class extends Janitor.TestCase
     App.RootView = class extends ViewWithTemplateSource
     App.UserController = class extends Wingman.Controller
     App.UserView = class extends ViewWithTemplateSource
-
+  
     root_el = Wingman.document.createElement 'div'
     app = new App el: root_el
     @assertEqual app.shared, app.view.get('user.shared')
     @assertEqual app.shared, app.controller.get('user.shared')
-
+  
     app.controller.get('user.shared').set my_test: 'Ongo bo tonko'
     @assertEqual 'Ongo bo tonko', app.view.get('user.shared').get('my_test')
   
