@@ -27,7 +27,7 @@ module.exports = class extends WingmanObject
     template = Wingman.Template.compile @templateSource()
     template @el, @
     @addClass @constructor._name
-    @setupEvents() if @events?
+    @setupListeners()
     @setupActiveListener() if @isActive
     @ready?()
   
@@ -35,7 +35,11 @@ module.exports = class extends WingmanObject
     template_source = @constructor.template_sources[@path()]
     throw new Error "Template '#{@path()}' not found." unless template_source
     template_source
-
+  
+  setupListeners: ->
+    @el.addEventListener 'click', (e) => @click(e) if @click
+    @setupEvents() if @events
+  
   setupEvents: ->
     @setupEvent event for event in @constructor.parseEvents(@events)
   

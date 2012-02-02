@@ -87,6 +87,22 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     clickElement view.el.childNodes[0].childNodes[0]
     @assert clicked
+    
+  'test click on views mother element': ->
+    event_from_callback = undefined
+    did_maintain_context = false
+    ViewKlass = class MainView extends View
+      randomProperty: true
+      click: (event) ->
+        did_maintain_context = @randomProperty
+        event_from_callback = event
+      templateSource: -> '<div><a>BOING</a></div>'
+
+    view = new ViewKlass
+    clickElement view.el.childNodes[0].childNodes[0]
+    @assert event_from_callback
+    @assertEqual 'A', event_from_callback.target.tagName
+    @assert did_maintain_context
   
   'test trigger arguments': ->
     View.template_sources.test = '<div>Something</div>'
