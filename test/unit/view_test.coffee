@@ -124,7 +124,7 @@ module.exports = class ViewTest extends Janitor.TestCase
   
   'test show/hide via isActive': ->
     LoggedInView = class extends ViewWithTemplateSource
-      property_dependencies:
+      @propertyDependencies
         isActive: ['logged_in']
       
       isActive: ->
@@ -139,7 +139,7 @@ module.exports = class ViewTest extends Janitor.TestCase
   
   'test show/hide via isActive using nested properties': ->
     LoggedInView = class extends ViewWithTemplateSource
-      property_dependencies:
+      @propertyDependencies
         isActive: ['session.user_id']
     
       isActive: ->

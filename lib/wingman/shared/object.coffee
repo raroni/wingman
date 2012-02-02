@@ -3,12 +3,16 @@ Events = require './events'
 
 WingmanObject = class extends Module
   @include Events
+  
+  @propertyDependencies: (hash) ->
+    @property_dependency_config ||= {}
+    @property_dependency_config[key] = value for key, value of hash
 
   constructor: ->
-    @initPropertyDependencies() if @property_dependencies
+    @initPropertyDependencies() if @constructor.property_dependency_config
   
   initPropertyDependencies: ->
-    for dependent_property_key, depending_properties_keys of @property_dependencies
+    for dependent_property_key, depending_properties_keys of @constructor.property_dependency_config
       depending_properties_keys = [depending_properties_keys] unless Array.isArray(depending_properties_keys)
       for depending_property_key in depending_properties_keys
         @initPropertyDependency dependent_property_key, depending_property_key

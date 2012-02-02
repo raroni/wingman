@@ -140,7 +140,7 @@ module.exports = class extends Janitor.TestCase
   
   'test property dependencies': ->
     Person = class extends WingmanObject
-      property_dependencies:
+      @propertyDependencies
         fullName: ['firstName', 'lastName']
       
       fullName: -> "#{@get('firstName')} #{@get('lastName')}"
@@ -156,7 +156,7 @@ module.exports = class extends Janitor.TestCase
     Country = class extends WingmanObject
       @NAMES: { dk: 'Denmark', se: 'Sweden' }
       
-      property_dependencies:
+      @propertyDependencies
         countryName: 'country_code'
 
       countryName: -> @constructor.NAMES[@get('country_code')]
@@ -171,7 +171,7 @@ module.exports = class extends Janitor.TestCase
   'test nested property dependencies': ->
     session = new WingmanObject
     View = class extends WingmanObject
-      property_dependencies:
+      @propertyDependencies
         isActive: 'session.user_id'
       
       isActive: ->
@@ -189,7 +189,7 @@ module.exports = class extends Janitor.TestCase
     session.set user_id: 1
     
     View = class extends WingmanObject
-      property_dependencies:
+      @propertyDependencies
         isActive: ['session.user_id']
         canTrain: ['training.created_on']
       
@@ -217,7 +217,7 @@ module.exports = class extends Janitor.TestCase
         UK: 'England'
         SE: 'Sweden'
   
-      property_dependencies:
+      @propertyDependencies
         name: ['code']
   
       name: ->
@@ -250,7 +250,7 @@ module.exports = class extends Janitor.TestCase
   
   'test property dependency for array-like property': ->
     Person = class extends WingmanObject
-      property_dependencies:
+      @propertyDependencies
         fullName: ['names']
       
       fullName: ->
