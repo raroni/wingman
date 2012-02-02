@@ -1,18 +1,37 @@
 Module = require './module'
 Events = require './events'
 
+property_dependencies = {}
+
 WingmanObject = class extends Module
   @include Events
   
+  @parentPropertyDependencies: ->
+    if @__super__?.constructor?.propertyDependencies
+      @__super__.constructor.propertyDependencies()
+    else
+      {}
+  
+  @buildPropertyDependencies: ->
+    dependencies = {}
+    dependencies[key] = value for key, value of @parentPropertyDependencies()
+    dependencies
+  
   @propertyDependencies: (hash) ->
-    @property_dependency_config ||= {}
-    @property_dependency_config[key] = value for key, value of hash
-
+    if hash
+      @addPropertyDependencies hash
+    else
+      property_dependencies[@] ||= @buildPropertyDependencies()
+    
+  @addPropertyDependencies: (hash) ->
+    config = @propertyDependencies()
+    config[key] = value for key, value of hash
+  
   constructor: ->
-    @initPropertyDependencies() if @constructor.property_dependency_config
+    @initPropertyDependencies() if @constructor.propertyDependencies()
   
   initPropertyDependencies: ->
-    for dependent_property_key, depending_properties_keys of @constructor.property_dependency_config
+    for dependent_property_key, depending_properties_keys of @constructor.propertyDependencies()
       depending_properties_keys = [depending_properties_keys] unless Array.isArray(depending_properties_keys)
       for depending_property_key in depending_properties_keys
         @initPropertyDependency dependent_property_key, depending_property_key

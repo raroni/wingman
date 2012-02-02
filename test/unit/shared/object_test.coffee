@@ -158,14 +158,14 @@ module.exports = class extends Janitor.TestCase
       
       @propertyDependencies
         countryName: 'country_code'
-
+  
       countryName: -> @constructor.NAMES[@get('country_code')]
-
+  
     country = new Country
     result = undefined
     country.observe 'countryName', (new_value) -> result = new_value
     country.set country_code: 'dk'
-
+  
     @assertEqual 'Denmark', result
   
   'test nested property dependencies': ->
@@ -251,7 +251,7 @@ module.exports = class extends Janitor.TestCase
   'test property dependency for array-like property': ->
     Person = class extends WingmanObject
       @propertyDependencies
-        fullName: ['names']
+        fullName: 'names'
       
       fullName: ->
         @get('names').join(' ') if @get('names')
@@ -266,6 +266,46 @@ module.exports = class extends Janitor.TestCase
     @assertEqual '', callback_values[0]
     @assertEqual 'Rasmus', callback_values[1]
     @assertEqual 'Rasmus Nielsen', callback_values[2]
+  
+  'test property dependency inheritance': ->
+    class Parent extends WingmanObject
+      @propertyDependencies
+        loggedIn: 'current_user'
+      
+      loggedIn: ->
+        !!@get('current_user')
+    
+    class Child extends Parent
+      @propertyDependencies
+        something: 'loggedIn'
+      
+      something: ->
+    
+    child = new Child
+    callback_fired = false
+    child.observe 'something', -> callback_fired = true
+    child.set current_user: 'yogi'
+    @assert callback_fired
+  
+  'test childrens property dependencies doesnt affect parents': ->
+    class Parent extends WingmanObject
+      @propertyDependencies
+        loggedIn: 'current_user'
+      
+      loggedIn: ->
+        !!@get('current_user')
+    
+    class Child extends Parent
+      @propertyDependencies
+        something: 'loggedIn'
+      
+      something: ->
+    
+    parent = new Parent
+    parent_callback_fired = false
+    parent.observe 'something', -> parent_callback_fired = true
+    parent.set current_user: 'bobo'
+    @assert !parent_callback_fired
   
   'test observe array property add': ->
     instance = new WingmanObject
@@ -293,13 +333,13 @@ module.exports = class extends Janitor.TestCase
     context.get('user.notifications').push 'Hello'
     
     @assertEqual 'Hello', added[0]
-
+  
   'test deeply nested observe of array add of yet to be set properties': ->
     context = new WingmanObject
     shared = new WingmanObject
     added = []
     context.observe 'shared.current_club.notifications', 'add', (new_value) -> added.push(new_value)
-
+  
     context.set { shared }
     
     current_club = new WingmanObject
