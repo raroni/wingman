@@ -53,3 +53,25 @@ module.exports = class extends Janitor.TestCase
     children_options = { options: { session } }
     controller = new NestedController parent: {}, children: children_options
     @assertEqual session, controller.get('logged_in.welcome.session')
+
+  'test child classes': ->
+    instantiated_classes = []
+    class DummyCounter extends WingmanObject
+      @include FamilyMember
+      
+      constructor: ->
+        @parent = {}
+        @familize 'Controller'
+        instantiated_classes.push @constructor.name
+    
+    class BaseController extends DummyCounter
+    class BaseController.Controller extends DummyCounter
+    class BaseController.UserController extends DummyCounter
+    class BaseController.MailController extends DummyCounter
+    class BaseController.MailView extends DummyCounter
+    
+    new BaseController
+    @assertEqual 3, instantiated_classes.length
+    @assertContains instantiated_classes, 'BaseController'
+    @assertContains instantiated_classes, 'MailController'
+    @assertContains instantiated_classes, 'UserController'

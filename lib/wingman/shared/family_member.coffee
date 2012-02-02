@@ -27,7 +27,7 @@ module.exports =
     classes = []
     source = options?.source || @
     for key, value of source.constructor
-      match = key.match "(.*)#{type}$"
+      match = key.match "(.+)#{type}$"
       if match && value != @constructor
         value._name = Fleck.underscore match[1]
         classes.push value
