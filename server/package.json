@@ -1,0 +1,14 @@
+{
+  "name": "wingman-server",
+  "description": "TODO.",
+  "author": "Rasmus Rønn Nielsen <rasmusrnielsen@gmail.com>",
+  "version": "0.1.0",
+  "main": "lib/wingman-server",
+  "devDependencies": {
+    "janitor": "0.1.5",
+    "coffee-script" : "1.2.0"
+  },
+  "dependencies": {
+    "wingman-client": "0.1.0"
+  }
+}
