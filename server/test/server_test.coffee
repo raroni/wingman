@@ -4,7 +4,6 @@ http = require 'http'
 path = require 'path'
 URL = require 'url'
 
-
 get = (url, callback) ->
   parsed_url = URL.parse url
   http.get host: parsed_url.hostname, port: parsed_url.port, path: parsed_url.path, (response) =>
@@ -56,7 +55,7 @@ module.exports = class ModelTest extends Janitor.TestCase
       server.stop()
       @complete()
   
-  'async test css file': ->
+  'async test application css file': ->
     root_dir = path.join __dirname, 'fixtures/sample_app'
     server = createServer root_dir
     server.start()
@@ -66,5 +65,17 @@ module.exports = class ModelTest extends Janitor.TestCase
       @assertContains response.body, 'margin: 321px auto'
       @assertContains response.body, 'padding-top: 973px'
       @assertEqual response.headers['content-type'], 'text/css'
+      server.stop()
+      @complete()
+  
+  'async test application javascript': ->
+    root_dir = path.join __dirname, 'fixtures/sample_app'
+    server = createServer root_dir
+    server.start()
+    
+    get "http://localhost:#{server.options.port}/application.js", (response) =>
+      @assertEqual 200, response.statusCode
+      @assertEqual response.headers['content-type'], 'application/x-javascript'
+      @assertContains response.body, 'Wingman'
       server.stop()
       @complete()
