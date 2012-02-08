@@ -41,8 +41,7 @@ class Server
           myCount = (str) ->
             str.match(reg_exp).length
           if myCount(a) > myCount(b) then 1 else -1
-      
-      requires.push file.replace('app/', '').replace(".coffee", "") for file in files
+        requires.push file.replace(path.join(@options.root_dir, 'app'), '').substring(1).replace(".coffee", "") for file in files
       
       js_requires = ""
       for require in requires
