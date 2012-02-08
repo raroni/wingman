@@ -43,3 +43,15 @@ module.exports = class ModelTest extends Janitor.TestCase
       @assertContains response.body, 'It works'
       server.stop()
       @complete()
+  
+  'async test asset file': ->
+    app_dir = path.join __dirname, 'fixtures/sample_app'
+    server = createServer app_dir
+    server.start()
+
+    get "http://localhost:#{server.options.port}/assets/txts/test.txt", (response) =>
+      @assertEqual 200, response.statusCode
+      @assertEqual response.body, 'I am a VERY happy assets! :D'
+      @assertEqual response.headers['content-type'], 'text/plain; charset=UTF-8'
+      server.stop()
+      @complete()

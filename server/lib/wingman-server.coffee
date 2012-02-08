@@ -12,6 +12,8 @@ class Server
       html = fs.readFileSync file, 'utf-8'
       response.send html
     
+    app.use "/assets", express.static(@options.app_dir + '/app/assets')
+    
     @server = app.listen @options.port
   
   stop: ->
