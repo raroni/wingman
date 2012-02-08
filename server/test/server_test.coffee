@@ -13,14 +13,14 @@ get = (url, callback) ->
     response.on 'end', -> callback { body, statusCode: response.statusCode, headers: response.headers }
 
 next_port = 5000
-createServer = (app_dir) ->
+createServer = (root_dir) ->
   next_port++
-  new Server { port: next_port, app_dir }
+  new Server { port: next_port, root_dir }
 
 module.exports = class ModelTest extends Janitor.TestCase
   'async test root path of server': ->
-    app_dir = path.join __dirname, 'fixtures/sample_app'
-    server = createServer app_dir
+    root_dir = path.join __dirname, 'fixtures/sample_app'
+    server = createServer root_dir
     server.start()
     
     get "http://localhost:#{server.options.port}/", (response) =>
@@ -32,8 +32,8 @@ module.exports = class ModelTest extends Janitor.TestCase
       @complete()
   
   'async test random non assets path without file extensions': ->
-    app_dir = path.join __dirname, 'fixtures/sample_app'
-    server = createServer app_dir
+    root_dir = path.join __dirname, 'fixtures/sample_app'
+    server = createServer root_dir
     server.start()
     
     get "http://localhost:#{server.options.port}/something", (response) =>
@@ -45,10 +45,10 @@ module.exports = class ModelTest extends Janitor.TestCase
       @complete()
   
   'async test asset file': ->
-    app_dir = path.join __dirname, 'fixtures/sample_app'
-    server = createServer app_dir
+    root_dir = path.join __dirname, 'fixtures/sample_app'
+    server = createServer root_dir
     server.start()
-
+    
     get "http://localhost:#{server.options.port}/assets/txts/test.txt", (response) =>
       @assertEqual 200, response.statusCode
       @assertEqual response.body, 'I am a VERY happy assets! :D'
