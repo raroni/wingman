@@ -55,3 +55,16 @@ module.exports = class ModelTest extends Janitor.TestCase
       @assertEqual response.headers['content-type'], 'text/plain; charset=UTF-8'
       server.stop()
       @complete()
+  
+  'async test css file': ->
+    root_dir = path.join __dirname, 'fixtures/sample_app'
+    server = createServer root_dir
+    server.start()
+    
+    get "http://localhost:#{server.options.port}/application.css", (response) =>
+      @assertEqual 200, response.statusCode
+      @assertContains response.body, 'margin: 321px auto'
+      @assertContains response.body, 'padding-top: 973px'
+      @assertEqual response.headers['content-type'], 'text/css'
+      server.stop()
+      @complete()

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "express": "2.5.4",
+    "stylus": "0.23.0",
     "wingman-client": "0.1.0"
   }
 }
