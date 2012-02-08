@@ -48,11 +48,22 @@ class Server
       for require in requires
         js_requires += "require('#{require}');\n"
       
+      
+      #templates
+      
+      templates = {}
+      prefix = path.join @options.root_dir, 'app', 'templates'
+      template_paths = glob.sync path.join(prefix, '**.whtml')
+      for template_path in template_paths
+        key = template_path.replace(prefix, '').replace('.whtml', '').replace(/\//g, '.')
+        templates[key] = fs.readFileSync template_path, 'utf-8'
+      
       package.compile (err, source) ->
         source = """
           (function() {
             #{source}
             window.Wingman = require('wingman');
+            window.Wingman.View.template_sources = #{JSON.stringify(templates)}
             #{js_requires}
           })();
         """

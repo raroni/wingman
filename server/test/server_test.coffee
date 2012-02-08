@@ -83,5 +83,6 @@ module.exports = class ModelTest extends Janitor.TestCase
       @assertContains response.body, 'SampleApp.RootView'
       @assertContains response.body, 'SampleApp.User'
       @assertContains response.body, 'new SampleApp'
+      @assertContains response.body, 'I am the root template'
       server.stop()
       @complete()
