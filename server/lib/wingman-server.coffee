@@ -3,6 +3,7 @@ path = require 'path'
 fs = require 'fs'
 stylus = require 'stylus'
 stitch = require 'stitch'
+glob = require 'glob'
 
 class Server
   constructor: (@options) ->
@@ -29,11 +30,30 @@ class Server
           @options.root_dir + '/config'
           wingman_client_dir
         ]
+      
+      requires = ['application']
+      app_dirs = ['helpers', 'models', 'views', 'controllers']
+      for app_dir in app_dirs
+        glob_search_string = path.join @options.root_dir, 'app', app_dir, '**.coffee'
+        files = glob.sync glob_search_string
+        files = files.sort (a, b) ->
+          reg_exp = ///////g
+          myCount = (str) ->
+            str.match(reg_exp).length
+          if myCount(a) > myCount(b) then 1 else -1
+      
+      requires.push file.replace('app/', '').replace(".coffee", "") for file in files
+      
+      js_requires = ""
+      for require in requires
+        js_requires += "require('#{require}');\n"
+      
       package.compile (err, source) ->
         source = """
           (function() {
             #{source}
             window.Wingman = require('wingman');
+            #{js_requires}
           })();
         """
         response.header 'Content-Type', 'application/x-javascript'

@@ -77,5 +77,10 @@ module.exports = class ModelTest extends Janitor.TestCase
       @assertEqual 200, response.statusCode
       @assertEqual response.headers['content-type'], 'application/x-javascript'
       @assertContains response.body, 'Wingman'
+      @assertContains response.body, 'SampleApp.Controller'
+      @assertContains response.body, 'SampleApp.RootController'
+      @assertContains response.body, 'SampleApp.View'
+      @assertContains response.body, 'SampleApp.RootView'
+      @assertContains response.body, 'SampleApp.User'
       server.stop()
       @complete()
