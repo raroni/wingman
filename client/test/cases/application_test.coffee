@@ -191,6 +191,15 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app = new MyApp el: Wingman.document.createElement('div')
     @assertEqual 1, app.session.get('user_id')
   
+  'test setting correct classes on RootView': ->
+    class MyApp extends Wingman.Application
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.RootView extends ViewWithTemplateSource
+    class MyApp.MainView extends ViewWithTemplateSource
+    new MyApp el: Wingman.document.createElement('div') 
+    @assertEqual MyApp.MainView, MyApp.RootView.MainView
+    @assert !MyApp.RootView.RootController
+  
   teardown: ->
     delete Wingman.Application.instance
     Wingman.View.template_sources = {}

@@ -20,6 +20,9 @@ module.exports = class extends Module
     @session = new session_class id: 1
     @shared = new WingmanObject
     
+    for key, value of @constructor
+      @constructor.RootView[key] = value if key.match("(.+)View$") && key != 'RootView'
+    
     @el = options.el if options.el?
     @view = options.view || @buildView()
     
