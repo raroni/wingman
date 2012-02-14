@@ -133,7 +133,7 @@ module.exports = class extends Janitor.TestCase
     
     app = new MyApp el: Wingman.document.createElement 'div'
     app.navigate 'user'
-    @assertEqual 'user', app.session.get('path')
+    @assertEqual 'user', app.shared.get('path')
   
   'test initial path': ->
     MyApp = class extends Wingman.Application
@@ -142,7 +142,7 @@ module.exports = class extends Janitor.TestCase
     
     Wingman.window.document.location.pathname = '/user'
     app = new MyApp el: Wingman.document.createElement('div')
-    @assertEqual 'user', app.session.get('path')
+    @assertEqual 'user', app.shared.get('path')
   
   'test controller finding matching view automatically': ->
     MyApp = class extends Wingman.Application

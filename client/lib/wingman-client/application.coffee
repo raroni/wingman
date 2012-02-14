@@ -51,7 +51,7 @@ module.exports = class extends Module
     }
   
   updatePath: ->
-    @session.set path: Wingman.document.location.pathname.substr(1)
+    @shared.set path: Wingman.document.location.pathname.substr(1)
   
   findView: (path) ->
     @view.get path
