@@ -144,6 +144,18 @@ module.exports = class extends Janitor.TestCase
     app = new MyApp el: Wingman.document.createElement('div')
     @assertEqual 'user', app.shared.get('path')
   
+  'test backing through history': ->
+    class MyApp extends Wingman.Application
+    MyApp.RootController = class extends Wingman.Controller
+    MyApp.RootView = class extends ViewWithTemplateSource
+
+    app = new MyApp el: Wingman.document.createElement 'div'
+    app.navigate 'user'
+    app.navigate 'home'
+    app.back()
+    @assertEqual 'user', app.shared.get('path')
+    @assertEqual '/user', Wingman.window.location.pathname
+  
   'test controller finding matching view automatically': ->
     MyApp = class extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
