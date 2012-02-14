@@ -3,7 +3,7 @@ Events = require './events'
 
 property_dependencies = {}
 
-WingmanObject = class extends Module
+WingmanObject = class WingmanObject extends Module
   @include Events
   
   @parentPropertyDependencies: ->
