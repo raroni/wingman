@@ -31,6 +31,11 @@ module.exports = class extends WingmanObject
     @setupActiveListener() if @isActive
     @ready?()
   
+  buildSubView: (view_name) ->
+    class_name = Fleck.camelize "#{view_name}_view", true
+    klass = @constructor[class_name]
+    new klass parent: @
+  
   templateSource: ->
     template_source = @constructor.template_sources[@path()]
     throw new Error "Template '#{@path()}' not found." unless template_source

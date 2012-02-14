@@ -211,3 +211,12 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     view = new MainView
     @assert callback_fired
+  
+  'test build sub view': ->
+    MainView = class extends ViewWithTemplateSource
+    MainView.UserView = class extends ViewWithTemplateSource
+    
+    view = new MainView
+    sub_view = view.buildSubView 'user'
+    @assert sub_view instanceof MainView.UserView
+    @assert view, sub_view.parent
