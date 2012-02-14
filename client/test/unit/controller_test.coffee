@@ -11,13 +11,13 @@ class ControllerWithView extends Wingman.Controller
     options.view = new DummyView parent: { el: Wingman.document.createElement('div') }
     super options
 
-module.exports = class extends Janitor.TestCase
+module.exports = class ControllerTest extends Janitor.TestCase
   'test automatic children instantiation': ->
     MainController = class extends ControllerWithView
     MainController.UserController = class extends ControllerWithView
     
     main_controller = new MainController
-    @assert main_controller.get('user') instanceof MainController.UserController
+    @assert main_controller.get('user_controller') instanceof MainController.UserController
   
   'test ready callback': ->
     callback_fired = false
@@ -41,7 +41,7 @@ module.exports = class extends Janitor.TestCase
     
     session = new WingmanObject
     controller = new MainController children: { options: { session} }
-    @assertEqual session, controller.get('user.name.first.session')
+    @assertEqual session, controller.get('user_controller.name_controller.first_controller.session')
 
   'test sharing of shared context object': ->
     MainController = class extends ControllerWithView
@@ -51,4 +51,4 @@ module.exports = class extends Janitor.TestCase
 
     shared = new WingmanObject
     controller = new MainController children: { options: { shared } }
-    @assertEqual shared, controller.get('user.name.first.shared')
+    @assertEqual shared, controller.get('user_controller.name_controller.first_controller.shared')

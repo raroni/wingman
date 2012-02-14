@@ -36,7 +36,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     UserView = class extends View
       @_name: 'user'
       templateSource: -> '<div>hello</div>'
-
+  
     view = new UserView
     @assertEqual 'user', view.el.className
   
@@ -97,7 +97,7 @@ module.exports = class ViewTest extends Janitor.TestCase
         did_maintain_context = @randomProperty
         event_from_callback = event
       templateSource: -> '<div><a>BOING</a></div>'
-
+  
     view = new ViewKlass
     clickElement view.el.childNodes[0].childNodes[0]
     @assert event_from_callback
@@ -136,7 +136,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView.UserView.NameView.FirstView = class extends ViewWithTemplateSource
     
     view = new MainView parent: { el: document.createElement('div') }
-    @assertEqual 'user.name.first', view.get('user.name.first').path()
+    @assertEqual 'user_view.name_view.first_view', view.get('user_view.name_view.first_view').path()
   
   'test show/hide via isActive': ->
     LoggedInView = class extends ViewWithTemplateSource
@@ -183,7 +183,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     session = new WingmanObject
     view = new MainView children: { options: { session} }
-    @assertEqual session, view.get('user.name.session')
+    @assertEqual session, view.get('user_view.name_view.session')
   
   'test sharing of shared context object': ->
     MainView = class extends ViewWithTemplateSource
@@ -193,7 +193,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     shared = new WingmanObject
     view = new MainView children: { options: { shared } }
-    @assertEqual shared, view.get('user.name.shared')
+    @assertEqual shared, view.get('user_view.name_view.shared')
   
   'test access to parent': ->
     MainView = class extends ViewWithTemplateSource
@@ -201,8 +201,8 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView.UserView.NameView = class extends ViewWithTemplateSource
     
     view = new MainView
-    @assert view.get('user.name').get('parent.parent') instanceof MainView
-    @assert view.get('user.name.parent.parent') instanceof MainView
+    @assert view.get('user_view.name_view').get('parent.parent') instanceof MainView
+    @assert view.get('user_view.name_view.parent.parent') instanceof MainView
     
   'test ready callback': ->
     callback_fired = false

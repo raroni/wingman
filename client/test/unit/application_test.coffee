@@ -16,7 +16,7 @@ class ControllerWithView extends Wingman.Controller
     options.view = new ViewWithTemplateSource parent: { el: Wingman.document.createElement('div') }
     super options
 
-module.exports = class extends Janitor.TestCase
+module.exports = class ApplicationTest extends Janitor.TestCase
   setup: ->
     Wingman.document = require('jsdom').jsdom()
     Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
@@ -54,10 +54,10 @@ module.exports = class extends Janitor.TestCase
     
     root_el = Wingman.document.createElement 'div'
     app = new App el: root_el
-    @assertEqual app.session, app.view.get('user.session')
-    @assertEqual app.session, app.controller.get('user.session')
+    @assertEqual app.session, app.view.get('user_view.session')
+    @assertEqual app.session, app.controller.get('user_controller.session')
     
-    app.controller.get('user.session').set user_id: 2
+    app.controller.get('user_controller.session').set user_id: 2
     @assertEqual 2, app.session.get('user_id')
     
   'test shared context object': ->
@@ -79,11 +79,11 @@ module.exports = class extends Janitor.TestCase
   
     root_el = Wingman.document.createElement 'div'
     app = new App el: root_el
-    @assertEqual app.shared, app.view.get('user.shared')
-    @assertEqual app.shared, app.controller.get('user.shared')
+    @assertEqual app.shared, app.view.get('user_view.shared')
+    @assertEqual app.shared, app.controller.get('user_controller.shared')
   
-    app.controller.get('user.shared').set my_test: 'Ongo bo tonko'
-    @assertEqual 'Ongo bo tonko', app.view.get('user.shared').get('my_test')
+    app.controller.get('user_controller.shared').set my_test: 'Ongo bo tonko'
+    @assertEqual 'Ongo bo tonko', app.view.get('user_view.shared').get('my_test')
   
   'test singleton instance': ->
     class MyApp extends Wingman.Application
@@ -148,7 +148,7 @@ module.exports = class extends Janitor.TestCase
     class MyApp extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
-
+  
     app = new MyApp el: Wingman.document.createElement 'div'
     app.navigate 'user'
     app.navigate 'home'
@@ -166,7 +166,7 @@ module.exports = class extends Janitor.TestCase
     MyApp.MainView = class extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert app.controller.get('main').view instanceof MyApp.MainView
+    @assert app.controller.get('main_controller').view instanceof MyApp.MainView
     
   'test nested controllers finding matching view automatically': ->
     Wingman.View.template_sources = { 'root': '{view main}' }
@@ -181,7 +181,7 @@ module.exports = class extends Janitor.TestCase
     MyApp.MainView.UserView = class extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert app.controller.get('main.user').view instanceof MyApp.MainView.UserView
+    @assert app.controller.get('main_controller.user_controller').view instanceof MyApp.MainView.UserView
   
   'test automatic session load after init': ->
     Wingman.localStorage.setItem "sessions.1", JSON.stringify({ user_id: 1 })

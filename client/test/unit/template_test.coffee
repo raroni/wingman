@@ -17,7 +17,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
     template @parent
     @assertEqual 1, @parent.childNodes.length
     @assertEqual 'hello', @parent.childNodes[0].innerHTML
-
+  
   'test template with nested tags': ->
     template = Wingman.Template.compile '<ol><li>hello</li></ol>'
     template @parent
@@ -227,10 +227,10 @@ module.exports = class TemplateTest extends Janitor.TestCase
     
     sunset_view = new SunsetView
     context = new WingmanObject
-    context.set sunset: sunset_view
-  
+    context.set { sunset_view }
+    
     template @parent, context
-  
+    
     @assertEqual 2, @parent.childNodes.length
     @assertEqual '<div>tester</div>', @parent.childNodes[1].innerHTML
   

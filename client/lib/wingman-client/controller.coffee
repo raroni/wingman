@@ -9,9 +9,10 @@ module.exports = class extends WingmanObject
   
   constructor: (options) ->
     @set parent: options.parent if options?.parent?
-    @familize 'Controller', options.children
+    @familize 'controller', options.children
     @view = options?.view || @findView()
     @ready?()
   
   findView: (path) ->
-    @get('parent').findView(path || @path())
+    path ||= @path().replace ///controller///g, 'view'
+    @get('parent').findView path

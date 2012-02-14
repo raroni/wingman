@@ -4,7 +4,7 @@ Wingman = require '../../wingman-client'
 module.exports =
   pathKeys: ->
     return [] unless @constructor._name
-    path_keys = [@constructor._name]
+    path_keys = [Fleck.underscore(@constructor._name)]
     path_keys = @get('parent').pathKeys().concat path_keys if @get('parent')?.pathKeys?
     path_keys
 
@@ -21,14 +21,14 @@ module.exports =
   createChildren: (type, options) ->
     for child_klass in @childClasses(type, options)
       object = new child_klass parent: @, children: { options: options?.options }
-      @setProperty child_klass._name, object
+      @setProperty Fleck.underscore(child_klass._name), object
     
   childClasses: (type, options) ->
     classes = []
     source = options?.source || @
     for key, value of source.constructor
-      match = key.match "(.+)#{type}$"
+      match = key.match "(.+)#{Fleck.camelize(type, true)}$"
       if match && value != @constructor
-        value._name = Fleck.underscore match[1]
+        value._name = key
         classes.push value
     classes

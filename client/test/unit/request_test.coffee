@@ -23,3 +23,4 @@ module.exports = class extends Janitor.TestCase
     Wingman.request.realRequest = sinon.spy()
     Wingman.request url: '/users'
     @assertEqual 'json', Wingman.request.realRequest.args[0][0].dataType
+  

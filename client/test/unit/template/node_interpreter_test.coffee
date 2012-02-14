@@ -369,6 +369,6 @@ module.exports = class extends Janitor.TestCase
   
     user_view = new UserView
     context = new WingmanObject
-    context.set user: user_view
+    context.set { user_view }
     interpreter = new NodeInterpreter element_node, @parent, context
     @assertEqual '<div>test</div>', @parent.childNodes[0].innerHTML

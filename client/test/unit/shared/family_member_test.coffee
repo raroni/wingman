@@ -7,7 +7,7 @@ class DummyController extends WingmanObject
   
   constructor: (options) ->
     @parent = options.parent
-    @familize 'Controller', options.children
+    @familize 'controller', options.children
 
 SimpleController = class extends DummyController
 SimpleController.UserController = class extends DummyController
@@ -18,23 +18,23 @@ NestedController.LoggedInController = class extends DummyController
 NestedController.LoggedInController.WelcomeController = class extends DummyController
 NestedController.LoginController = class extends DummyController
 
-module.exports = class extends Janitor.TestCase
+module.exports = class FamilyMemberTest extends Janitor.TestCase
   'test simple child instantiation': ->
     controller = new SimpleController parent: {}
-    @assert controller.get('user') instanceof SimpleController.UserController
-    @assert controller.get('mail') instanceof SimpleController.MailController
+    @assert controller.get('user_controller') instanceof SimpleController.UserController
+    @assert controller.get('mail_controller') instanceof SimpleController.MailController
   
   'test nested child instantiation': ->
     controller = new NestedController parent: {}
-    @assert controller.get('logged_in') instanceof NestedController.LoggedInController
-    @assert controller.get('login') instanceof NestedController.LoginController
-    @assert controller.get('logged_in.welcome') instanceof NestedController.LoggedInController.WelcomeController
+    @assert controller.get('logged_in_controller') instanceof NestedController.LoggedInController
+    @assert controller.get('login_controller') instanceof NestedController.LoginController
+    @assert controller.get('logged_in_controller.welcome_controller') instanceof NestedController.LoggedInController.WelcomeController
   
   'test nested path': ->
     controller = new NestedController parent: {}
-    welcome_controller = controller.get('logged_in.welcome')
-    @assertEqual 'logged_in.welcome', welcome_controller.path()
-
+    welcome_controller = controller.get('logged_in_controller.welcome_controller')
+    @assertEqual 'logged_in_controller.welcome_controller', welcome_controller.path()
+  
   'test child source': ->
     DummyApp = class
     DummyApp.UserController = class extends DummyController
@@ -44,16 +44,16 @@ module.exports = class extends Janitor.TestCase
     app = new DummyApp
     controller = new DummyApp.RootController parent: app, children: { source: app }
     
-    @assert controller.get('user') instanceof DummyApp.UserController
-    @assert controller.get('main') instanceof DummyApp.MainController
+    @assert controller.get('user_controller') instanceof DummyApp.UserController
+    @assert controller.get('main_controller') instanceof DummyApp.MainController
     @assertEqual undefined, controller.get('root')
-
+  
   'test child options': ->
     session = new WingmanObject
     children_options = { options: { session } }
     controller = new NestedController parent: {}, children: children_options
-    @assertEqual session, controller.get('logged_in.welcome.session')
-
+    @assertEqual session, controller.get('logged_in_controller.welcome_controller.session')
+  
   'test child classes': ->
     instantiated_classes = []
     class DummyCounter extends WingmanObject
@@ -61,7 +61,7 @@ module.exports = class extends Janitor.TestCase
       
       constructor: ->
         @parent = {}
-        @familize 'Controller'
+        @familize 'controller'
         instantiated_classes.push @constructor.name
     
     class BaseController extends DummyCounter
@@ -75,3 +75,4 @@ module.exports = class extends Janitor.TestCase
     @assertContains instantiated_classes, 'BaseController'
     @assertContains instantiated_classes, 'MailController'
     @assertContains instantiated_classes, 'UserController'
+  
