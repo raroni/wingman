@@ -238,6 +238,43 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     @assertEqual MyApp.MainView, MyApp.RootView.MainView
     @assert !MyApp.RootView.RootController
   
+  'test view depending on properties of shared': ->
+    callback_fired = false
+    
+    class MyApp extends Wingman.Application
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.RootView extends ViewWithTemplateSource
+      @propertyDependencies
+        someMethod: 'shared.test'
+      
+      someMethod: ->
+        callback_fired = true
+    
+    app = new MyApp el: Wingman.document.createElement('div')
+    @assert callback_fired # fired because root_view's shared is set during its constructor
+    callback_fired = false
+    app.shared.set test: 'something'
+    @assert callback_fired
+    
+  'test controller depending on properties of shared': ->
+    callback_fired = false
+    
+    class MyApp extends Wingman.Application
+    class MyApp.RootController extends Wingman.Controller
+      @propertyDependencies
+        someMethod: 'shared.test'
+      
+      someMethod: ->
+        callback_fired = true
+    
+    class MyApp.RootView extends ViewWithTemplateSource
+    
+    app = new MyApp el: Wingman.document.createElement('div')
+    @assert callback_fired # fired because root_controller's shared is set during its constructor
+    callback_fired = false
+    app.shared.set test: 'something'
+    @assert callback_fired
+  
   teardown: ->
     delete Wingman.Application.instance
     Wingman.View.template_sources = {}
