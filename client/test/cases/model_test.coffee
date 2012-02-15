@@ -4,6 +4,11 @@ WingmanObject = require '../../lib/wingman-client/shared/object'
 sinon = require 'sinon'
 RestStorage = require '../../lib/wingman-client/model/storage_adapters/rest'
 
+uglyAssociationHack = (klass) ->
+  # For now we have no better solution than this
+  Wingman.Application.instance = { constructor: {} }
+  Wingman.Application.instance.constructor[klass.name] = klass
+
 module.exports = class ModelTest extends Janitor.TestCase
   'test setting attributes via constructor': ->
     User = class extends Wingman.Model
@@ -245,9 +250,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     class Notification extends Wingman.Model
     
-    # For now we have no better solution than 
-    Wingman.Application.instance = { constructor: {} }
-    Wingman.Application.instance.constructor.Notification = Notification
+    uglyAssociationHack Notification
     
     user = new User()
     user.save()
@@ -258,21 +261,19 @@ module.exports = class ModelTest extends Janitor.TestCase
     @assertEqual 2, user.get('notifications').count()
     delete Wingman.Application.instance
   
-  
   'test has many association add event': ->
     id = 1
     Wingman.request.realRequest = (options) ->
       options.data.id = id++
       options.success options.data
-
+    
     class User extends Wingman.Model
       @hasMany 'notifications'
-
+    
     class Notification extends Wingman.Model
-
+    
     # For now we have no better solution than 
-    Wingman.Application.instance = { constructor: {} }
-    Wingman.Application.instance.constructor.Notification = Notification
+    uglyAssociationHack Notification
     
     context = new WingmanObject
     callback_values = []
@@ -293,7 +294,29 @@ module.exports = class ModelTest extends Janitor.TestCase
     @assertEqual notifications[0], callback_values[0]
     @assertEqual notifications[2], callback_values[1]
     delete Wingman.Application.instance
-
+  
+  'test has many association with json export': ->
+    id = 1
+    Wingman.request.realRequest = (options) ->
+      options.data.id = id++
+      options.success options.data
+    
+    class User extends Wingman.Model
+      @hasMany 'notifications'
+    
+    class Notification extends Wingman.Model
+    
+    uglyAssociationHack Notification
+    
+    user = new User()
+    user.save()
+    
+    new Notification(user_id: 1).save() for [1..2]
+    new Notification(user_id: 2).save()
+    
+    @assert !user.toJSON().notifications
+    
+    delete Wingman.Application.instance
   
   'test store add': ->
     class User extends Wingman.Model

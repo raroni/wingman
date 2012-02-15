@@ -448,3 +448,19 @@ module.exports = class extends Janitor.TestCase
     context.observe 'name', -> callback_fired = true
     context.set name: 'Rasmus'
     @assert callback_fired
+  
+  'test intelligent properties and json export': ->
+    class Thingamabob
+    thingamabob = new Thingamabob
+
+    context = new WingmanObject
+    context.set
+      name: 'Guybrush'
+      age: 25
+      engine: thingamabob
+    
+    json = context.toJSON()
+    
+    @assertEqual 2, Object.keys(json).length
+    @assertEqual 'Guybrush', json.name
+    @assertEqual 25, json.age
