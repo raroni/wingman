@@ -22,7 +22,7 @@ module.exports = class extends WingmanObject
     @set parent: options.parent if options?.parent?
     @set session: options.session if options?.session?
     @set shared: options.shared if options?.shared?
-    @el = @dom_element = options?.el || Wingman.document.createElement 'div'
+    @el = @dom_element = options?.el || Wingman.document.createElement(@tag || 'div')
     @render() if options?.render
   
   render: ->

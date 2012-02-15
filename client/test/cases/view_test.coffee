@@ -233,3 +233,10 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assertEqual 2, callback_values.length
     @assertEqual user, callback_values[0]
     @assertEqual name, callback_values[1]
+  
+  'test custom tag': ->
+    class MainView extends ViewWithTemplateSource
+      tag: 'tr'
+    
+    main_view = new MainView render: true
+    @assertEqual 'TR', main_view.el.tagName
