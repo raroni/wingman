@@ -158,7 +158,26 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     child_elements = @parent.childNodes
     
     @assertEqual 0, child_elements.length
-    context.set users: ['Rasmus', 'John']
+    context.set users: ['Rasmus', 'Mario']
     @assertEqual 2, child_elements.length
     @assertEqual 'Rasmus', child_elements[0].innerHTML
-    @assertEqual 'John', child_elements[1].innerHTML
+    @assertEqual 'Mario', child_elements[1].innerHTML
+  
+  'test child view': ->
+    node_data =
+      type: 'for'
+      source: 'users'
+      children: [
+        type: 'child_view'
+        name: 'user'
+      ]
+    
+    class MainView extends Wingman.View
+    class MainView.UserView extends Wingman.View
+      templateSource: -> '<div>{user}</div>'
+    
+    main_view = new MainView
+    main_view.set users: ['Luigi', 'Yoshi']
+    new ForBlock node_data, @parent, main_view
+    @assertEqual '<div>Luigi</div>', @parent.childNodes[0].innerHTML
+    @assertEqual '<div>Yoshi</div>', @parent.childNodes[1].innerHTML

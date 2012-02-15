@@ -251,3 +251,19 @@ module.exports = class TemplateTest extends Janitor.TestCase
     @assertEqual 'my_pic.png', @parent.childNodes[0].getAttribute('src')
     context.set mySrc: 'my_pic2.png'
     @assertEqual 'my_pic2.png', @parent.childNodes[0].getAttribute('src')
+
+  'test for block containing sub view': ->
+    class MainView extends Wingman.View
+      templateSource: -> '<section>{for users}{view user}{end}</section>'
+    
+    class MainView.UserView extends Wingman.View
+      templateSource: -> '<div>{user}</div>'
+    
+    main_view = new MainView
+    template = Wingman.Template.compile main_view.templateSource()
+    template @parent, main_view
+    main_view.set users: ['Rasmus', 'John']
+    
+    @assertEqual 2, @parent.childNodes[0].childNodes.length
+    @assertEqual 'Rasmus', @parent.childNodes[0].childNodes[0].childNodes[0].innerHTML
+    @assertEqual 'John', @parent.childNodes[0].childNodes[1].childNodes[0].innerHTML
