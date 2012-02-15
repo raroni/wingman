@@ -8,8 +8,7 @@ module.exports = class
       @interpretElement()
   
   interpretFor: ->
-    for new_node_data in @node_data.children
-      new ForChildElement new_node_data, @scope, @context, @node_data.source
+    new ForBlock @node_data, @scope, @context
   
   interpretChildView: ->
     view = @context.createChildView @node_data.name
@@ -22,5 +21,5 @@ module.exports = class
 
 # By requiring these after module.exports, node can handle the cyclic
 # dependency between node_interpreter and node_interpreter/for_child_element
-ForChildElement = require './node_interpreter/for_child_element'
+ForBlock = require './node_interpreter/for_block'
 Element = require './node_interpreter/element'
