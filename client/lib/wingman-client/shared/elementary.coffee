@@ -17,6 +17,12 @@ module.exports =
       else
        class_name
   
+  activate: ->
+    @setStyle 'display', ''
+  
+  deactivate: ->
+    @setStyle 'display', 'none'
+  
   removeClass: (class_name) ->
     @classCache()[class_name]-- if @classCache()[class_name]
     

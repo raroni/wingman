@@ -378,3 +378,23 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     main_view = new MainView
     interpreter = new NodeInterpreter element_node, @parent, main_view
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
+  
+  'test conditonal': ->
+    node_data =
+      type: 'conditional'
+      source: 'something'
+      children: [
+        type: 'element'
+        tag: 'span'
+        value: new Value('user')
+      ]
+    
+    context = new WingmanObject
+    context.set something: true
+    new NodeInterpreter node_data, @parent, context
+    
+    element = @parent.childNodes[0]
+    @assert !element.style.display
+    
+    context.set something: false
+    @assertEqual 'none', element.style.display

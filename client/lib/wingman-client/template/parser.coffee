@@ -3,6 +3,7 @@ Value = require "./parser/value"
 
 self_closing_tags = ['input', 'img', 'br', 'hr']
 
+# TODO
 # REFACTORING IDEA: Let each individual node type have its own class.
 # That would make it possible to extract parseStyle, parseClass and so on into a ElementNode class or the like
 # This would in turn make this class simpler :)
@@ -33,7 +34,7 @@ module.exports = class
         @scan()
   
   scan: ->
-    @scanForEndTag() || @scanForStartTag() || @scanForViewToken() || @scanForForToken() || @scanForEndToken() || @scanForText()
+    @scanForEndTag() || @scanForStartTag() || @scanForIfToken() || @scanForViewToken() || @scanForForToken() || @scanForEndToken() || @scanForText()
   
   scanForEndTag: ->
     result = @scanner.scan /<\/(.*?)>/
@@ -49,15 +50,15 @@ module.exports = class
         children: []
         parent: @current_scope
         type: 'element'
-
+      
       if @scanner.getCapture(1)
         attributes = @parseAttributes @scanner.getCapture(1)
         @addAttributes new_node, attributes
-
+        
       @current_scope.children.push new_node
       @current_scope = new_node unless self_closing_tags.indexOf(new_node.tag) != -1
     result
-    
+  
   scanForForToken: ->
     result = @scanner.scan /\{for (.*?)\}/
     if result
@@ -78,6 +79,18 @@ module.exports = class
         parent: @current_scope
         type: 'child_view'
       @current_scope.children.push new_node
+    result
+    
+  scanForIfToken: ->
+    result = @scanner.scan /\{if (.*?)\}/
+    if result
+      new_node =
+        source: @scanner.getCapture(0)
+        parent: @current_scope
+        type: 'conditional'
+        children: []
+      @current_scope.children.push new_node
+      @current_scope = new_node
     result
     
   scanForEndToken: ->

@@ -1,4 +1,4 @@
-module.exports = class
+module.exports = class Template
   @compile = (source) ->
     template = new @ source
     (el, context) ->

@@ -74,9 +74,9 @@ module.exports = class extends WingmanObject
   
   checkIsActive: =>
     if @get 'isActive'
-      @setStyle 'display', ''
+      @activate()
     else
-      @setStyle 'display', 'none'
+      @deactivate()
   
   pathName: ->
     Fleck.underscore @constructor.name.replace(/([A-Z])/g, ' $1').substring(1).split(' ').slice(0, -1).join('')

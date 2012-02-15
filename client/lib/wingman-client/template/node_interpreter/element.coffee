@@ -1,7 +1,7 @@
 Module = require '../../shared/module'
 Elementary = require '../../shared/elementary'
 
-module.exports = class extends Module
+module.exports = class Element extends Module
   @include Elementary
   
   constructor: (@element_data, @scope, @context) ->

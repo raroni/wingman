@@ -207,3 +207,20 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 1, Object.keys(input.attributes).length
     @assertEqual 'mySrc', input.attributes.src.get()
     @assert input.attributes.src.is_dynamic
+    
+  'test simple conditional': ->
+    tree = @parse '{if something}<div>hej</div>{end}'
+    nodes = tree.children
+    
+    @assertEqual 1, nodes.length
+    node = nodes[0]
+    @assertEqual 'conditional', node.type
+    @assertEqual 'something', node.source
+    
+    children = node.children
+    @assertEqual 1, children.length
+    
+    div = children[0]
+    @assertEqual 'element', div.type
+    @assertEqual 'div', div.tag
+    @assertEqual 'hej', div.value.get()
