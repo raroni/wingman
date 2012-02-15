@@ -51,3 +51,14 @@ module.exports = class StoreTest extends Janitor.TestCase
     @store.add user
     user.destroy()
     @assertEqual value_from_callback, user
+  
+  'test add two models with same id': ->
+    user1 = new @User id: 1, name: 'Megaman'
+    user2 = new @User id: 1, name: 'Sonic'
+    
+    @assertEqual 0, @store.count()
+    @store.add user1
+    @assertEqual 1, @store.count()
+    @store.add user2
+    @assertEqual 1, @store.count()
+    @assertEqual 'Sonic', user1.get('name')

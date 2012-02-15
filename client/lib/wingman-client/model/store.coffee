@@ -9,10 +9,19 @@ module.exports = class Store extends Module
   
   add: (model) ->
     throw new Error('Model must have ID to be stored.') unless model.get('id')
-    throw new Error("#{model.constructor.name} model with ID #{model.get('id')} already in store.") if @exists(model)
+    if @exists model
+      @update @models[model.get('id')], model
+    else
+      @insert model
+  
+  insert: (model) ->
     @models[model.get('id')] = model
     @trigger 'add', model
     model.bind 'destroy', @remove
+  
+  update: (model, model2) ->
+    for key, value of model2.toJSON()
+      model.setProperty key, value unless key == 'id'
   
   count: ->
     Object.keys(@models).length
