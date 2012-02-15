@@ -4,15 +4,14 @@ NodeInterpreter = require '../node_interpreter'
 
 module.exports = class ForBlock
   constructor: (@node_data, @scope, @context) ->
-    @elements = {}
+    @nodes = {}
     @addAll() if @source()
     @context.observe @node_data.source, @rebuild
     @context.observe @node_data.source, 'add', @add
     @context.observe @node_data.source, 'remove', @remove
   
   add: (value) =>
-    @elements ||= {}
-    @elements[value] ||= []
+    @nodes[value] = []
     
     for new_node_data in @node_data.children
       new_context = new WingmanObject
@@ -20,13 +19,14 @@ module.exports = class ForBlock
       hash = {}
       hash[key] = value
       new_context.set hash
-      element = new NodeInterpreter(new_node_data, @scope, new_context).element
-      @elements[value].push element
+      node = new NodeInterpreter new_node_data, @scope, new_context
+      @nodes[value].push node
   
   remove: (value) =>
-    while @elements[value].length
-      element = @elements[value].pop()
-      element.parentNode.removeChild element
+    while @nodes[value].length
+      node = @nodes[value].pop()
+      node.remove()
+    delete @nodes[value]
   
   source: ->
     @context.get @node_data.source
@@ -35,7 +35,7 @@ module.exports = class ForBlock
     @source().forEach (value) => @add value
   
   removeAll: ->
-    @remove value for value, element of @elements
+    @remove value for value, element of @nodes
   
   rebuild: =>
     @removeAll()

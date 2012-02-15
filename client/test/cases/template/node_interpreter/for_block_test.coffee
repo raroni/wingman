@@ -5,12 +5,12 @@ WingmanObject = require '../../../../lib/wingman-client/shared/object'
 ForBlock = require '../../../../lib/wingman-client/template/node_interpreter/for_block'
 Wingman = require '../../../../.'
 
-module.exports = class extends Janitor.TestCase
+module.exports = class ForBlockTest extends Janitor.TestCase
   setup: ->
     Wingman.document = document
     @parent = Wingman.document.createElement 'div'
 
-  'test for node': ->
+  'test simple for block': ->
     node_data =
       type: 'for'
       source: 'users'
@@ -30,7 +30,7 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'Rasmus', child_elements[0].innerHTML
     @assertEqual 'John', child_elements[1].innerHTML
   
-  'test for block with several children': ->
+  'test several children': ->
     node_data =
       type: 'for'
       source: 'users'

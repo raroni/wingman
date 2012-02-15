@@ -31,6 +31,9 @@ module.exports =
   setAttribute: (key, value) ->
     @dom_element.setAttribute key, value
   
+  remove: ->
+    @dom_element.parentNode.removeChild @dom_element
+  
   # This method should probably not be an instance method. I could make it a private method,
   # but that would make it hard to test - so for now, it's just an instance method.
   # Should be refactored sometime.
