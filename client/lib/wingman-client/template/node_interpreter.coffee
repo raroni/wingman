@@ -12,7 +12,7 @@ module.exports = class
       new ForChildElement new_node_data, @scope, @context, @node_data.source
   
   interpretSubView: ->
-    view = @context.get "#{@node_data.name}_view"
+    view = @context.createSubView @node_data.name
     element = view.el
     @scope.appendChild element
   

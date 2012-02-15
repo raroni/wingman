@@ -20,50 +20,63 @@ module.exports = class ApplicationTest extends Janitor.TestCase
   setup: ->
     Wingman.document = require('jsdom').jsdom()
     Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
+  
+  'test most basic application': ->
+    class MyApp extends Wingman.Application
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.RootView extends Wingman.View
+      templateSource: -> '<div>Hi</div>'
+    app = new MyApp el: Wingman.document.createElement('div')
+    @assert '<div>Hi</div>', app.el.innerHTML
+  
+  'test simple sub view': ->
+    class MyApp extends Wingman.Application
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.UserController extends Wingman.Controller
     
-  'test automatic children instantiation': ->
-    App = class extends Wingman.Application
-    App.RootView = class extends Wingman.View
+    class MyApp.RootView extends Wingman.View
       templateSource: -> '{view user}'
     
-    App.RootController = class extends Wingman.Controller
-    App.UserController = class extends Wingman.Controller
-    App.UserView = class extends Wingman.View
+    class MyApp.UserView extends Wingman.View
       templateSource: -> '<div>stubbing the source</div>'
     
     root_el = Wingman.document.createElement 'div'
-    app = new App el: root_el
+    app = new MyApp el: root_el
     @assert root_el.innerHTML.match('stubbing the source')
   
   'test session': ->
-    App = class extends Wingman.Application
-    App.RootView = class extends ViewWithTemplateSource
-    App.RootController = class extends Wingman.Controller
+    class App extends Wingman.Application
+    class App.RootView extends ViewWithTemplateSource
+    class App.RootController extends Wingman.Controller
   
     root_el = Wingman.document.createElement 'div'
     app = new App el: root_el
     app.session.set user_id: 27
     @assertEqual 27, app.session.get('user_id')
-    
+   
   'test session sharing': ->
-    App = class extends Wingman.Application
-    App.RootController = class extends Wingman.Controller
-    App.RootView = class extends ViewWithTemplateSource
-    App.UserController = class extends Wingman.Controller
-    App.UserView = class extends ViewWithTemplateSource
+    class MyApp extends Wingman.Application
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.RootView extends Wingman.View
+      templateSource: -> "{view user}"
+    class MyApp.UserController extends Wingman.Controller
+      ready: ->
+        @get('session').set controller_greeting: 'Controller says hello'
+    
+    class MyApp.UserView extends ViewWithTemplateSource
+      ready: ->
+        @get('session').set view_greeting: 'View says hello'
     
     root_el = Wingman.document.createElement 'div'
-    app = new App el: root_el
-    @assertEqual app.session, app.view.get('user_view.session')
-    @assertEqual app.session, app.controller.get('user_controller.session')
+    app = new MyApp el: root_el
     
-    app.controller.get('user_controller.session').set user_id: 2
-    @assertEqual 2, app.session.get('user_id')
-    
+    @assertEqual 'View says hello', app.session.get('view_greeting')
+    @assertEqual 'Controller says hello', app.session.get('controller_greeting')
+  
   'test shared context object': ->
-    App = class extends Wingman.Application
-    App.RootView = class extends ViewWithTemplateSource
-    App.RootController = class extends Wingman.Controller
+    class App extends Wingman.Application
+    class App.RootView extends ViewWithTemplateSource
+    class App.RootController extends Wingman.Controller
     
     root_el = Wingman.document.createElement 'div'
     app = new App el: root_el
@@ -71,24 +84,28 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     @assertEqual 28, app.shared.get('user_id')
   
   'test sharing of shared context object': ->
-    App = class extends Wingman.Application
-    App.RootController = class extends Wingman.Controller
-    App.RootView = class extends ViewWithTemplateSource
-    App.UserController = class extends Wingman.Controller
-    App.UserView = class extends ViewWithTemplateSource
-  
+    class App extends Wingman.Application
+    class App.RootController extends Wingman.Controller
+    class App.RootView extends Wingman.View
+      templateSource: -> "{view user}"
+    
+    class App.UserController extends Wingman.Controller
+      ready: ->
+        @get('shared').set controller_greeting: 'Controller says hello'
+    
+    class App.UserView extends ViewWithTemplateSource
+      ready: ->
+        @get('shared').set view_greeting: 'View says hello'
+    
     root_el = Wingman.document.createElement 'div'
     app = new App el: root_el
-    @assertEqual app.shared, app.view.get('user_view.shared')
-    @assertEqual app.shared, app.controller.get('user_controller.shared')
-  
-    app.controller.get('user_controller.shared').set my_test: 'Ongo bo tonko'
-    @assertEqual 'Ongo bo tonko', app.view.get('user_view.shared').get('my_test')
+    @assertEqual 'View says hello', app.shared.get('view_greeting')
+    @assertEqual 'Controller says hello', app.shared.get('controller_greeting')
   
   'test singleton instance': ->
     class MyApp extends Wingman.Application
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.RootView extends ViewWithTemplateSource
     
     @assert !Wingman.Application.instance
     new MyApp el: Wingman.document.createElement 'div'
@@ -96,8 +113,8 @@ module.exports = class ApplicationTest extends Janitor.TestCase
   
   'test instantiation of two apps': ->
     class MyApp extends Wingman.Application
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.RootView extends ViewWithTemplateSource
     
     app_options = { el: Wingman.document.createElement('div') }
     new MyApp app_options
@@ -113,17 +130,28 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     
     @assertEqual 'test-host.com', Wingman.Application.instance?.host
   
-  'test ready callback': ->
+  'test application ready callback': ->
     callback_fired = false
-    MyApp = class extends Wingman.Application
+    
+    class MyApp extends Wingman.Application
+      ready: -> callback_fired = true
+    
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.RootView extends ViewWithTemplateSource
+    
+    app = new MyApp el: Wingman.document.createElement('div')
+    @assert callback_fired
+  
+  'test root controller callback': ->
+    callback_fired = false
+    
+    class MyApp extends Wingman.Application
+    class MyApp.RootView extends ViewWithTemplateSource
+    class MyApp.RootController extends Wingman.Controller
       ready: ->
         callback_fired = true
     
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
-    
-    root_view = new ViewWithTemplateSource
-    app = new MyApp el: Wingman.document.createElement('div')
+    new MyApp el: Wingman.document.createElement('div')
     @assert callback_fired
   
   'test navigate and session': ->
@@ -156,32 +184,42 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     @assertEqual 'user', app.shared.get('path')
     @assertEqual '/user', Wingman.window.location.pathname
   
-  'test controller finding matching view automatically': ->
-    MyApp = class extends Wingman.Application
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends Wingman.View
+  'test controller getting served correct view': ->
+    main_view_from_controller = undefined
+    
+    class MyApp extends Wingman.Application
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.RootView extends Wingman.View
       templateSource: -> '{view main}'
     
-    MyApp.MainController = class extends Wingman.Controller
-    MyApp.MainView = class extends ViewWithTemplateSource
+    class MyApp.MainController extends Wingman.Controller
+      ready: ->
+        main_view_from_controller = @view
+      
+    class MyApp.MainView extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert app.controller.get('main_controller').view instanceof MyApp.MainView
+    @assert main_view_from_controller instanceof MyApp.MainView
+  
+  'test nested controller getting served correct view': ->
+    view_from_main_controller = undefined
     
-  'test nested controllers finding matching view automatically': ->
-    Wingman.View.template_sources = { 'root': '{view main}' }
+    class MyApp extends Wingman.Application
+    class MyApp.RootController extends Wingman.Controller
+    class MyApp.MainController extends ControllerWithView
+    class MyApp.MainController.UserController extends Wingman.Controller
+      ready: -> view_from_main_controller = @view
     
-    MyApp = class extends Wingman.Application
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends Wingman.View
+    class MyApp.RootView extends Wingman.View
       templateSource: -> '{view main}'
-    MyApp.MainController = class extends ControllerWithView
-    MyApp.MainController.UserController = class extends Wingman.Controller
-    MyApp.MainView = class extends ViewWithTemplateSource
-    MyApp.MainView.UserView = class extends ViewWithTemplateSource
+    
+    class MyApp.MainView extends Wingman.View
+      templateSource: -> '{view user}'
+    
+    class MyApp.MainView.UserView extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert app.controller.get('main_controller.user_controller').view instanceof MyApp.MainView.UserView
+    @assert view_from_main_controller instanceof MyApp.MainView.UserView
   
   'test automatic session load after init': ->
     Wingman.localStorage.setItem "sessions.1", JSON.stringify({ user_id: 1 })

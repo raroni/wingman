@@ -363,12 +363,11 @@ module.exports = class extends Janitor.TestCase
     element_node =
       type: 'sub_view'
       name: 'user'
-  
-    class UserView extends Wingman.View
-      templateSource: -> '<div>test</div>'
-  
-    user_view = new UserView
-    context = new WingmanObject
-    context.set { user_view }
-    interpreter = new NodeInterpreter element_node, @parent, context
-    @assertEqual '<div>test</div>', @parent.childNodes[0].innerHTML
+    
+    class MainView extends Wingman.View
+    class MainView.UserView extends Wingman.View
+      templateSource: -> '<div>I am the user view</div>'
+    
+    main_view = new MainView
+    interpreter = new NodeInterpreter element_node, @parent, main_view
+    @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML

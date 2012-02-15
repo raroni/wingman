@@ -1,16 +1,17 @@
 Wingman = require '../wingman-client'
 Module = require './shared/module'
+Events = require './shared/events'
 WingmanObject = require './shared/object'
-FamilyMember = require './shared/family_member'
 Navigator = require './shared/navigator'
+Fleck = require 'fleck'
 
 createSessionClass = ->
   class Session extends Wingman.Model
     @storage 'local', namespace: 'sessions'
 
-module.exports = class extends Module
-  @include FamilyMember
+module.exports = class Application extends Module
   @include Navigator
+  @include Events
   
   constructor: (options) ->
     throw new Error 'You cannot instantiate two Wingman apps at the same time.' if @constructor.__super__.constructor.instance
@@ -23,21 +24,31 @@ module.exports = class extends Module
     for key, value of @constructor
       @constructor.RootView[key] = value if key.match("(.+)View$") && key != 'RootView'
     
+    @bind 'viewCreated', @buildController
+    
     @el = options.el if options.el?
     @view = options.view || @buildView()
     
-    @setupController()
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
     @updatePath()
     @session.load()
     @ready?()
   
   buildView: ->
-    new @constructor.RootView parent: @, el: @el, children: @childOptions()
+    view = new @constructor.RootView parent: @, el: @el, session: @session, shared: @shared
+    view.bind 'descendantCreated', (view) => @trigger 'viewCreated', view
+    @trigger 'viewCreated', view
+    view.render()
+    view
   
-  setupController: ->
-    @controller = new @constructor.RootController parent: @, children: @childOptions()
-
+  buildController: (view) =>
+    parts = view.path().split '.'
+    scope = @constructor
+    for part in parts
+      klass_name = Fleck.camelize "#{part}_controller", true
+      scope = scope[klass_name]
+    new scope view
+  
   handlePopStateChange: (e) =>
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run
       @_first_run = true

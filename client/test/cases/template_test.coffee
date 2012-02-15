@@ -220,15 +220,15 @@ module.exports = class TemplateTest extends Janitor.TestCase
     @assertElementHasClass element, 'premium'
   
   'test sub view': ->
-    template = Wingman.Template.compile '<div>Test</div>{view sunset}'
+    template = Wingman.Template.compile '<div>Test</div>{view user}'
     
-    SunsetView = class extends Wingman.View
+    class MainView extends Wingman.View
       templateSource: -> '<div>tester</div>'
     
-    sunset_view = new SunsetView
-    context = new WingmanObject
-    context.set { sunset_view }
+    class MainView.UserView extends Wingman.View
+      templateSource: -> '<div>tester</div>'
     
+    context = new MainView
     template @parent, context
     
     @assertEqual 2, @parent.childNodes.length

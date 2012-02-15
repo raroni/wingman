@@ -1,12 +1,10 @@
 Wingman = require '../wingman-client'
 WingmanObject = require './shared/object'
 Elementary = require './shared/elementary'
-FamilyMember = require './shared/family_member'
 Fleck = require 'fleck'
 
 module.exports = class extends WingmanObject
   @include Elementary
-  @include FamilyMember
   
   @parseEvents: (events_hash) ->
     (@parseEvent(key, trigger) for key, trigger of events_hash)
@@ -22,19 +20,27 @@ module.exports = class extends WingmanObject
   constructor: (options) ->
     super()
     @set parent: options.parent if options?.parent?
+    @set session: options.session if options?.session?
+    @set shared: options.shared if options?.shared?
     @el = @dom_element = options?.el || Wingman.document.createElement 'div'
-    @familize 'view', (options?.children? && options.children || undefined)
+    @render() if options?.render
+  
+  render: ->
     template = Wingman.Template.compile @templateSource()
     template @el, @
-    @addClass @constructor._name
+    @addClass @pathName()
     @setupListeners()
     @setupActiveListener() if @isActive
     @ready?()
   
-  buildSubView: (view_name) ->
+  createSubView: (view_name) ->
     class_name = Fleck.camelize "#{view_name}_view", true
     klass = @constructor[class_name]
-    new klass parent: @
+    view = new klass parent: @, session: @session, shared: @shared
+    view.bind 'descendantCreated', (view) => @trigger 'descendantCreated', view
+    @trigger 'descendantCreated', view
+    view.render()
+    view
   
   templateSource: ->
     template_source = @constructor.template_sources[@path()]
@@ -71,3 +77,21 @@ module.exports = class extends WingmanObject
       @setStyle 'display', ''
     else
       @setStyle 'display', 'none'
+  
+  pathName: ->
+    Fleck.underscore @constructor.name.replace(/([A-Z])/g, ' $1').substring(1).split(' ').slice(0, -1).join('')
+  
+  pathKeys: ->
+    return [] if @isRoot()
+    path_keys = [@pathName()]
+    path_keys = @get('parent').pathKeys().concat path_keys if @get('parent')?.pathKeys?
+    path_keys
+  
+  isRoot: ->
+    @get('parent') instanceof Wingman.Application
+  
+  path: ->
+    if @get('parent') instanceof Wingman.Application
+      'root'
+    else
+      @pathKeys().join '.'

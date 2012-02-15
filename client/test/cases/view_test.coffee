@@ -20,36 +20,33 @@ module.exports = class ViewTest extends Janitor.TestCase
     View.template_sources = {}
   
   'test simple template': ->
-    View.template_sources.simple = '<div>hello</div>'
-    ViewKlass = class MainView extends View
-      @_name: 'simple'
+    View.template_sources.main = '<div>hello</div>'
+    class MainView extends View
     
     dummy_app =
       pathKeys: -> []
       el: document.createElement('div')
     
-    view = new ViewKlass parent: dummy_app
+    view = new MainView parent: dummy_app, render: true
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'hello', view.el.childNodes[0].innerHTML
     
   'test setting dom class': ->
-    UserView = class extends View
-      @_name: 'user'
+    class UserView extends View
       templateSource: -> '<div>hello</div>'
   
-    view = new UserView
+    view = new UserView render: true
     @assertEqual 'user', view.el.className
   
   'test simple template with dynamic values': ->
     View.template_sources.simple_with_dynamic_values = '<div>{myName}</div>'
-    ViewKlass = class MainView extends View
-      @_name: 'simple_with_dynamic_values'
+    class SimpleWithDynamicValuesView extends View
   
     dummy_app =
       pathKeys: -> []
       el: document.createElement('div')
   
-    view = new ViewKlass parent: dummy_app
+    view = new SimpleWithDynamicValuesView parent: dummy_app, render: true
     view.set myName: 'Razda'
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'Razda', view.el.childNodes[0].innerHTML
@@ -70,8 +67,8 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assertEqual 'button.some_class', events[1].selector
   
   'test simple event': ->
-    View.template_sources.test = '<div><div class="user">Johnny</div></div>'
-    ViewKlass = class MainView extends View
+    View.template_sources.main = '<div><div class="user">Johnny</div></div>'
+    class MainView extends View
       @_name: 'test'
       events:
         'click .user': 'user_clicked'
@@ -80,7 +77,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       pathKeys: -> []
       el: document.createElement('div')
     
-    view = new ViewKlass parent: dummy_app
+    view = new MainView parent: dummy_app, render: true
     clicked = false
     view.bind 'user_clicked', ->
       clicked = true
@@ -91,22 +88,22 @@ module.exports = class ViewTest extends Janitor.TestCase
   'test click on views mother element': ->
     event_from_callback = undefined
     did_maintain_context = false
-    ViewKlass = class MainView extends View
+    class MainView extends View
       randomProperty: true
       click: (event) ->
         did_maintain_context = @randomProperty
         event_from_callback = event
       templateSource: -> '<div><a>BOING</a></div>'
-  
-    view = new ViewKlass
+    
+    view = new MainView render: true
     clickElement view.el.childNodes[0].childNodes[0]
     @assert event_from_callback
     @assertEqual 'A', event_from_callback.target.tagName
     @assert did_maintain_context
   
   'test trigger arguments': ->
-    View.template_sources.test = '<div>Something</div>'
-    ViewKlass = class MainView extends View
+    View.template_sources.main = '<div>Something</div>'
+    class MainView extends View
       @_name: 'test'
       events:
         'click div': 'something_happened'
@@ -118,7 +115,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       pathKeys: -> []
       el: document.createElement('div')
     
-    view = new ViewKlass parent: dummy_app
+    view = new MainView parent: dummy_app, render: true
     a = null
     b = null
     view.bind 'something_happened', (x,y) ->
@@ -130,13 +127,17 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assertEqual 'b', b
   
   'test path of deeply nested view': ->
-    MainView = class extends ViewWithTemplateSource
-    MainView.UserView = class extends ViewWithTemplateSource
-    MainView.UserView.NameView = class extends ViewWithTemplateSource
-    MainView.UserView.NameView.FirstView = class extends ViewWithTemplateSource
+    class MainView extends ViewWithTemplateSource
+      isRoot: -> true
+    class MainView.UserView extends ViewWithTemplateSource
+    class MainView.UserView.NameView extends ViewWithTemplateSource
+    class MainView.UserView.NameView.FirstView extends ViewWithTemplateSource
     
-    view = new MainView parent: { el: document.createElement('div') }
-    @assertEqual 'user_view.name_view.first_view', view.get('user_view.name_view.first_view').path()
+    main = new MainView parent: { el: document.createElement('div') }, render: true
+    user = main.createSubView 'user'
+    name = user.createSubView 'name'
+    first = name.createSubView 'first'
+    @assertEqual 'user.name.first', first.path()
   
   'test show/hide via isActive': ->
     LoggedInView = class extends ViewWithTemplateSource
@@ -146,7 +147,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       isActive: ->
         @get 'logged_in'
     
-    view = new LoggedInView
+    view = new LoggedInView render: true
     @assertEqual 'none', view.el.style.display
     view.set logged_in: true
     @assertEqual '', view.el.style.display
@@ -161,7 +162,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       isActive: ->
         @get 'session.user_id'
     
-    view = new LoggedInView
+    view = new LoggedInView render: true
     session = new WingmanObject
     view.set { session }
     @assertEqual 'none', view.el.style.display
@@ -172,51 +173,63 @@ module.exports = class ViewTest extends Janitor.TestCase
   
   'test show/hide via isActive when isActive is not implemented': ->
     SomeView = class extends ViewWithTemplateSource
-    view = new SomeView
+    view = new SomeView render: true
     @assertEqual undefined, view.el.style.display
   
   'test session sharing': ->
-    MainView = class extends ViewWithTemplateSource
-    MainView.UserView = class extends ViewWithTemplateSource
-    MainView.UserView.NameView = class extends ViewWithTemplateSource
-    MainView.UserView.NameView.FirstView = class extends ViewWithTemplateSource
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    class MainView.UserView.NameView extends ViewWithTemplateSource
     
     session = new WingmanObject
-    view = new MainView children: { options: { session} }
-    @assertEqual session, view.get('user_view.name_view.session')
+    view = new MainView { session, render: true }
+    @assertEqual session, view.createSubView('user').createSubView('name').get('session')
   
   'test sharing of shared context object': ->
-    MainView = class extends ViewWithTemplateSource
-    MainView.UserView = class extends ViewWithTemplateSource
-    MainView.UserView.NameView = class extends ViewWithTemplateSource
-    MainView.UserView.NameView.FirstView = class extends ViewWithTemplateSource
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    class MainView.UserView.NameView extends ViewWithTemplateSource
     
     shared = new WingmanObject
-    view = new MainView children: { options: { shared } }
-    @assertEqual shared, view.get('user_view.name_view.shared')
+    view = new MainView { shared, render: true }
+    @assertEqual shared, view.createSubView('user').createSubView('name').get('shared')
   
   'test access to parent': ->
-    MainView = class extends ViewWithTemplateSource
-    MainView.UserView = class extends ViewWithTemplateSource
-    MainView.UserView.NameView = class extends ViewWithTemplateSource
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    class MainView.UserView.NameView extends ViewWithTemplateSource
     
-    view = new MainView
-    @assert view.get('user_view.name_view').get('parent.parent') instanceof MainView
-    @assert view.get('user_view.name_view.parent.parent') instanceof MainView
+    view = new MainView render: true
+    @assert view.createSubView('user').createSubView('name').get('parent.parent') instanceof MainView
     
   'test ready callback': ->
     callback_fired = false
-    MainView = class extends ViewWithTemplateSource
+    class MainView extends ViewWithTemplateSource
       ready: -> callback_fired = true
     
-    view = new MainView
+    view = new MainView render: true
     @assert callback_fired
   
   'test build sub view': ->
-    MainView = class extends ViewWithTemplateSource
-    MainView.UserView = class extends ViewWithTemplateSource
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
     
-    view = new MainView
-    sub_view = view.buildSubView 'user'
+    view = new MainView render: true
+    sub_view = view.createSubView 'user'
     @assert sub_view instanceof MainView.UserView
     @assert view, sub_view.parent
+  
+  'test descendant view event': ->
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    class MainView.UserView.NameView extends ViewWithTemplateSource
+    
+    main = new MainView
+    callback_values = []
+    main.bind 'descendantCreated', (view) -> callback_values.push view
+    user = main.createSubView('user')
+    name = user.createSubView('name')
+    
+    @assertEqual 2, callback_values.length
+    @assertEqual user, callback_values[0]
+    @assertEqual name, callback_values[1]
