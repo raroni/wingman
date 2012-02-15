@@ -25,3 +25,22 @@ module.exports = class ControllerTest extends Janitor.TestCase
     dummy_controller = new DummyController view: dummy_view
     
     @assert callback_fired
+  
+  'test property dependencies': ->
+    callback_fired = false
+    
+    class MainView extends Wingman.View
+    class MainController extends Wingman.Controller
+      @propertyDependencies
+        someMethod: 'shared.test'
+      
+      someMethod: ->
+        callback_fired = true
+    
+    shared = new WingmanObject
+    view = new MainView { shared }
+    controller = new MainController view
+    
+    shared.set test: 'something'
+    
+    @assert callback_fired
