@@ -76,7 +76,7 @@ module.exports = class
       new_node =
         name: @scanner.getCapture(0)
         parent: @current_scope
-        type: 'sub_view'
+        type: 'child_view'
       @current_scope.children.push new_node
     result
     

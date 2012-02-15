@@ -219,7 +219,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
     @assertElementHasClass element, 'user'
     @assertElementHasClass element, 'premium'
   
-  'test sub view': ->
+  'test child view': ->
     template = Wingman.Template.compile '<div>Test</div>{view user}'
     
     class MainView extends Wingman.View

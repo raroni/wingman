@@ -359,9 +359,9 @@ module.exports = class extends Janitor.TestCase
     @assertDOMElementHasClass interpreter.element, 'user'
     @assertDOMElementHasClass interpreter.element, 'premium'
   
-  'test sub view': ->
+  'test child view': ->
     element_node =
-      type: 'sub_view'
+      type: 'child_view'
       name: 'user'
     
     class MainView extends Wingman.View

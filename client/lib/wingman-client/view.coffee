@@ -33,7 +33,7 @@ module.exports = class extends WingmanObject
     @setupActiveListener() if @isActive
     @ready?()
   
-  createSubView: (view_name) ->
+  createChildView: (view_name) ->
     class_name = Fleck.camelize "#{view_name}_view", true
     klass = @constructor[class_name]
     view = new klass parent: @, session: @session, shared: @shared

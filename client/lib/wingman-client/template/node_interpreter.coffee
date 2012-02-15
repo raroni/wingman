@@ -2,8 +2,8 @@ module.exports = class
   constructor: (@node_data, @scope, @context) ->
     if @node_data.type == 'for'
       @interpretFor()
-    else if @node_data.type == 'sub_view'
-      @interpretSubView()
+    else if @node_data.type == 'child_view'
+      @interpretChildView()
     else
       @interpretElement()
   
@@ -11,8 +11,8 @@ module.exports = class
     for new_node_data in @node_data.children
       new ForChildElement new_node_data, @scope, @context, @node_data.source
   
-  interpretSubView: ->
-    view = @context.createSubView @node_data.name
+  interpretChildView: ->
+    view = @context.createChildView @node_data.name
     element = view.el
     @scope.appendChild element
   

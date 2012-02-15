@@ -134,9 +134,9 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView.NameView.FirstView extends ViewWithTemplateSource
     
     main = new MainView parent: { el: document.createElement('div') }, render: true
-    user = main.createSubView 'user'
-    name = user.createSubView 'name'
-    first = name.createSubView 'first'
+    user = main.createChildView 'user'
+    name = user.createChildView 'name'
+    first = name.createChildView 'first'
     @assertEqual 'user.name.first', first.path()
   
   'test show/hide via isActive': ->
@@ -183,7 +183,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     session = new WingmanObject
     view = new MainView { session, render: true }
-    @assertEqual session, view.createSubView('user').createSubView('name').get('session')
+    @assertEqual session, view.createChildView('user').createChildView('name').get('session')
   
   'test sharing of shared context object': ->
     class MainView extends ViewWithTemplateSource
@@ -192,7 +192,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     shared = new WingmanObject
     view = new MainView { shared, render: true }
-    @assertEqual shared, view.createSubView('user').createSubView('name').get('shared')
+    @assertEqual shared, view.createChildView('user').createChildView('name').get('shared')
   
   'test access to parent': ->
     class MainView extends ViewWithTemplateSource
@@ -200,7 +200,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView.NameView extends ViewWithTemplateSource
     
     view = new MainView render: true
-    @assert view.createSubView('user').createSubView('name').get('parent.parent') instanceof MainView
+    @assert view.createChildView('user').createChildView('name').get('parent.parent') instanceof MainView
     
   'test ready callback': ->
     callback_fired = false
@@ -215,7 +215,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView extends ViewWithTemplateSource
     
     view = new MainView render: true
-    sub_view = view.createSubView 'user'
+    sub_view = view.createChildView 'user'
     @assert sub_view instanceof MainView.UserView
     @assert view, sub_view.parent
   
@@ -227,8 +227,8 @@ module.exports = class ViewTest extends Janitor.TestCase
     main = new MainView
     callback_values = []
     main.bind 'descendantCreated', (view) -> callback_values.push view
-    user = main.createSubView('user')
-    name = user.createSubView('name')
+    user = main.createChildView('user')
+    name = user.createChildView('name')
     
     @assertEqual 2, callback_values.length
     @assertEqual user, callback_values[0]

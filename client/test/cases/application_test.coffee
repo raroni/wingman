@@ -29,7 +29,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app = new MyApp el: Wingman.document.createElement('div')
     @assert '<div>Hi</div>', app.el.innerHTML
   
-  'test simple sub view': ->
+  'test simple child view': ->
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
     class MyApp.UserController extends Wingman.Controller
