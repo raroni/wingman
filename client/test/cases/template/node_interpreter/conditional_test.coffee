@@ -14,7 +14,7 @@ module.exports = class ConditionalTest extends Janitor.TestCase
     node_data =
       type: 'conditional'
       source: 'something'
-      children: [
+      true_children: [
         type: 'element'
         tag: 'span'
         value: new Value('user')
@@ -29,3 +29,32 @@ module.exports = class ConditionalTest extends Janitor.TestCase
     
     context.set something: false
     @assertEqual 'none', element.style.display
+  
+  'test if else conditonal': ->
+    node_data =
+      type: 'conditional'
+      source: 'early'
+      true_children: [
+        type: 'element'
+        tag: 'span'
+        value: new Value('good morning')
+      ]
+      false_children: [
+        type: 'element'
+        tag: 'span'
+        value: new Value('good evening')
+      ]
+    
+    context = new WingmanObject
+    context.set early: true
+    new Conditional node_data, @parent, context
+    
+    child_nodes = @parent.childNodes
+    @assertEqual 2, child_nodes.length
+    @assert !child_nodes[0].style.display
+    @assertEqual 'none', child_nodes[1].style.display
+    
+    context.set early: false
+    
+    @assertEqual 'none', child_nodes[0].style.display
+    @assert !child_nodes[1].style.display

@@ -216,11 +216,34 @@ module.exports = class extends Janitor.TestCase
     node = nodes[0]
     @assertEqual 'conditional', node.type
     @assertEqual 'something', node.source
+    @assert !node.children
     
-    children = node.children
+    children = node.true_children
     @assertEqual 1, children.length
     
     div = children[0]
     @assertEqual 'element', div.type
     @assertEqual 'div', div.tag
     @assertEqual 'hej', div.value.get()
+  
+  'test if else conditional': ->
+    tree = @parse '{if early}<div>good morning</div>{else}<div>good evening</div>{end}'
+    nodes = tree.children
+    
+    @assertEqual 1, nodes.length
+    node = nodes[0]
+    @assertEqual 'conditional', node.type
+    @assertEqual 'early', node.source
+    
+    @assertEqual 1, node.true_children.length
+    @assertEqual 1, node.false_children.length
+    
+    div1 = node.true_children[0]
+    @assertEqual 'element', div1.type
+    @assertEqual 'div', div1.tag
+    @assertEqual 'good morning', div1.value.get()
+    
+    div1 = node.false_children[0]
+    @assertEqual 'element', div1.type
+    @assertEqual 'div', div1.tag
+    @assertEqual 'good evening', div1.value.get()

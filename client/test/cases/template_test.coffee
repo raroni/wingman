@@ -279,3 +279,18 @@ module.exports = class TemplateTest extends Janitor.TestCase
     @assertEqual 'none', div.style.display
     context.set something: true
     @assert !div.style.display
+    
+  'test simple conditional': ->
+    context = new WingmanObject
+    template = Wingman.Template.compile '{if early}<div>good morning</div>{else}<div>good evening</div>{end}'
+    template @parent, context
+    
+    child_nodes = @parent.childNodes
+    @assertEqual 2, child_nodes.length
+    
+    @assertEqual 'none', child_nodes[0].style.display
+    @assert !child_nodes[1].style.display
+    
+    context.set early: true
+    @assert !child_nodes[0].style.display
+    @assertEqual 'none', child_nodes[1].style.display

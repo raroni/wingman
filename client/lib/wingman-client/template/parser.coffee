@@ -34,7 +34,7 @@ module.exports = class
         @scan()
   
   scan: ->
-    @scanForEndTag() || @scanForStartTag() || @scanForIfToken() || @scanForViewToken() || @scanForForToken() || @scanForEndToken() || @scanForText()
+    @scanForEndTag() || @scanForStartTag() || @scanForIfToken() || @scanForElseToken() || @scanForViewToken() || @scanForForToken() || @scanForEndToken() || @scanForText()
   
   scanForEndTag: ->
     result = @scanner.scan /<\/(.*?)>/
@@ -89,13 +89,21 @@ module.exports = class
         parent: @current_scope
         type: 'conditional'
         children: []
+      new_node.true_children = new_node.children
       @current_scope.children.push new_node
       @current_scope = new_node
+    result
+    
+  scanForElseToken: ->
+    result = @scanner.scan /\{else\}/
+    if result
+      @current_scope.children = @current_scope.false_children = []
     result
     
   scanForEndToken: ->
     result = @scanner.scan /\{end\}/
     if result
+      delete @current_scope.children if @current_scope.type == 'conditional'
       @current_scope = @current_scope.parent
     result
 
