@@ -85,6 +85,20 @@ module.exports = class ViewTest extends Janitor.TestCase
     clickElement view.el.childNodes[0].childNodes[0]
     @assert clicked
     
+  'test event bubbling': ->
+    console.log '*****************'
+    View.template_sources.main = '<div class="outer"><div class="user">Johnny</div></div>'
+    class MainView extends View
+      @_name: 'test'
+      events:
+        'click .outer': 'outer_clicked'
+    
+    view = new MainView render: true
+    clicked = false
+    view.bind 'outer_clicked', -> clicked = true
+    clickElement view.el.childNodes[0].childNodes[0]
+    @assert clicked
+    
   'test click on views mother element': ->
     event_from_callback = undefined
     did_maintain_context = false

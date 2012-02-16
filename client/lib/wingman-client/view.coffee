@@ -64,7 +64,11 @@ module.exports = class extends WingmanObject
   setupEvent: (event) ->
     @el.addEventListener event.type, (e) =>
       for elm in Array.prototype.slice.call(@el.querySelectorAll(event.selector), 0)
-        if elm == e.target
+        current = e.target
+        while current != @el && !match
+          match = elm == current
+          current = current.parentNode
+        if match
           @triggerWithCustomArguments event.trigger
           e.preventDefault()
   
