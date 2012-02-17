@@ -19,7 +19,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
       tag: 'div'
       value: new Value('test')
     
-    interpreter = new NodeInterpreter node_data, @parent
+    new NodeInterpreter node_data, @parent
     element = @parent.childNodes[0]
     @assert element
     @assertEqual 'DIV', element.tagName
@@ -359,7 +359,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
   
-    interpreter = new NodeInterpreter element_node, @parent, context
+    new NodeInterpreter element_node, @parent, context
     context.set myAwesomeClass: 'premium'
     
     element = @parent.childNodes[0]
@@ -376,7 +376,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
       templateSource: -> '<div>I am the user view</div>'
     
     main_view = new MainView
-    interpreter = new NodeInterpreter element_node, @parent, main_view
+    new NodeInterpreter element_node, @parent, main_view
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
   'test conditonal': ->

@@ -86,7 +86,6 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assert clicked
     
   'test event bubbling': ->
-    console.log '*****************'
     View.template_sources.main = '<div class="outer"><div class="user">Johnny</div></div>'
     class MainView extends View
       @_name: 'test'
