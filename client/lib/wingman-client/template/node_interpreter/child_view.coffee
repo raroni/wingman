@@ -7,3 +7,9 @@ module.exports = class ChildView
   
   remove: ->
     @view.remove()
+  
+  deactivate: ->
+    @view.deactivate()
+  
+  activate: ->
+    @view.activate()
