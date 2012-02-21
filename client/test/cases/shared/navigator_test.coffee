@@ -23,3 +23,16 @@ module.exports = class extends Janitor.TestCase
     @assertEqual '/something', Wingman.document.location.pathname
     entries = Wingman.window.history.entries
     @assertEqual 'yeah', entries[entries.length-1].state.something
+  
+  'test back': ->
+    @controller.navigate 'first_page'
+    @controller.navigate 'second_page'
+    @controller.back(1)
+    @assertEqual '/first_page', Wingman.document.location.pathname
+  
+  'test back with arguments': ->
+    @controller.navigate 'first_page'
+    @controller.navigate 'second_page'
+    @controller.navigate 'third_page'
+    @controller.back(2)
+    @assertEqual '/first_page', Wingman.document.location.pathname

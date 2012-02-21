@@ -6,5 +6,5 @@ module.exports =
     Wingman.Application.instance.updateNavigationOptions options
     Wingman.Application.instance.updatePath()
   
-  back: ->
-    Wingman.window.history.back()
+  back: (times = 1) ->
+    Wingman.window.history.back times

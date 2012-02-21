@@ -15,8 +15,8 @@ class History
       for callback in @window._popstate_callbacks
         callback event
   
-  back: ->
-    @entries.pop()
+  back: (times = 1) ->
+    @entries.pop() for [1..times]
     if @entries.length
       @triggerPushEvent @entries[@entries.length-1]
 
