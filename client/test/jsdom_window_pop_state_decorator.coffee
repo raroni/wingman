@@ -2,14 +2,12 @@
 
 class History
   constructor: (@window) ->
-  
-  pushedStates: ->
-    @_pushed_states ||= []
+    @entries = []
   
   pushState: (obj, title, location) ->
-    event = { description: 'Im just a dummy event!', location }
-    @pushedStates().push event
-    @triggerPushEvent event
+    event = { state: obj, location }
+    @entries.push event
+    @window.document.location.pathname = event.location
   
   triggerPushEvent: (event) ->
     @window.document.location.pathname = event.location
@@ -18,9 +16,9 @@ class History
         callback event
   
   back: ->
-    @pushedStates().pop()
-    if @pushedStates().length
-      @triggerPushEvent @pushedStates()[@pushedStates().length-1]
+    @entries.pop()
+    if @entries.length
+      @triggerPushEvent @entries[@entries.length-1]
 
 module.exports =
   create: (window) ->

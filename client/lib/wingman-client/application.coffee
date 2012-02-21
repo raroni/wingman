@@ -53,6 +53,7 @@ module.exports = class Application extends Module
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run
       @_first_run = true
     else
+      @updateNavigationOptions e.state
       @updatePath()
   
   childOptions: ->
@@ -66,6 +67,9 @@ module.exports = class Application extends Module
   
   updatePath: ->
     @shared.set path: Wingman.document.location.pathname.substr(1)
+  
+  updateNavigationOptions: (options) ->
+    @shared.set navigation_options: options
   
   findView: (path) ->
     @view.get path

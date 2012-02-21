@@ -154,7 +154,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     new MyApp el: Wingman.document.createElement('div')
     @assert callback_fired
   
-  'test navigate and session': ->
+  'test navigate and shared path': ->
     class MyApp extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
@@ -162,6 +162,16 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app = new MyApp el: Wingman.document.createElement 'div'
     app.navigate 'user'
     @assertEqual 'user', app.shared.get('path')
+  
+  'test navigation options': ->
+    class MyApp extends Wingman.Application
+    MyApp.RootController = class extends Wingman.Controller
+    MyApp.RootView = class extends ViewWithTemplateSource
+
+    app = new MyApp el: Wingman.document.createElement 'div'
+    app.navigate 'user', level: 2
+    @assertEqual 'user', app.shared.get('path')
+    @assertEqual 2, app.shared.get('navigation_options.level')
   
   'test initial path': ->
     MyApp = class extends Wingman.Application
