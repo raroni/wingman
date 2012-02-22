@@ -15,8 +15,13 @@ class History
       for callback in @window._popstate_callbacks
         callback event
   
-  back: (times = 1) ->
-    @entries.pop() for [1..times]
+  go: (change) ->
+    if change >= 0
+      throw new Error "Going forward is not implemented!"
+    else
+      for [1..(-change)]
+        @entries.pop()
+    
     if @entries.length
       @triggerPushEvent @entries[@entries.length-1]
 

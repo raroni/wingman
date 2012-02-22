@@ -8,7 +8,7 @@ JSDomWindowPopStateDecorator = require '../../jsdom_window_pop_state_decorator'
 class DummyController extends Module
   @include Navigator
 
-module.exports = class extends Janitor.TestCase
+module.exports = class NavigatorTest extends Janitor.TestCase
   setup: ->
     Wingman.document = require('jsdom').jsdom()
     Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
@@ -27,12 +27,12 @@ module.exports = class extends Janitor.TestCase
   'test back': ->
     @controller.navigate 'first_page'
     @controller.navigate 'second_page'
-    @controller.back(1)
+    @controller.back()
     @assertEqual '/first_page', Wingman.document.location.pathname
   
-  'test back with arguments': ->
+  'test go': ->
     @controller.navigate 'first_page'
     @controller.navigate 'second_page'
     @controller.navigate 'third_page'
-    @controller.back(2)
+    @controller.back 2
     @assertEqual '/first_page', Wingman.document.location.pathname

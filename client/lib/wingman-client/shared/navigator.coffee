@@ -7,4 +7,4 @@ module.exports =
     Wingman.Application.instance.updatePath()
   
   back: (times = 1) ->
-    Wingman.window.history.back times
+    Wingman.window.history.go -times
