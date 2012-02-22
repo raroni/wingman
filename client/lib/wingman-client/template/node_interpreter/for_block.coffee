@@ -15,7 +15,9 @@ module.exports = class ForBlock
     
     new_context = new WingmanObject
     if @context.createChildView
-      new_context.createChildView = @context.createChildView.bind @context
+      # The line below would be prettier, but Function#bind is now supported on iOS5.
+      # new_context.createChildView = @context.createChildView.bind @context
+      new_context.createChildView = (name) => @context.createChildView.call @context, name
     key = Fleck.singularize @node_data.source.split('.').pop()
     hash = {}
     hash[key] = value
