@@ -61,13 +61,6 @@ WingmanObject = class WingmanObject extends Module
     for property_name, value of hash
       @setProperty property_name, value
   
-  triggerPropertyChangesForDependingProperties: (property, old_value) ->
-    # This implementation should probably be cleaned up.
-    triggered = {}
-    for property_name, dependent_properties of @constructor._property_dependencies
-      @triggerPropertyChange property_name, old_value if !triggered[property_name]
-      triggered[property_name] = true
-  
   triggerPropertyChange: (property_name, old_value) ->
     @trigger "change:#{property_name}", @get(property_name), old_value
   
@@ -127,11 +120,10 @@ WingmanObject = class WingmanObject extends Module
     
     @registerPropertySet property_name
     old_value = @get property_name
-
+    
     @[property_name] = value
     @triggerPropertyChange property_name, old_value
-    @triggerPropertyChangesForDependingProperties property_name, old_value
-
+    
     parent = @
     if Array.isArray @[property_name]
       for value, i in @[property_name]
