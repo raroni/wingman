@@ -61,8 +61,12 @@ WingmanObject = class WingmanObject extends Module
     for property_name, value of hash
       @setProperty property_name, value
   
-  triggerPropertyChange: (property_name, old_value) ->
-    @trigger "change:#{property_name}", @get(property_name), old_value
+  triggerPropertyChange: (property_name) ->
+    @previous_properties ||= {}
+    new_value = @get property_name
+    if !@previous_properties.hasOwnProperty(property_name) || @previous_properties[property_name] != new_value
+      @trigger "change:#{property_name}", new_value, @previous_properties[property_name]
+      @previous_properties[property_name] = new_value
   
   observeOnce: (chain_as_string, callback) ->
     observer = (args...) =>
@@ -119,10 +123,8 @@ WingmanObject = class WingmanObject extends Module
     value = @convertIfNecessary value
     
     @registerPropertySet property_name
-    old_value = @get property_name
-    
     @[property_name] = value
-    @triggerPropertyChange property_name, old_value
+    @triggerPropertyChange property_name
     
     parent = @
     if Array.isArray @[property_name]

@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
 WingmanObject = require '../../../lib/wingman-client/shared/object'
 
-module.exports = class extends Janitor.TestCase
+module.exports = class ObjectTest extends Janitor.TestCase
   'test simple set/get': ->
     klass = class extends WingmanObject
     instance = new klass
@@ -151,16 +151,36 @@ module.exports = class extends Janitor.TestCase
     person.set firstName: 'Rasmus', lastName: 'Nielsen'
     
     @assertEqual 'Rasmus Nielsen', result
+  
+  'test observation of computed property that is reevaluated but not changed': ->
+    Person = class extends WingmanObject
+      @propertyDependencies
+        isHappy: 'car'
     
+      isHappy: -> @get('car') == 'Batmobile'
+    
+    person = new Person
+    callback_values = []
+    person.observe 'isHappy', (value) -> callback_values.push value
+    person.set car: 'Lada'
+    person.set car: 'Toyota'
+    person.set car: 'Batmobile'
+    person.set car: 'Volkswagen'
+    
+    @assertEqual 3, callback_values.length
+    @assertEqual false, callback_values[0]
+    @assertEqual true, callback_values[1]
+    @assertEqual false, callback_values[2]
+  
   'test property dependencies with single depending property': ->
     Country = class extends WingmanObject
       @NAMES: { dk: 'Denmark', se: 'Sweden' }
       
       @propertyDependencies
         countryName: 'country_code'
-  
+      
       countryName: -> @constructor.NAMES[@get('country_code')]
-  
+    
     country = new Country
     result = undefined
     country.observe 'countryName', (new_value) -> result = new_value
