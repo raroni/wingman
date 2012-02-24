@@ -2,37 +2,23 @@ NodeFactory = require '../node_factory'
 
 module.exports = class Conditional
   constructor: (@node_data, @scope, @context) ->
-    @nodes =
-      true: []
-      false: []
-    
-    @add()
+    @nodes = []
     @context.observe @node_data.source, @update
     @update @context.get(@node_data.source)
   
-  add: ->
-    for new_node_data in @node_data.true_children
-      node = NodeFactory.create new_node_data, @scope, @context
-      @nodes.true.push node
-    
-    if @node_data.false_children
+  add: (current_value) ->
+    if current_value
+      for new_node_data in @node_data.true_children
+        node = NodeFactory.create new_node_data, @scope, @context
+        @nodes.push node
+    else if @node_data.false_children
       for new_node_data in @node_data.false_children
         node = NodeFactory.create new_node_data, @scope, @context
-        @nodes.false.push node
+        @nodes.push node
   
   remove: ->
-    throw new Error 'Not implemented!'
-  
-  activate: ->
-    node.activate() for node in @nodes.true
-    node.deactivate() for node in @nodes.false
-    
-  deactivate: ->
-    node.deactivate() for node in @nodes.true
-    node.activate() for node in @nodes.false
+    node.remove() while node = @nodes.shift()
   
   update: (current_value) =>
-    if current_value
-      @activate()
-    else
-      @deactivate()
+    @remove()
+    @add current_value

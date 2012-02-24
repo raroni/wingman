@@ -379,35 +379,49 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     NodeFactory.create element_node, @parent, main_view
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
-  'test conditonal': ->
+  'test conditional': ->
     node_data =
       type: 'conditional'
       source: 'something'
       true_children: [
-        type: 'element'
-        tag: 'span'
-        value: new Value('user')
+        {
+          type: 'element'
+          tag: 'span'
+          value: new Value('user')
+        },
+        {
+          type: 'element'
+          tag: 'span'
+          value: new Value('user2')
+        }
       ]
     
     context = new WingmanObject
     context.set something: true
     NodeFactory.create node_data, @parent, context
     
-    @assertEqual 1, @parent.childNodes.length
-    element = @parent.childNodes[0]
-    @assert !element.style.display
-    
+    child_nodes = @parent.childNodes
+    @assertEqual 2, child_nodes.length
+    @assertEqual 'user', child_nodes[0].innerHTML
+    @assertEqual 'user2', child_nodes[1].innerHTML
     context.set something: false
-    @assertEqual 'none', element.style.display
+    @assertEqual 0, child_nodes.length
   
   'test if else conditonal': ->
     node_data =
       type: 'conditional'
       source: 'early'
       true_children: [
-        type: 'element'
-        tag: 'span'
-        value: new Value('good morning')
+        {
+          type: 'element'
+          tag: 'span'
+          value: new Value('good morning')
+        },
+        {
+          type: 'element'
+          tag: 'span'
+          value: new Value('good morning again')
+        }
       ]
       false_children: [
         type: 'element'
@@ -421,10 +435,8 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     
     child_nodes = @parent.childNodes
     @assertEqual 2, child_nodes.length
-    @assert !child_nodes[0].style.display
-    @assertEqual 'none', child_nodes[1].style.display
-    
+    @assertEqual 'good morning', child_nodes[0].innerHTML
+    @assertEqual 'good morning again', child_nodes[1].innerHTML
     context.set early: false
-    
-    @assertEqual 'none', child_nodes[0].style.display
-    @assert !child_nodes[1].style.display
+    @assertEqual 1, child_nodes.length
+    @assertEqual 'good evening', child_nodes[0].innerHTML
