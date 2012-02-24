@@ -192,17 +192,17 @@ module.exports = class ObjectTest extends Janitor.TestCase
     session = new WingmanObject
     View = class extends WingmanObject
       @propertyDependencies
-        isActive: 'session.user_id'
+        isHappy: 'session.cake'
       
-      isActive: ->
-        !!@get('session.user_id')
+      isHappy: ->
+        !!@get('session.cake')
     
     view = new View
-    callback_fired = false
-    view.observe 'isActive', -> callback_fired = true
-    view.set {session}
-    session.set user_id: 2
-    @assert callback_fired
+    callback_value = undefined
+    view.observe 'isHappy', (value) -> callback_value = value
+    view.set { session }
+    session.set cake: 'strawberry'
+    @assert callback_value
   
   'test several nested property dependencies': ->
     session = new WingmanObject
@@ -210,8 +210,8 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     View = class extends WingmanObject
       @propertyDependencies
-        isActive: ['session.user_id']
-        canTrain: ['training.created_on']
+        isActive: 'session.user_id'
+        canTrain: 'training.created_on'
       
       canTrain: ->
         @get('training.created_on') != '2012-01-26'
@@ -224,7 +224,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     can_train_callback_fired = false
     view.observe 'isActive', -> is_active_callback_fired = true
     view.observe 'canTrain', -> can_train_callback_fired = true
-    view.set {session}
+    view.set { session }
     view.set training: { created_on: 'test' }
     
     @assert is_active_callback_fired

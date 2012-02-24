@@ -30,7 +30,6 @@ module.exports = class extends WingmanObject
     template @el, @
     @addClass @pathName()
     @setupListeners()
-    @setupActiveListener() if @isActive
     @ready?()
   
   createChildView: (view_name) ->
@@ -71,16 +70,6 @@ module.exports = class extends WingmanObject
         if match
           @triggerWithCustomArguments event.trigger
           e.preventDefault()
-  
-  setupActiveListener: ->
-    @observe 'isActive', @checkIsActive
-    @checkIsActive()
-  
-  checkIsActive: =>
-    if @get 'isActive'
-      @activate()
-    else
-      @deactivate()
   
   pathName: ->
     Fleck.underscore @constructor.name.replace(/([A-Z])/g, ' $1').substring(1).split(' ').slice(0, -1).join('')
