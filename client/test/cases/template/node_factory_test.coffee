@@ -1,12 +1,12 @@
 Janitor = require 'janitor'
-NodeInterpreter = require '../../../lib/wingman-client/template/node_interpreter'
+NodeFactory = require '../../../lib/wingman-client/template/node_factory'
 Value = require '../../../lib/wingman-client/template/parser/value'
 WingmanObject = require '../../../lib/wingman-client/shared/object'
 Wingman = require '../../..'
 CustomAssertions = require '../../custom_assertions'
 Wingman.document = require('jsdom').jsdom()
 
-module.exports = class NodeInterpreterTest extends Janitor.TestCase
+module.exports = class NodeFactoryTest extends Janitor.TestCase
   setup: ->
     @parent = Wingman.document.createElement 'div'
   
@@ -19,7 +19,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
       tag: 'div'
       value: new Value('test')
     
-    new NodeInterpreter node_data, @parent
+    NodeFactory.create node_data, @parent
     element = @parent.childNodes[0]
     @assert element
     @assertEqual 'DIV', element.tagName
@@ -35,7 +35,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
         value: new Value('test')
       ]
   
-    new NodeInterpreter node_data, @parent
+    NodeFactory.create node_data, @parent
     element = @parent.childNodes[0]
     @assert element
     @assertEqual 'DIV', element.tagName
@@ -51,7 +51,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
   
     context = new WingmanObject
     context.set name: 'Rasmus'
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
   
     @assertEqual 'Rasmus', @parent.childNodes[0].innerHTML
   
@@ -63,7 +63,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
   
     context = new WingmanObject
     context.set name: 'John'
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     element = @parent.childNodes[0]
     @assertEqual 'John', element.innerHTML
     context.set name: 'Rasmus'
@@ -80,7 +80,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     user.set name: 'John'
     context = new WingmanObject
     context.set {user}
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     element = @parent.childNodes[0]
     @assertEqual 'John', element.innerHTML
     user.set name: 'Rasmus'
@@ -100,7 +100,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
   
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     child_nodes = @parent.childNodes
     @assertEqual 2, child_nodes.length
     @assertEqual 'Rasmus', child_nodes[0].innerHTML
@@ -120,7 +120,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
   
     element = Wingman.document.createElement 'ol'
-    new NodeInterpreter node_data, element, context
+    NodeFactory.create node_data, element, context
     
     @assertEqual 2, element.childNodes.length
     context.get('users').push 'Joe'
@@ -141,7 +141,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
   
     element = Wingman.document.createElement 'ol'
-    new NodeInterpreter node_data, element, context
+    NodeFactory.create node_data, element, context
     
     @assertEqual 2, element.childNodes.length
     context.get('users').remove 'John'
@@ -160,7 +160,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
   
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     
     @assertEqual 2, @parent.childNodes.length
     context.set users: ['Oliver']
@@ -175,7 +175,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
       styles:
         color: new Value('red')
     
-    new NodeInterpreter node_data, @parent
+    NodeFactory.create node_data, @parent
     @assertEqual 'red', @parent.childNodes[0].style.color
   
   'test element node with single dynamic style': ->
@@ -189,7 +189,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
     context.set color: 'red'
     
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     
     @assertEqual 'red', @parent.childNodes[0].style.color
   
@@ -203,7 +203,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set color: 'red'
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     context.set color: 'blue'
     @assertEqual 'blue', @parent.childNodes[0].style.color
   
@@ -216,7 +216,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
         color: new Value('red')
         'font-size': new Value('15px')
     
-    new NodeInterpreter node_data, @parent
+    NodeFactory.create node_data, @parent
     element = @parent.childNodes[0]
     @assertEqual 'red', element.style.color
     @assertEqual '15px', element.style.fontSize
@@ -233,7 +233,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
   
     context.set myColor: 'red', myFontSize: '15px'
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     style = @parent.childNodes[0].style
     @assertEqual 'red', style.color
     @assertEqual '15px', style.fontSize
@@ -253,7 +253,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set myColor: 'red', myFontSize: '15px'
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     
     element = @parent.childNodes[0]
     @assertEqual 'red', element.style.color
@@ -270,7 +270,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
       value: new Value('Something')
       classes: [new Value('user')]
     
-    new NodeInterpreter node_data, @parent
+    NodeFactory.create node_data, @parent
     @assertEqual @parent.childNodes[0].className, 'user'
   
   'test element node with two static classes': ->
@@ -280,7 +280,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
       value: new Value('Something')
       classes: [new Value('user'), new Value('premium')]
     
-    new NodeInterpreter node_data, @parent
+    NodeFactory.create node_data, @parent
     element = @parent.childNodes[0]
     @assertDOMElementHasClass element, 'user'
     @assertDOMElementHasClass element, 'premium'
@@ -295,7 +295,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
   
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     @assertDOMElementHasClass @parent.childNodes[0], 'user'
   
   'test deferred reset with element node with single dynamic class': ->
@@ -308,7 +308,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
   
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     element = @parent.childNodes[0]
     @assertEqual element.className, 'user'
     context.set myAwesomeClass: 'something_else'
@@ -324,7 +324,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
   
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     element = @parent.childNodes[0]
     @assertEqual element.className, 'user'
     context.set myAwesomeClass: null
@@ -343,7 +343,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
   
-    new NodeInterpreter element_node, @parent, context
+    NodeFactory.create element_node, @parent, context
     @assertEqual @parent.childNodes[0].className, 'user'
   
   'test deferred reset of dynamic class that evaluates to the same value as another dynamic class in node element': ->
@@ -359,7 +359,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
   
-    new NodeInterpreter element_node, @parent, context
+    NodeFactory.create element_node, @parent, context
     context.set myAwesomeClass: 'premium'
     
     element = @parent.childNodes[0]
@@ -376,7 +376,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
       templateSource: -> '<div>I am the user view</div>'
     
     main_view = new MainView
-    new NodeInterpreter element_node, @parent, main_view
+    NodeFactory.create element_node, @parent, main_view
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
   'test conditonal': ->
@@ -391,7 +391,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set something: true
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     
     @assertEqual 1, @parent.childNodes.length
     element = @parent.childNodes[0]
@@ -417,7 +417,7 @@ module.exports = class NodeInterpreterTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set early: true
-    new NodeInterpreter node_data, @parent, context
+    NodeFactory.create node_data, @parent, context
     
     child_nodes = @parent.childNodes
     @assertEqual 2, child_nodes.length

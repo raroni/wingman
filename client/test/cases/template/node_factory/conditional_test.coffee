@@ -1,6 +1,6 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
-Conditional = require '../../../../lib/wingman-client/template/node_interpreter/conditional'
+Conditional = require '../../../../lib/wingman-client/template/node_factory/conditional'
 Wingman = require '../../../../.'
 Value = require '../../../../lib/wingman-client/template/parser/value'
 WingmanObject = require '../../../../lib/wingman-client/shared/object'

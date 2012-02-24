@@ -2,7 +2,7 @@ document = require('jsdom').jsdom()
 Janitor = require 'janitor'
 Value = require '../../../../lib/wingman-client/template/parser/value'
 WingmanObject = require '../../../../lib/wingman-client/shared/object'
-ForBlock = require '../../../../lib/wingman-client/template/node_interpreter/for_block'
+ForBlock = require '../../../../lib/wingman-client/template/node_factory/for_block'
 Wingman = require '../../../../.'
 
 module.exports = class ForBlockTest extends Janitor.TestCase

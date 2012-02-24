@@ -1,6 +1,6 @@
 WingmanObject = require '../../shared/object'
 Fleck = require 'fleck'
-NodeInterpreter = require '../node_interpreter'
+NodeFactory = require '../node_factory'
 
 module.exports = class ForBlock
   constructor: (@node_data, @scope, @context) ->
@@ -24,7 +24,7 @@ module.exports = class ForBlock
     new_context.set hash
     
     for new_node_data in @node_data.children
-      node = new NodeInterpreter new_node_data, @scope, new_context
+      node = NodeFactory.create new_node_data, @scope, new_context
       @nodes[value].push node
   
   remove: (value) =>

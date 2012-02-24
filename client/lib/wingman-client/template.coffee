@@ -9,8 +9,8 @@ module.exports = class Template
 
   evaluate: (el, context) ->
     for node_data in @tree.children
-      new NodeInterpreter node_data, el, context
+      NodeFactory.create node_data, el, context
 
 Parser = require './template/parser'
-NodeInterpreter = require './template/node_interpreter'
+NodeFactory = require './template/node_factory'
 Fleck = require 'fleck'

@@ -56,7 +56,7 @@ module.exports = class Element extends Module
   
   setupChildren: ->
     for child in @element_data.children
-      new NodeInterpreter child, @dom_element, @context
+      NodeFactory.create child, @dom_element, @context
 
 Wingman = require '../../../wingman-client'
-NodeInterpreter = require '../node_interpreter'
+NodeFactory = require '../node_factory'

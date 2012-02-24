@@ -1,4 +1,4 @@
-NodeInterpreter = require '../node_interpreter'
+NodeFactory = require '../node_factory'
 
 module.exports = class Conditional
   constructor: (@node_data, @scope, @context) ->
@@ -12,12 +12,12 @@ module.exports = class Conditional
   
   add: ->
     for new_node_data in @node_data.true_children
-      node = new NodeInterpreter new_node_data, @scope, @context
+      node = NodeFactory.create new_node_data, @scope, @context
       @nodes.true.push node
     
     if @node_data.false_children
       for new_node_data in @node_data.false_children
-        node = new NodeInterpreter new_node_data, @scope, @context
+        node = NodeFactory.create new_node_data, @scope, @context
         @nodes.false.push node
   
   remove: ->

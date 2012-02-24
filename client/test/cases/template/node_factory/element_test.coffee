@@ -1,6 +1,6 @@
 Janitor = require 'janitor'
 Value = require '../../../../lib/wingman-client/template/parser/value'
-Element = require '../../../../lib/wingman-client/template/node_interpreter/element'
+Element = require '../../../../lib/wingman-client/template/node_factory/element'
 Wingman = require '../../../../.'
 WingmanObject = require '../../../../lib/wingman-client/shared/object'
 CustomAssertions = require '../../../custom_assertions'
