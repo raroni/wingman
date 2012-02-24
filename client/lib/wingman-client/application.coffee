@@ -56,15 +56,6 @@ module.exports = class Application extends Module
       @updateNavigationOptions e.state
       @updatePath()
   
-  childOptions: ->
-    {
-      source: @,
-      options: {
-        session: @session,
-        shared: @shared
-      }
-    }
-  
   updatePath: ->
     @shared.set path: Wingman.document.location.pathname.substr(1)
   
