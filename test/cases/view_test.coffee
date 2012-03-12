@@ -232,6 +232,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       templateSource: null
     
     main_view = new MainView render: true
+    @assertEqual 0, main_view.el.childNodes.length
   
   teardown: ->
     delete View.template_sources
