@@ -238,6 +238,11 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app.set test: 'something'
     @assert callback_fired
   
+  'test view without corresponding controller': ->
+    class MyApp extends Wingman.Application
+    class MyApp.RootView extends ViewWithTemplateSource
+    @refuteThrows -> new MyApp el: Wingman.document.createElement('div')
+  
   teardown: ->
     delete Wingman.Application.instance
     Wingman.View.template_sources = {}

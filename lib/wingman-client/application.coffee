@@ -32,12 +32,17 @@ module.exports = class Application extends WingmanObject
     view
   
   buildController: (view) =>
+    Controller = @controllerClassForView view
+    new Controller view if Controller
+  
+  controllerClassForView: (view) ->
     parts = view.path().split '.'
     scope = @constructor
     for part in parts
       klass_name = Fleck.camelize "#{part}_controller", true
       scope = scope[klass_name]
-    new scope view
+      return undefined unless scope
+    scope
   
   handlePopStateChange: (e) =>
     if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run
