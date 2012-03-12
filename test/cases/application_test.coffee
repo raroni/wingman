@@ -242,6 +242,14 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp extends Wingman.Application
     class MyApp.RootView extends ViewWithTemplateSource
     @refuteThrows -> new MyApp el: Wingman.document.createElement('div')
+
+  'test using document.body as default parent': ->
+    class MyApp extends Wingman.Application
+    class MyApp.RootView extends Wingman.View
+      templateSource: '<div>hello</div>'
+    
+    new MyApp
+    @assertEqual '<div>hello</div>', Wingman.document.body.innerHTML
   
   teardown: ->
     delete Wingman.Application.instance

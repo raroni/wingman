@@ -17,8 +17,8 @@ module.exports = class Application extends WingmanObject
     
     @bind 'viewCreated', @buildController
     
-    @el = options.el if options.el?
-    @view = options.view || @buildView()
+    @el = options?.el || Wingman.document.body
+    @view = options?.view || @buildView()
     
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
     @updatePath()
