@@ -1,6 +1,0 @@
-#!/usr/bin/env node
-
-// Todo: make wingman use an app's version of Wingman if current dir is a wingman app dir.
-
-Tools = require('wingman-tools');
-Tools.Command.run()

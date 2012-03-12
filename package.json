@@ -1,10 +1,19 @@
 {
-  "name": "wingman",
+  "name": "wingman-client",
   "description": "TODO.",
   "author": "Rasmus Rønn Nielsen <rasmusrnielsen@gmail.com>",
   "version": "0.1.0",
+  "main": "lib/wingman-client",
   "dependencies": {
-    "wingman-tools": "0.1.0"
+    "strscan": ">=1.0.1",
+    "fleck": ">=0.5.1"
   },
-  "bin": "./bin/wingman"
+  "devDependencies": {
+    "janitor": "0.1.5",
+    "jsdom": "0.2.10",
+    "stitch": "0.3.3",
+    "coffee-script" : "1.2.0",
+    "sinon": "1.3.1",
+    "localStorage": "1.0.0"
+  }
 }
