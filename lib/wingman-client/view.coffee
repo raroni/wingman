@@ -80,6 +80,9 @@ module.exports = class extends WingmanObject
   pathName: ->
     Fleck.underscore @constructor.name.replace(/([A-Z])/g, ' $1').substring(1).split(' ').slice(0, -1).join('')
   
+  append: (view) ->
+    @el.appendChild view.el
+  
   pathKeys: ->
     return [] if @isRoot()
     path_keys = [@pathName()]

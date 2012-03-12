@@ -231,6 +231,19 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     main_view = new MainView render: true
     @assertEqual 0, main_view.el.childNodes.length
+    
+  'test appending view': ->
+    class MainView extends Wingman.View
+      templateSource: null
+      
+    class SubView extends Wingman.View
+      templateSource: '<div>hello</div>'
+    
+    main_view = new MainView render: true
+    sub_view = new SubView render: true
+    main_view.append sub_view
+    
+    @assertEqual '<div class="sub"><div>hello</div></div>', main_view.el.innerHTML
   
   teardown: ->
     delete View.template_sources
