@@ -152,23 +152,14 @@ module.exports = class ViewTest extends Janitor.TestCase
     first = name.createChildView 'first'
     @assertEqual 'user.name.first', first.path()
   
-  'test session sharing': ->
+  'test app instance sharing': ->
     class MainView extends ViewWithTemplateSource
     class MainView.UserView extends ViewWithTemplateSource
     class MainView.UserView.NameView extends ViewWithTemplateSource
     
-    session = new WingmanObject
-    view = new MainView { session, render: true }
-    @assertEqual session, view.createChildView('user').createChildView('name').get('session')
-  
-  'test sharing of shared context object': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
-    class MainView.UserView.NameView extends ViewWithTemplateSource
-    
-    shared = new WingmanObject
-    view = new MainView { shared, render: true }
-    @assertEqual shared, view.createChildView('user').createChildView('name').get('shared')
+    app = new WingmanObject
+    view = new MainView { app, render: true }
+    @assertEqual app, view.createChildView('user').createChildView('name').get('app')
   
   'test access to parent': ->
     class MainView extends ViewWithTemplateSource

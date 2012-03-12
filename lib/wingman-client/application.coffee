@@ -1,25 +1,16 @@
 Wingman = require '../wingman-client'
-Module = require './shared/module'
 Events = require './shared/events'
 WingmanObject = require './shared/object'
 Navigator = require './shared/navigator'
 Fleck = require 'fleck'
 
-createSessionClass = ->
-  class Session extends Wingman.Model
-    @storage 'local', namespace: 'sessions'
-
-module.exports = class Application extends Module
+module.exports = class Application extends WingmanObject
   @include Navigator
   @include Events
   
   constructor: (options) ->
     throw new Error 'You cannot instantiate two Wingman apps at the same time.' if @constructor.__super__.constructor.instance
     @constructor.__super__.constructor.instance = @
-    
-    session_class = createSessionClass()
-    @session = new session_class id: 1
-    @shared = new WingmanObject
     
     for key, value of @constructor
       @constructor.RootView[key] = value if key.match("(.+)View$") && key != 'RootView'
@@ -31,11 +22,10 @@ module.exports = class Application extends Module
     
     Wingman.window.addEventListener 'popstate', @handlePopStateChange
     @updatePath()
-    @session.load()
     @ready?()
   
   buildView: ->
-    view = new @constructor.RootView parent: @, el: @el, session: @session, shared: @shared
+    view = new @constructor.RootView parent: @, el: @el, app: @
     view.bind 'descendantCreated', (view) => @trigger 'viewCreated', view
     @trigger 'viewCreated', view
     view.render()
@@ -57,10 +47,10 @@ module.exports = class Application extends Module
       @updatePath()
   
   updatePath: ->
-    @shared.set path: Wingman.document.location.pathname.substr(1)
+    @set path: Wingman.document.location.pathname.substr(1)
   
   updateNavigationOptions: (options) ->
-    @shared.set navigation_options: options
+    @set navigation_options: options
   
   findView: (path) ->
     @view.get path

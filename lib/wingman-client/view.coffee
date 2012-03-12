@@ -20,8 +20,7 @@ module.exports = class extends WingmanObject
   constructor: (options) ->
     super()
     @set parent: options.parent if options?.parent?
-    @set session: options.session if options?.session?
-    @set shared: options.shared if options?.shared?
+    @set app: options.app if options?.app?
     @el = @dom_element = options?.el || Wingman.document.createElement(@tag || 'div')
     @render() if options?.render
   
@@ -38,7 +37,7 @@ module.exports = class extends WingmanObject
   createChildView: (view_name) ->
     class_name = Fleck.camelize "#{view_name}_view", true
     klass = @constructor[class_name]
-    view = new klass parent: @, session: @session, shared: @shared
+    view = new klass parent: @, app: @get('app')
     view.bind 'descendantCreated', (view) => @trigger 'descendantCreated', view
     @trigger 'descendantCreated', view
     view.render()

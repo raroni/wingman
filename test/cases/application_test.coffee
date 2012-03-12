@@ -43,64 +43,25 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     root_el = Wingman.document.createElement 'div'
     app = new MyApp el: root_el
     @assert root_el.innerHTML.match('stubbing the source')
-  
-  'test session': ->
-    class App extends Wingman.Application
-    class App.RootView extends ViewWithTemplateSource
-    class App.RootController extends Wingman.Controller
-  
-    root_el = Wingman.document.createElement 'div'
-    app = new App el: root_el
-    app.session.set user_id: 27
-    @assertEqual 27, app.session.get('user_id')
-   
-  'test session sharing': ->
+
+  'test access to application instance': ->
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends Wingman.View
       templateSource: -> "{view user}"
     class MyApp.UserController extends Wingman.Controller
       ready: ->
-        @get('session').set controller_greeting: 'Controller says hello'
+        @get('app').set controller_greeting: 'Controller says hello'
     
     class MyApp.UserView extends ViewWithTemplateSource
       ready: ->
-        @get('session').set view_greeting: 'View says hello'
+        @get('app').set view_greeting: 'View says hello'
     
     root_el = Wingman.document.createElement 'div'
     app = new MyApp el: root_el
     
-    @assertEqual 'View says hello', app.session.get('view_greeting')
-    @assertEqual 'Controller says hello', app.session.get('controller_greeting')
-  
-  'test shared context object': ->
-    class App extends Wingman.Application
-    class App.RootView extends ViewWithTemplateSource
-    class App.RootController extends Wingman.Controller
-    
-    root_el = Wingman.document.createElement 'div'
-    app = new App el: root_el
-    app.shared.set user_id: 28
-    @assertEqual 28, app.shared.get('user_id')
-  
-  'test sharing of shared context object': ->
-    class App extends Wingman.Application
-    class App.RootController extends Wingman.Controller
-    class App.RootView extends Wingman.View
-      templateSource: -> "{view user}"
-    
-    class App.UserController extends Wingman.Controller
-      ready: ->
-        @get('shared').set controller_greeting: 'Controller says hello'
-    
-    class App.UserView extends ViewWithTemplateSource
-      ready: ->
-        @get('shared').set view_greeting: 'View says hello'
-    
-    root_el = Wingman.document.createElement 'div'
-    app = new App el: root_el
-    @assertEqual 'View says hello', app.shared.get('view_greeting')
-    @assertEqual 'Controller says hello', app.shared.get('controller_greeting')
+    @assertEqual 'View says hello', app.get('view_greeting')
+    @assertEqual 'Controller says hello', app.get('controller_greeting')
   
   'test singleton instance': ->
     class MyApp extends Wingman.Application
@@ -161,7 +122,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     
     app = new MyApp el: Wingman.document.createElement 'div'
     app.navigate 'user'
-    @assertEqual 'user', app.shared.get('path')
+    @assertEqual 'user', app.get('path')
   
   'test navigation options': ->
     class MyApp extends Wingman.Application
@@ -170,8 +131,8 @@ module.exports = class ApplicationTest extends Janitor.TestCase
 
     app = new MyApp el: Wingman.document.createElement 'div'
     app.navigate 'user', level: 2
-    @assertEqual 'user', app.shared.get('path')
-    @assertEqual 2, app.shared.get('navigation_options.level')
+    @assertEqual 'user', app.get('path')
+    @assertEqual 2, app.get('navigation_options.level')
   
   'test initial path': ->
     MyApp = class extends Wingman.Application
@@ -180,7 +141,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     
     Wingman.window.document.location.pathname = '/user'
     app = new MyApp el: Wingman.document.createElement('div')
-    @assertEqual 'user', app.shared.get('path')
+    @assertEqual 'user', app.get('path')
   
   'test backing through history': ->
     class MyApp extends Wingman.Application
@@ -191,7 +152,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app.navigate 'user'
     app.navigate 'home'
     app.back()
-    @assertEqual 'user', app.shared.get('path')
+    @assertEqual 'user', app.get('path')
     @assertEqual '/user', Wingman.window.location.pathname
   
   'test controller getting served correct view': ->
@@ -231,14 +192,6 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app = new MyApp el: Wingman.document.createElement('div')
     @assert view_from_main_controller instanceof MyApp.MainView.UserView
   
-  'test automatic session load after init': ->
-    Wingman.localStorage.setItem "sessions.1", JSON.stringify({ user_id: 1 })
-    MyApp = class extends Wingman.Application
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
-    app = new MyApp el: Wingman.document.createElement('div')
-    @assertEqual 1, app.session.get('user_id')
-  
   'test setting correct classes on RootView': ->
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
@@ -255,7 +208,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends ViewWithTemplateSource
       @propertyDependencies
-        someMethod: 'shared.test'
+        someMethod: 'app.test'
       
       someMethod: ->
         callback_fired = true
@@ -263,7 +216,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app = new MyApp el: Wingman.document.createElement('div')
     @assert callback_fired # fired because root_view's shared is set during its constructor
     callback_fired = false
-    app.shared.set test: 'something'
+    app.set test: 'something'
     @assert callback_fired
     
   'test controller depending on properties of shared': ->
@@ -272,7 +225,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
       @propertyDependencies
-        someMethod: 'shared.test'
+        someMethod: 'app.test'
       
       someMethod: ->
         callback_fired = true
@@ -282,7 +235,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app = new MyApp el: Wingman.document.createElement('div')
     @assert callback_fired # fired because root_controller's shared is set during its constructor
     callback_fired = false
-    app.shared.set test: 'something'
+    app.set test: 'something'
     @assert callback_fired
   
   teardown: ->

@@ -32,15 +32,15 @@ module.exports = class ControllerTest extends Janitor.TestCase
     class MainView extends Wingman.View
     class MainController extends Wingman.Controller
       @propertyDependencies
-        someMethod: 'shared.test'
+        someMethod: 'app.test'
       
       someMethod: ->
         callback_fired = true
     
-    shared = new WingmanObject
-    view = new MainView { shared }
+    app = new WingmanObject
+    view = new MainView { app }
     controller = new MainController view
     
-    shared.set test: 'something'
+    app.set test: 'something'
     
     @assert callback_fired

@@ -8,6 +8,5 @@ module.exports = class extends WingmanObject
   constructor: (view) ->
     super()
     @set view: view
-    @set session: view.session
-    @set shared: view.shared
+    @set app: view.app
     @ready?()
