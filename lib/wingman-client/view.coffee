@@ -27,7 +27,7 @@ module.exports = class extends WingmanObject
   render: ->
     template_source = @get 'templateSource'
     if template_source
-      template = Wingman.Template.compile @templateSource()
+      template = Wingman.Template.compile template_source
       template @el, @
     
     @addClass @pathName()

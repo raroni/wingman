@@ -218,6 +218,13 @@ module.exports = class ViewTest extends Janitor.TestCase
     main_view = new MainView render: true
     @assertEqual 'hi', main_view.el.childNodes[0].innerHTML
   
+  'test template source as a string': ->
+    class MainView extends Wingman.View
+      templateSource: '<div>hello</div>'
+    
+    main_view = new MainView render: true
+    @assertEqual 'hello', main_view.el.childNodes[0].innerHTML
+  
   'test disabling template': ->
     class MainView extends Wingman.View
       templateSource: null
