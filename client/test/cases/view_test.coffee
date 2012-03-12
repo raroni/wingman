@@ -216,3 +216,16 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     main_view = new MainView render: true
     @assertEqual 'TR', main_view.el.tagName
+
+  'test custom template name': ->
+    View.template_sources =
+      'my_custom_name': '<div>hi</div>'
+    
+    class MainView extends Wingman.View
+      templateName: 'my_custom_name'
+    
+    main_view = new MainView render: true
+    @assertEqual 'hi', main_view.el.childNodes[0].innerHTML
+  
+  teardown: ->
+    delete View.template_sources

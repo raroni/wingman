@@ -42,9 +42,13 @@ module.exports = class extends WingmanObject
     view
   
   templateSource: ->
-    template_source = @constructor.template_sources[@path()]
-    throw new Error "Template '#{@path()}' not found." unless template_source
+    name = @get 'templateName'
+    template_source = @constructor.template_sources[name]
+    throw new Error "Template '#{name}' not found." unless template_source
     template_source
+  
+  templateName: ->
+    @path()
   
   setupListeners: ->
     @el.addEventListener 'click', (e) => @click(e) if @click
