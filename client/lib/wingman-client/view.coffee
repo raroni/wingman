@@ -26,8 +26,11 @@ module.exports = class extends WingmanObject
     @render() if options?.render
   
   render: ->
-    template = Wingman.Template.compile @templateSource()
-    template @el, @
+    template_source = @get 'templateSource'
+    if template_source
+      template = Wingman.Template.compile @templateSource()
+      template @el, @
+    
     @addClass @pathName()
     @setupListeners()
     @ready?()
