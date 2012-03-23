@@ -272,7 +272,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     class Notification extends Wingman.Model
     
-    # For now we have no better solution than 
+    # For now we have no better solution than
     uglyAssociationHack Notification
     
     context = new WingmanObject
@@ -294,6 +294,18 @@ module.exports = class ModelTest extends Janitor.TestCase
     @assertEqual notifications[0], callback_values[0]
     @assertEqual notifications[2], callback_values[1]
     delete Wingman.Application.instance
+  
+  'test has many nested population': ->
+    class User extends Wingman.Model
+      @hasMany 'notifications'
+    
+    class Notification extends Wingman.Model
+      
+    uglyAssociationHack Notification
+    
+    user = new User id: 1, name: 'Rasmus', notifications: [ { id: 1, title: 'yeah' }, { id: 2, title: 'something else' } ]
+    @assertEqual 2, Notification.count()
+    @assertEqual 2, user.get('notifications').count()
   
   'test has many association with json export': ->
     id = 1
@@ -324,6 +336,11 @@ module.exports = class ModelTest extends Janitor.TestCase
     @assertEqual 0, User.store().count()
     user.set id: 1
     @assertEqual 1, User.store().count()
+  
+  'test find': ->
+    class User extends Wingman.Model
+    new User id: 1, name: 'Ras'
+    @assertEqual 'Ras', User.find(1).get('name')
   
   'test exception when attempting to change id': ->
     class User extends Wingman.Model

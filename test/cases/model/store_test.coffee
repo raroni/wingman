@@ -4,7 +4,7 @@ Store = require '../../../lib/wingman-client/model/store'
 
 module.exports = class StoreTest extends Janitor.TestCase
   setup: ->
-    class @User extends Wingman.Model
+    class @User extends Wingman.Model # maybe this should just be a dummy object rather than a Wingman.Model to better illustrate the purpose?
     @store = new Store
   
   'test add': ->
@@ -62,3 +62,8 @@ module.exports = class StoreTest extends Janitor.TestCase
     @store.add user2
     @assertEqual 1, @store.count()
     @assertEqual 'Sonic', user1.get('name')
+    
+  'test find': ->
+    user = new @User id: 1, name: 'Ras'
+    @store.add user
+    @assertEqual 'Ras', @store.find(1).get('name')

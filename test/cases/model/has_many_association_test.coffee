@@ -48,6 +48,29 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     association.forEach -> callback_fired = true
     @assert !callback_fired
   
+  'test build by hash': ->
+    user = new @User id: 13
+    association = new HasManyAssociation user, @Notification
+    
+    association.build id: 1, title: 'YO'
+    
+    @assertEqual 'YO', @Notification.find(1).get('title')
+    @assertEqual 13, @Notification.find(1).get('user_id')
+  
+  'test build by array': ->
+    user = new @User id: 13
+    association = new HasManyAssociation user, @Notification
+    
+    association.build [
+      { id: 1, title: 'YO' },
+      { id: 2, title: 'HI' }
+    ]
+    
+    @assertEqual 'YO', @Notification.find(1).get('title')
+    @assertEqual 13, @Notification.find(1).get('user_id')
+    @assertEqual 'HI', @Notification.find(2).get('title')
+    @assertEqual 13, @Notification.find(2).get('user_id')
+  
   'test add event': ->
     user = new @User
     association = new HasManyAssociation user, @Notification

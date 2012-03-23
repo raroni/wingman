@@ -40,6 +40,9 @@ module.exports = class Model extends WingmanObject
   @scoped: (params) ->
     new Scope @store(), params
   
+  @find: (id) ->
+    @store().find id
+  
   constructor: (properties, options) ->
     @storage_adapter = @constructor.storageAdapter()
     @dirty_static_property_names = []
@@ -94,9 +97,13 @@ module.exports = class Model extends WingmanObject
   
   setProperty: (property_name, values) ->
     throw new Error 'You cannot change the ID of a model when set.' if property_name == 'id' && @get('id')
-    @dirty_static_property_names.push property_name
-    super property_name, values
-    @save() if @storage_adapter.auto_save
+    
+    if @get(property_name) instanceof HasManyAssociation
+      @get(property_name).build values
+    else
+      @dirty_static_property_names.push property_name
+      super property_name, values
+      @save() if @storage_adapter.auto_save
   
   isPersisted: ->
     !!@get('id')

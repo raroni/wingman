@@ -23,6 +23,9 @@ module.exports = class Store extends Module
     for key, value of model2.toJSON()
       model.setProperty key, value unless key == 'id'
   
+  find: (id) ->
+    @models[id]
+  
   count: ->
     Object.keys(@models).length
   
