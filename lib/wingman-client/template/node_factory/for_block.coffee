@@ -3,28 +3,28 @@ Fleck = require 'fleck'
 NodeFactory = require '../node_factory'
 
 module.exports = class ForBlock
-  constructor: (@node_data, @scope, @context) ->
+  constructor: (@nodeData, @scope, @context) ->
     @nodes = {}
     @addAll() if @source()
-    @context.observe @node_data.source, @rebuild
-    @context.observe @node_data.source, 'add', @add
-    @context.observe @node_data.source, 'remove', @remove
+    @context.observe @nodeData.source, @rebuild
+    @context.observe @nodeData.source, 'add', @add
+    @context.observe @nodeData.source, 'remove', @remove
   
   add: (value) =>
     @nodes[value] = []
     
-    new_context = new WingmanObject
+    newContext = new WingmanObject
     if @context.createChildView
       # The line below would be prettier, but Function#bind is now supported on iOS5.
-      # new_context.createChildView = @context.createChildView.bind @context
-      new_context.createChildView = (name) => @context.createChildView.call @context, name
-    key = Fleck.singularize @node_data.source.split('.').pop()
+      # newContext.createChildView = @context.createChildView.bind @context
+      newContext.createChildView = (name) => @context.createChildView.call @context, name
+    key = Fleck.singularize @nodeData.source.split('.').pop()
     hash = {}
     hash[key] = value
-    new_context.set hash
+    newContext.set hash
     
-    for new_node_data in @node_data.children
-      node = NodeFactory.create new_node_data, @scope, new_context
+    for newNodeData in @nodeData.children
+      node = NodeFactory.create newNodeData, @scope, newContext
       @nodes[value].push node
   
   remove: (value) =>
@@ -34,7 +34,7 @@ module.exports = class ForBlock
     delete @nodes[value]
   
   source: ->
-    @context.get @node_data.source
+    @context.get @nodeData.source
   
   addAll: ->
     @source().forEach (value) => @add value

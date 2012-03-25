@@ -1,9 +1,9 @@
-DOMElementHasClass = (element, class_name) ->
-  element.className.split(' ').indexOf(class_name) != -1
+DOMElementHasClass = (element, className) ->
+  element.className.split(' ').indexOf(className) != -1
 
 module.exports =
-  assertDOMElementHasClass: (element, class_name) ->
-    @assert DOMElementHasClass(element, class_name)
+  assertDOMElementHasClass: (element, className) ->
+    @assert DOMElementHasClass(element, className)
   
-  refuteDOMElementHasClass: (element, class_name) ->
-    @assert !DOMElementHasClass(element, class_name)
+  refuteDOMElementHasClass: (element, className) ->
+    @assert !DOMElementHasClass(element, className)

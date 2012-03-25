@@ -6,8 +6,8 @@ Fleck = require 'fleck'
 module.exports = class extends WingmanObject
   @include Elementary
   
-  @parseEvents: (events_hash) ->
-    (@parseEvent(key, trigger) for key, trigger of events_hash)
+  @parseEvents: (eventsHash) ->
+    (@parseEvent(key, trigger) for key, trigger of eventsHash)
   
   @parseEvent: (key, trigger) ->
     type = key.split(' ')[0]
@@ -21,22 +21,22 @@ module.exports = class extends WingmanObject
     super()
     @set parent: options.parent if options?.parent?
     @set app: options.app if options?.app?
-    @el = @dom_element = options?.el || Wingman.document.createElement(@tag || 'div')
+    @el = @domElement = options?.el || Wingman.document.createElement(@tag || 'div')
     @render() if options?.render
   
   render: ->
-    template_source = @get 'templateSource'
-    if template_source
-      template = Wingman.Template.compile template_source
+    templateSource = @get 'templateSource'
+    if templateSource
+      template = Wingman.Template.compile templateSource
       template @el, @
     
     @addClass @pathName()
     @setupListeners()
     @ready?()
   
-  createChildView: (view_name) ->
-    class_name = Fleck.camelize "#{view_name}_view", true
-    klass = @constructor[class_name]
+  createChildView: (viewName) ->
+    className = Fleck.camelize(Fleck.underscore(viewName), true) + 'View'
+    klass = @constructor[className]
     view = new klass parent: @, app: @get('app')
     view.bind 'descendantCreated', (view) => @trigger 'descendantCreated', view
     @trigger 'descendantCreated', view
@@ -45,9 +45,9 @@ module.exports = class extends WingmanObject
   
   templateSource: ->
     name = @get 'templateName'
-    template_source = @constructor.template_sources[name]
-    throw new Error "Template '#{name}' not found." unless template_source
-    template_source
+    templateSource = @constructor.templateSources[name]
+    throw new Error "Template '#{name}' not found." unless templateSource
+    templateSource
   
   templateName: ->
     @path()
@@ -61,9 +61,9 @@ module.exports = class extends WingmanObject
   
   triggerWithCustomArguments: (trigger) ->
     args = [trigger]
-    arguments_method_name = Fleck.camelize(trigger) + "Arguments"
-    custom_arguments = @[arguments_method_name]?()
-    args.push.apply args, custom_arguments if custom_arguments
+    argumentsMethodName = Fleck.camelize(trigger) + "Arguments"
+    customArguments = @[argumentsMethodName]?()
+    args.push.apply args, customArguments if customArguments
     @trigger.apply @, args
   
   setupEvent: (event) ->
@@ -85,9 +85,9 @@ module.exports = class extends WingmanObject
   
   pathKeys: ->
     return [] if @isRoot()
-    path_keys = [@pathName()]
-    path_keys = @get('parent').pathKeys().concat path_keys if @get('parent')?.pathKeys?
-    path_keys
+    pathKeys = [@pathName()]
+    pathKeys = @get('parent').pathKeys().concat pathKeys if @get('parent')?.pathKeys?
+    pathKeys
   
   isRoot: ->
     @get('parent') instanceof Wingman.Application

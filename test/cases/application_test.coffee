@@ -3,7 +3,7 @@ Wingman = require '../../.'
 JSDomWindowPopStateDecorator = require '../jsdom_window_pop_state_decorator'
 Wingman.localStorage = require 'localStorage'
 
-Wingman.View.template_sources = {
+Wingman.View.templateSources = {
   'user': '<div>stubbing the source</div>'
   'main': '<div>stubbing the source</div>'
 }
@@ -40,9 +40,9 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp.UserView extends Wingman.View
       templateSource: -> '<div>stubbing the source</div>'
     
-    root_el = Wingman.document.createElement 'div'
-    app = new MyApp el: root_el
-    @assert root_el.innerHTML.match('stubbing the source')
+    rootEl = Wingman.document.createElement 'div'
+    app = new MyApp el: rootEl
+    @assert rootEl.innerHTML.match('stubbing the source')
 
   'test access to application instance': ->
     class MyApp extends Wingman.Application
@@ -51,17 +51,17 @@ module.exports = class ApplicationTest extends Janitor.TestCase
       templateSource: -> "{view user}"
     class MyApp.UserController extends Wingman.Controller
       ready: ->
-        @get('app').set controller_greeting: 'Controller says hello'
+        @get('app').set controllerGreeting: 'Controller says hello'
     
     class MyApp.UserView extends ViewWithTemplateSource
       ready: ->
-        @get('app').set view_greeting: 'View says hello'
+        @get('app').set viewGreeting: 'View says hello'
     
-    root_el = Wingman.document.createElement 'div'
-    app = new MyApp el: root_el
+    rootEl = Wingman.document.createElement 'div'
+    app = new MyApp el: rootEl
     
-    @assertEqual 'View says hello', app.get('view_greeting')
-    @assertEqual 'Controller says hello', app.get('controller_greeting')
+    @assertEqual 'View says hello', app.get('viewGreeting')
+    @assertEqual 'Controller says hello', app.get('controllerGreeting')
   
   'test singleton instance': ->
     class MyApp extends Wingman.Application
@@ -77,9 +77,9 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends ViewWithTemplateSource
     
-    app_options = { el: Wingman.document.createElement('div') }
-    new MyApp app_options
-    @assertThrows -> new App app_options
+    appOptions = { el: Wingman.document.createElement('div') }
+    new MyApp appOptions
+    @assertThrows -> new App appOptions
   
   'test reading config params on applications instance': ->
     class MyApp extends Wingman.Application
@@ -92,28 +92,28 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     @assertEqual 'test-host.com', Wingman.Application.instance?.host
   
   'test application ready callback': ->
-    callback_fired = false
+    callbackFired = false
     
     class MyApp extends Wingman.Application
-      ready: -> callback_fired = true
+      ready: -> callbackFired = true
     
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert callback_fired
+    @assert callbackFired
   
   'test root controller callback': ->
-    callback_fired = false
+    callbackFired = false
     
     class MyApp extends Wingman.Application
     class MyApp.RootView extends ViewWithTemplateSource
     class MyApp.RootController extends Wingman.Controller
       ready: ->
-        callback_fired = true
+        callbackFired = true
     
     new MyApp el: Wingman.document.createElement('div')
-    @assert callback_fired
+    @assert callbackFired
   
   'test navigate and shared path': ->
     class MyApp extends Wingman.Application
@@ -132,7 +132,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app = new MyApp el: Wingman.document.createElement 'div'
     app.navigate 'user', level: 2
     @assertEqual 'user', app.get('path')
-    @assertEqual 2, app.get('navigation_options.level')
+    @assertEqual 2, app.get('navigationOptions.level')
   
   'test initial path': ->
     MyApp = class extends Wingman.Application
@@ -156,7 +156,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     @assertEqual '/user', Wingman.window.location.pathname
   
   'test controller getting served correct view': ->
-    main_view_from_controller = undefined
+    mainViewFromController = undefined
     
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
@@ -165,21 +165,21 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     
     class MyApp.MainController extends Wingman.Controller
       ready: ->
-        main_view_from_controller = @view
+        mainViewFromController = @view
       
     class MyApp.MainView extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert main_view_from_controller instanceof MyApp.MainView
+    @assert mainViewFromController instanceof MyApp.MainView
   
   'test nested controller getting served correct view': ->
-    view_from_main_controller = undefined
+    viewFromMainController = undefined
     
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
     class MyApp.MainController extends ControllerWithView
     class MyApp.MainController.UserController extends Wingman.Controller
-      ready: -> view_from_main_controller = @view
+      ready: -> viewFromMainController = @view
     
     class MyApp.RootView extends Wingman.View
       templateSource: -> '{view main}'
@@ -190,7 +190,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp.MainView.UserView extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert view_from_main_controller instanceof MyApp.MainView.UserView
+    @assert viewFromMainController instanceof MyApp.MainView.UserView
   
   'test setting correct classes on RootView': ->
     class MyApp extends Wingman.Application
@@ -202,7 +202,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     @assert !MyApp.RootView.RootController
   
   'test view depending on properties of shared': ->
-    callback_fired = false
+    callbackFired = false
     
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
@@ -211,16 +211,16 @@ module.exports = class ApplicationTest extends Janitor.TestCase
         someMethod: 'app.test'
       
       someMethod: ->
-        callback_fired = true
+        callbackFired = true
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert callback_fired # fired because root_view's shared is set during its constructor
-    callback_fired = false
+    @assert callbackFired # fired because rootView's shared is set during its constructor
+    callbackFired = false
     app.set test: 'something'
-    @assert callback_fired
+    @assert callbackFired
     
   'test controller depending on properties of shared': ->
-    callback_fired = false
+    callbackFired = false
     
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
@@ -228,15 +228,15 @@ module.exports = class ApplicationTest extends Janitor.TestCase
         someMethod: 'app.test'
       
       someMethod: ->
-        callback_fired = true
+        callbackFired = true
     
     class MyApp.RootView extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert callback_fired # fired because root_controller's shared is set during its constructor
-    callback_fired = false
+    @assert callbackFired # fired because rootController's shared is set during its constructor
+    callbackFired = false
     app.set test: 'something'
-    @assert callback_fired
+    @assert callbackFired
   
   'test view without corresponding controller': ->
     class MyApp extends Wingman.Application
@@ -253,4 +253,4 @@ module.exports = class ApplicationTest extends Janitor.TestCase
   
   teardown: ->
     delete Wingman.Application.instance
-    Wingman.View.template_sources = {}
+    Wingman.View.templateSources = {}

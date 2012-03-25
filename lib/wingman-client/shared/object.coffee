@@ -1,7 +1,7 @@
 Module = require './module'
 Events = require './events'
 
-property_dependencies = {}
+propertyDependencies = {}
 
 WingmanObject = class WingmanObject extends Module
   @include Events
@@ -21,7 +21,7 @@ WingmanObject = class WingmanObject extends Module
     if hash
       @addPropertyDependencies hash
     else
-      property_dependencies[@] ||= @buildPropertyDependencies()
+      propertyDependencies[@] ||= @buildPropertyDependencies()
     
   @addPropertyDependencies: (hash) ->
     config = @propertyDependencies()
@@ -31,142 +31,142 @@ WingmanObject = class WingmanObject extends Module
     @initPropertyDependencies() if @constructor.propertyDependencies()
   
   initPropertyDependencies: ->
-    for dependent_property_key, depending_properties_keys of @constructor.propertyDependencies()
-      depending_properties_keys = [depending_properties_keys] unless Array.isArray(depending_properties_keys)
-      for depending_property_key in depending_properties_keys
-        @initPropertyDependency dependent_property_key, depending_property_key
+    for dependentPropertyKey, dependingPropertiesKeys of @constructor.propertyDependencies()
+      dependingPropertiesKeys = [dependingPropertiesKeys] unless Array.isArray(dependingPropertiesKeys)
+      for dependingPropertyKey in dependingPropertiesKeys
+        @initPropertyDependency dependentPropertyKey, dependingPropertyKey
   
-  initPropertyDependency: (dependent_property_key, depending_property_key) ->
-    trigger = => @triggerPropertyChange dependent_property_key
-    @observe depending_property_key, (new_value, old_value) =>
+  initPropertyDependency: (dependentPropertyKey, dependingPropertyKey) ->
+    trigger = => @triggerPropertyChange dependentPropertyKey
+    @observe dependingPropertyKey, (newValue, oldValue) =>
       trigger()
       
-      if !old_value?.forEach && new_value?.forEach
+      if !oldValue?.forEach && newValue?.forEach
         observeArrayLike()
-      else if old_value?.forEach
+      else if oldValue?.forEach
         unobserveArrayLike()
     
     observeArrayLike = =>
-      @observe depending_property_key, 'add', trigger
-      @observe depending_property_key, 'remove', trigger
+      @observe dependingPropertyKey, 'add', trigger
+      @observe dependingPropertyKey, 'remove', trigger
     
     unobserveArrayLike = =>
-      @unobserve depending_property_key, 'add', trigger
-      @unobserve depending_property_key, 'remove', trigger
+      @unobserve dependingPropertyKey, 'add', trigger
+      @unobserve dependingPropertyKey, 'remove', trigger
   
   set: (hash) ->
     @setProperties hash
 
   setProperties: (hash) ->
-    for property_name, value of hash
-      @setProperty property_name, value
+    for propertyName, value of hash
+      @setProperty propertyName, value
   
-  triggerPropertyChange: (property_name) ->
-    @previous_properties ||= {}
-    new_value = @get property_name
-    if !@previous_properties.hasOwnProperty(property_name) || @previous_properties[property_name] != new_value
-      @trigger "change:#{property_name}", new_value, @previous_properties[property_name]
-      @previous_properties[property_name] = new_value
+  triggerPropertyChange: (propertyName) ->
+    @previousProperties ||= {}
+    newValue = @get propertyName
+    if !@previousProperties.hasOwnProperty(propertyName) || @previousProperties[propertyName] != newValue
+      @trigger "change:#{propertyName}", newValue, @previousProperties[propertyName]
+      @previousProperties[propertyName] = newValue
   
-  observeOnce: (chain_as_string, callback) ->
+  observeOnce: (chainAsString, callback) ->
     observer = (args...) =>
       callback args...
-      @unobserve chain_as_string, observer
+      @unobserve chainAsString, observer
       
-    @observe chain_as_string, observer
+    @observe chainAsString, observer
   
-  observe: (chain_as_string, args...) ->
+  observe: (chainAsString, args...) ->
     # Beware, all ye who enter, for here be dragons!
     callback = args.pop()
     type = args.pop() || 'change'
     
-    chain = chain_as_string.split '.'
-    chain_except_first = chain.slice 1, chain.length
-    chain_except_first_as_string = chain_except_first.join '.'
-    nested = chain_except_first.length != 0
+    chain = chainAsString.split '.'
+    chainExceptFirst = chain.slice 1, chain.length
+    chainExceptFirstAsString = chainExceptFirst.join '.'
+    nested = chainExceptFirst.length != 0
     
-    get_and_send_to_callback = (new_value, old_value) =>
+    getAndSendToCallback = (newValue, oldValue) =>
       if type == 'change'
-        callback new_value, old_value
+        callback newValue, oldValue
       else
-        callback new_value
+        callback newValue
     
     property = @get chain[0]
     
     observeOnNested = (p) =>
-      p.observe chain_except_first_as_string, type, (new_value, old_value) ->
-        get_and_send_to_callback new_value, old_value
+      p.observe chainExceptFirstAsString, type, (newValue, oldValue) ->
+        getAndSendToCallback newValue, oldValue
     
     observeOnNested(property) if nested && property
     
-    observe_type = if nested then 'change' else type
-    @observeProperty chain[0], observe_type, (new_value, old_value) ->
+    observeType = if nested then 'change' else type
+    @observeProperty chain[0], observeType, (newValue, oldValue) ->
       if nested
-        if new_value
-          ov = if old_value then old_value.get(chain_except_first.join('.')) else undefined
-          get_and_send_to_callback new_value.get(chain_except_first.join('.')), ov if type == 'change'
-          observeOnNested new_value
-        if old_value
-          old_value.unobserve chain_except_first_as_string, type, get_and_send_to_callback
+        if newValue
+          ov = if oldValue then oldValue.get(chainExceptFirst.join('.')) else undefined
+          getAndSendToCallback newValue.get(chainExceptFirst.join('.')), ov if type == 'change'
+          observeOnNested newValue
+        if oldValue
+          oldValue.unobserve chainExceptFirstAsString, type, getAndSendToCallback
       else
-        get_and_send_to_callback new_value, old_value
+        getAndSendToCallback newValue, oldValue
   
-  observeProperty: (property_name, type, callback) ->
-    @bind "#{type}:#{property_name}", callback
+  observeProperty: (propertyName, type, callback) ->
+    @bind "#{type}:#{propertyName}", callback
 
-  unobserve: (property_name, args...) ->
+  unobserve: (propertyName, args...) ->
     callback = args.pop()
     type = args.pop() || 'change'
-    @unbind "#{type}:#{property_name}", callback
+    @unbind "#{type}:#{propertyName}", callback
 
-  setProperty: (property_name, value) ->
+  setProperty: (propertyName, value) ->
     value = @convertIfNecessary value
     
-    @registerPropertySet property_name
-    @[property_name] = value
-    @triggerPropertyChange property_name
+    @registerPropertySet propertyName
+    @[propertyName] = value
+    @triggerPropertyChange propertyName
     
     parent = @
-    if Array.isArray @[property_name]
-      for value, i in @[property_name]
-        @[property_name][i] = @convertIfNecessary value
-      @addTriggersToArray property_name
+    if Array.isArray @[propertyName]
+      for value, i in @[propertyName]
+        @[propertyName][i] = @convertIfNecessary value
+      @addTriggersToArray propertyName
   
   # Without this, we wouldn't be able to make an appropriate #toJSON.
-  registerPropertySet: (property_name) ->
-    @setPropertyNames().push property_name
+  registerPropertySet: (propertyName) ->
+    @setPropertyNames().push propertyName
   
   setPropertyNames: ->
-    @set_property_names ||= []
+    @_setPropertyNames ||= []
   
-  get: (chain_as_string) ->
-    chain = chain_as_string.split '.'
+  get: (chainAsString) ->
+    chain = chainAsString.split '.'
     if chain.length == 1
       @getProperty chain[0]
     else
-      nested_property_name = chain.shift()
-      nested_property = @getProperty nested_property_name
-      if nested_property
-        nested_property.get chain.join('.')
+      nestedPropertyName = chain.shift()
+      nestedProperty = @getProperty nestedPropertyName
+      if nestedProperty
+        nestedProperty.get chain.join('.')
       else
         undefined
   
-  getProperty: (property_name) ->
-    if typeof(@[property_name]) == 'function'
-      @[property_name].apply @
+  getProperty: (propertyName) ->
+    if typeof(@[propertyName]) == 'function'
+      @[propertyName].apply @
     else
-      @[property_name]
+      @[propertyName]
   
   toJSON: (options = {}) ->
     options.only = [options.only] if options.only && !Array.isArray options.only
     
     json = {}
-    for property_name in @setPropertyNames()
-      should_be_included = (
-        (!options.only || (property_name in options.only)) &&
-        @serializable(@get(property_name))
+    for propertyName in @setPropertyNames()
+      shouldBeIncluded = (
+        (!options.only || (propertyName in options.only)) &&
+        @serializable(@get(propertyName))
       )
-      json[property_name] = @get property_name if should_be_included
+      json[propertyName] = @get propertyName if shouldBeIncluded
     json
   
   serializable: (value) ->
@@ -187,17 +187,17 @@ WingmanObject = class WingmanObject extends Module
     (!(value instanceof WingmanObject)) &&
     !value?._ownerDocument? # need this to detect jsdom HTMLElement values - is there a better way?
   
-  addTriggersToArray: (property_name) ->
+  addTriggersToArray: (propertyName) ->
     parent = @
-    array = @[property_name]
+    array = @[propertyName]
     array.push = ->
       Array.prototype.push.apply @, arguments
-      parent.trigger "add:#{property_name}", arguments['0']
+      parent.trigger "add:#{propertyName}", arguments['0']
     
     array.remove = (value) ->
       index = @indexOf value
       if index != -1
         @splice index, 1
-        parent.trigger "remove:#{property_name}", value
+        parent.trigger "remove:#{propertyName}", value
 
 module.exports = WingmanObject

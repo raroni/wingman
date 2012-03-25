@@ -8,8 +8,8 @@ module.exports = class Template
     @tree = Parser.parse source
 
   evaluate: (el, context) ->
-    for node_data in @tree.children
-      NodeFactory.create node_data, el, context
+    for nodeData in @tree.children
+      NodeFactory.create nodeData, el, context
 
 Parser = require './template/parser'
 NodeFactory = require './template/node_factory'

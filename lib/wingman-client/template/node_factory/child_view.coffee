@@ -1,7 +1,7 @@
 module.exports = class ChildView
-  constructor: (@node_data, @scope, @context) ->
-    @view = @context.createChildView @node_data.name
-    @view.setProperty @node_data.name, @context.get(@node_data.name) if @context.get(@node_data.name)
+  constructor: (@nodeData, @scope, @context) ->
+    @view = @context.createChildView @nodeData.name
+    @view.setProperty @nodeData.name, @context.get(@nodeData.name) if @context.get(@nodeData.name)
     element = @view.el
     @scope.appendChild element
   

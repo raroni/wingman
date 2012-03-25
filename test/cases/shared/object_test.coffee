@@ -21,27 +21,27 @@ module.exports = class ObjectTest extends Janitor.TestCase
     person = new Person
     person.set name: 'Roger'
   
-    new_name_from_callback = ''
-    old_name_from_callback = ''
-    person.observe 'name', (new_name, old_name) ->
-      new_name_from_callback = new_name
-      old_name_from_callback = old_name
+    newNameFromCallback = ''
+    oldNameFromCallback = ''
+    person.observe 'name', (newName, oldName) ->
+      newNameFromCallback = newName
+      oldNameFromCallback = oldName
     person.set name: 'Rasmus'
-    @assertEqual new_name_from_callback, 'Rasmus'
-    @assertEqual old_name_from_callback, 'Roger'
+    @assertEqual newNameFromCallback, 'Rasmus'
+    @assertEqual oldNameFromCallback, 'Roger'
   
   'test observe of unset properties': ->
     Person = class extends WingmanObject
     person = new Person
   
-    new_name_from_callback = ''
-    old_name_from_callback = ''
-    person.observe 'name', (new_name, old_name) ->
-      new_name_from_callback = new_name
-      old_name_from_callback = old_name
+    newNameFromCallback = ''
+    oldNameFromCallback = ''
+    person.observe 'name', (newName, oldName) ->
+      newNameFromCallback = newName
+      oldNameFromCallback = oldName
     person.set name: 'Rasmus'
-    @assertEqual new_name_from_callback, 'Rasmus'
-    @assertEqual old_name_from_callback, undefined
+    @assertEqual newNameFromCallback, 'Rasmus'
+    @assertEqual oldNameFromCallback, undefined
   
   'test observe of nested unset properties': ->
     Person = class extends WingmanObject
@@ -49,44 +49,44 @@ module.exports = class ObjectTest extends Janitor.TestCase
     john = new Person
     john.set name: 'John'
   
-    new_name_from_callback = ''
-    old_name_from_callback = ''
+    newNameFromCallback = ''
+    oldNameFromCallback = ''
     
-    rasmus.observe 'friend.name', (new_name, old_name) ->
-      new_name_from_callback = new_name
-      old_name_from_callback = old_name
+    rasmus.observe 'friend.name', (newName, oldName) ->
+      newNameFromCallback = newName
+      oldNameFromCallback = oldName
     rasmus.set friend: john
     
-    @assertEqual new_name_from_callback, 'John'
-    @assertEqual old_name_from_callback, undefined
+    @assertEqual newNameFromCallback, 'John'
+    @assertEqual oldNameFromCallback, undefined
   
   'test observing on deeply nested properties that are later changed': ->
     view = new WingmanObject
-    latest_value_from_callback = undefined
-    view.observe 'user.car.kilometers_driven', (new_value) -> latest_value_from_callback = new_value
+    latestvalueFromCallback = undefined
+    view.observe 'user.car.kilometersDriven', (newValue) -> latestvalueFromCallback = newValue
   
     user = new WingmanObject
     view.set { user }
     car1 = new WingmanObject
-    car1.set kilometers_driven: 200000
+    car1.set kilometersDriven: 200000
     car2 = new WingmanObject
-    car2.set kilometers_driven: 10000
+    car2.set kilometersDriven: 10000
     
     user.set car: car1
     user.set car: car2
     
-    @assertEqual 10000, latest_value_from_callback
+    @assertEqual 10000, latestvalueFromCallback
   
   'test unobserve': ->
     Person = class extends WingmanObject
     person = new Person
-    callback_run = false
+    callbackRun = false
     callback = ->
-      callback_run = true
+      callbackRun = true
     person.observe 'name', callback
     person.unobserve 'name', callback
     person.set name: 'Rasmus'
-    @assert !callback_run
+    @assert !callbackRun
   
   'test getting non existing nested property': ->
     Person = class extends WingmanObject
@@ -97,10 +97,10 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Car = class extends WingmanObject
     CarType = class extends WingmanObject
     
-    slow_car = new CarType
-    slow_car.set name: 'Toyota'
+    slowCar = new CarType
+    slowCar.set name: 'Toyota'
     car = new Car()
-    car.set type: slow_car
+    car.set type: slowCar
     @assertEqual 'Toyota', car.get('type.name')
   
   'test nested observe': ->
@@ -117,26 +117,26 @@ module.exports = class ObjectTest extends Janitor.TestCase
     city = new WingmanObject
     city.set {region: region1}
   
-    new_names = []
-    old_names = []
-    city.observe 'region.country.name', (new_name, old_name) ->
-      new_names.push new_name
-      old_names.push old_name
+    newNames = []
+    oldNames = []
+    city.observe 'region.country.name', (newName, oldName) ->
+      newNames.push newName
+      oldNames.push oldName
   
     denmark.set name: 'Denmark test'
     region1.set country: england
     denmark.set name: 'Denmark test2'
     city.set region: region2
   
-    @assertEqual 3, new_names.length
-    @assertEqual 'Denmark test', new_names[0]
-    @assertEqual 'England', new_names[1]
-    @assertEqual 'Sweden', new_names[2]
+    @assertEqual 3, newNames.length
+    @assertEqual 'Denmark test', newNames[0]
+    @assertEqual 'England', newNames[1]
+    @assertEqual 'Sweden', newNames[2]
   
-    @assertEqual 3, old_names.length
-    @assertEqual 'Denmark', old_names[0]
-    @assertEqual 'Denmark test', old_names[1]
-    @assertEqual 'England', old_names[2]
+    @assertEqual 3, oldNames.length
+    @assertEqual 'Denmark', oldNames[0]
+    @assertEqual 'Denmark test', oldNames[1]
+    @assertEqual 'England', oldNames[2]
   
   'test property dependencies': ->
     Person = class extends WingmanObject
@@ -147,7 +147,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     person = new Person
     result = ''
-    person.observe 'fullName', (new_value) -> result = new_value
+    person.observe 'fullName', (newValue) -> result = newValue
     person.set firstName: 'Rasmus', lastName: 'Nielsen'
     
     @assertEqual 'Rasmus Nielsen', result
@@ -160,31 +160,31 @@ module.exports = class ObjectTest extends Janitor.TestCase
       isHappy: -> @get('car') == 'Batmobile'
     
     person = new Person
-    callback_values = []
-    person.observe 'isHappy', (value) -> callback_values.push value
+    callbackValues = []
+    person.observe 'isHappy', (value) -> callbackValues.push value
     person.set car: 'Lada'
     person.set car: 'Toyota'
     person.set car: 'Batmobile'
     person.set car: 'Volkswagen'
     
-    @assertEqual 3, callback_values.length
-    @assertEqual false, callback_values[0]
-    @assertEqual true, callback_values[1]
-    @assertEqual false, callback_values[2]
+    @assertEqual 3, callbackValues.length
+    @assertEqual false, callbackValues[0]
+    @assertEqual true, callbackValues[1]
+    @assertEqual false, callbackValues[2]
   
   'test property dependencies with single depending property': ->
     Country = class extends WingmanObject
       @NAMES: { dk: 'Denmark', se: 'Sweden' }
       
       @propertyDependencies
-        countryName: 'country_code'
+        countryName: 'countryCode'
       
-      countryName: -> @constructor.NAMES[@get('country_code')]
+      countryName: -> @constructor.NAMES[@get('countryCode')]
     
     country = new Country
     result = undefined
-    country.observe 'countryName', (new_value) -> result = new_value
-    country.set country_code: 'dk'
+    country.observe 'countryName', (newValue) -> result = newValue
+    country.set countryCode: 'dk'
   
     @assertEqual 'Denmark', result
   
@@ -198,37 +198,37 @@ module.exports = class ObjectTest extends Janitor.TestCase
         !!@get('session.cake')
     
     view = new View
-    callback_value = undefined
-    view.observe 'isHappy', (value) -> callback_value = value
+    callbackValue = undefined
+    view.observe 'isHappy', (value) -> callbackValue = value
     view.set { session }
     session.set cake: 'strawberry'
-    @assert callback_value
+    @assert callbackValue
   
   'test several nested property dependencies': ->
     session = new WingmanObject
-    session.set user_id: 1
+    session.set userId: 1
     
     View = class extends WingmanObject
       @propertyDependencies
-        isActive: 'session.user_id'
-        canTrain: 'training.created_on'
+        isActive: 'session.userId'
+        canTrain: 'training.createdOn'
       
       canTrain: ->
-        @get('training.created_on') != '2012-01-26'
+        @get('training.createdOn') != '2012-01-26'
       
       isActive: ->
-        !!@get('session.user_id')
+        !!@get('session.userId')
     
     view = new View
-    is_active_callback_fired = false
-    can_train_callback_fired = false
-    view.observe 'isActive', -> is_active_callback_fired = true
-    view.observe 'canTrain', -> can_train_callback_fired = true
+    isActiveCallbackFired = false
+    canTrainCallbackFired = false
+    view.observe 'isActive', -> isActiveCallbackFired = true
+    view.observe 'canTrain', -> canTrainCallbackFired = true
     view.set { session }
-    view.set training: { created_on: 'test' }
+    view.set training: { createdOn: 'test' }
     
-    @assert is_active_callback_fired
-    @assert can_train_callback_fired
+    @assert isActiveCallbackFired
+    @assert canTrainCallbackFired
   
   'test nested observe combined with property dependencies': ->
     Country = class extends WingmanObject
@@ -257,7 +257,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     city.set {region: region1}
   
     names = []
-    city.observe 'region.country.name', (new_name) -> names.push(new_name)
+    city.observe 'region.country.name', (newName) -> names.push(newName)
     denmark.set code: 'SE'
     region1.set country: england
     denmark.set code: 'UK'
@@ -277,23 +277,23 @@ module.exports = class ObjectTest extends Janitor.TestCase
         @get('names').join(' ') if @get('names')
     
     person = new Person
-    callback_values = []
-    person.observe 'fullName', (value) -> callback_values.push value
+    callbackValues = []
+    person.observe 'fullName', (value) -> callbackValues.push value
     person.set names: []
     person.get('names').push 'Rasmus'
     person.get('names').push 'Nielsen'
     
-    @assertEqual '', callback_values[0]
-    @assertEqual 'Rasmus', callback_values[1]
-    @assertEqual 'Rasmus Nielsen', callback_values[2]
+    @assertEqual '', callbackValues[0]
+    @assertEqual 'Rasmus', callbackValues[1]
+    @assertEqual 'Rasmus Nielsen', callbackValues[2]
   
   'test property dependency inheritance': ->
     class Parent extends WingmanObject
       @propertyDependencies
-        loggedIn: 'current_user'
+        loggedIn: 'currentUser'
       
       loggedIn: ->
-        !!@get('current_user')
+        !!@get('currentUser')
     
     class Child extends Parent
       @propertyDependencies
@@ -302,18 +302,18 @@ module.exports = class ObjectTest extends Janitor.TestCase
       something: ->
     
     child = new Child
-    callback_fired = false
-    child.observe 'something', -> callback_fired = true
-    child.set current_user: 'yogi'
-    @assert callback_fired
+    callbackFired = false
+    child.observe 'something', -> callbackFired = true
+    child.set currentUser: 'yogi'
+    @assert callbackFired
   
   'test childrens property dependencies doesnt affect parents': ->
     class Parent extends WingmanObject
       @propertyDependencies
-        loggedIn: 'current_user'
+        loggedIn: 'currentUser'
       
       loggedIn: ->
-        !!@get('current_user')
+        !!@get('currentUser')
     
     class Child extends Parent
       @propertyDependencies
@@ -322,15 +322,15 @@ module.exports = class ObjectTest extends Janitor.TestCase
       something: ->
     
     parent = new Parent
-    parent_callback_fired = false
-    parent.observe 'something', -> parent_callback_fired = true
-    parent.set current_user: 'bobo'
-    @assert !parent_callback_fired
+    parentCallbackFired = false
+    parent.observe 'something', -> parentCallbackFired = true
+    parent.set currentUser: 'bobo'
+    @assert !parentCallbackFired
   
   'test observe array property add': ->
     instance = new WingmanObject
     added = []
-    instance.observe 'users', 'add', (new_value) -> added.push(new_value)
+    instance.observe 'users', 'add', (newValue) -> added.push(newValue)
     instance.set users: []
     instance.get('users').push 'Rasmus'
     instance.get('users').push 'John'
@@ -345,7 +345,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
   'test nested observe of array add of yet to be set properties': ->
     context = new WingmanObject
     added = []
-    context.observe 'user.notifications', 'add', (new_value) -> added.push(new_value)
+    context.observe 'user.notifications', 'add', (newValue) -> added.push(newValue)
     
     user = new WingmanObject
     context.set { user }
@@ -358,25 +358,25 @@ module.exports = class ObjectTest extends Janitor.TestCase
     context = new WingmanObject
     shared = new WingmanObject
     added = []
-    context.observe 'shared.current_club.notifications', 'add', (new_value) -> added.push(new_value)
+    context.observe 'shared.currentUser.notifications', 'add', (newValue) -> added.push(newValue)
   
     context.set { shared }
     
-    current_club = new WingmanObject
-    current_club.set notifications: []
-    shared.set { current_club }
+    currentUser = new WingmanObject
+    currentUser.set notifications: []
+    shared.set { currentUser }
     
-    context.get('shared.current_club.notifications').push 'Hello'
+    context.get('shared.currentUser.notifications').push 'Hello'
     @assertEqual 'Hello', added[0]
     
   'test observe array property remove': ->
     country = new WingmanObject
     country.set cities: ['London', 'Manchester']
-    removed_value_from_callback = ''
-    country.observe 'cities', 'remove', (removed_value) -> removed_value_from_callback = removed_value
+    removedValueFromCallback = ''
+    country.observe 'cities', 'remove', (removedValue) -> removedValueFromCallback = removedValue
     country.get('cities').remove 'London'
   
-    @assertEqual 'London', removed_value_from_callback
+    @assertEqual 'London', removedValueFromCallback
     @assertEqual 'Manchester', country.get('cities')[0]
     @assertEqual 1, country.get('cities').length
   
@@ -387,7 +387,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     user.set {country}
   
     result = ''
-    user.observe 'country.cities', 'add', (new_value) -> result = new_value
+    user.observe 'country.cities', 'add', (newValue) -> result = newValue
     country.get('cities').push 'Liverpool'
   
     @assertEqual 'Liverpool', result
@@ -413,16 +413,16 @@ module.exports = class ObjectTest extends Janitor.TestCase
     country = new WingmanObject
     country.set code: 'dk', region: 'eu', population: 5000000
   
-    only_code = country.toJSON(only: 'code')
+    onlyCode = country.toJSON(only: 'code')
   
-    @assertEqual 'dk', only_code.code
-    @assertEqual 1, Object.keys(only_code).length
+    @assertEqual 'dk', onlyCode.code
+    @assertEqual 1, Object.keys(onlyCode).length
     
-    only_code_and_region = country.toJSON(only: ['code', 'region'])
+    onlyCodeAndRegion = country.toJSON(only: ['code', 'region'])
   
-    @assertEqual 'dk', only_code.code
-    @assertEqual 'eu', country.toJSON().region
-    @assertEqual 2, Object.keys(only_code_and_region).length
+    @assertEqual 'dk', onlyCodeAndRegion.code
+    @assertEqual 'eu', onlyCodeAndRegion.region
+    @assertEqual 2, Object.keys(onlyCodeAndRegion).length
   
   'test nested set': ->
     context = new WingmanObject
@@ -451,23 +451,23 @@ module.exports = class ObjectTest extends Janitor.TestCase
   
   'test observe once': ->
     context = new WingmanObject
-    values_from_callback = []
-    context.observeOnce 'name', (value) -> values_from_callback.push(value)
+    valuesFromCallback = []
+    context.observeOnce 'name', (value) -> valuesFromCallback.push(value)
     
     context.set name: 'Rasmus'
     context.set name: 'Lou Bega'
     context.set name: 'Hendrix'
     
-    @assertEqual 1, values_from_callback.length
-    @assertEqual 'Rasmus', values_from_callback[0]
+    @assertEqual 1, valuesFromCallback.length
+    @assertEqual 'Rasmus', valuesFromCallback[0]
   
   'test observe once in combination with normal observe': ->
     context = new WingmanObject
     context.observeOnce 'name', -> 'test'
-    callback_fired = false
-    context.observe 'name', -> callback_fired = true
+    callbackFired = false
+    context.observe 'name', -> callbackFired = true
     context.set name: 'Rasmus'
-    @assert callback_fired
+    @assert callbackFired
   
   'test intelligent properties and json export': ->
     class Thingamabob

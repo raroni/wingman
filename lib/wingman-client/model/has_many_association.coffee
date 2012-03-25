@@ -5,11 +5,11 @@ Events = require './../shared/events'
 module.exports = class HasManyAssociation extends Module
   @include Events
   
-  constructor: (@model, @associated_class) ->
+  constructor: (@model, @associatedClass) ->
     @model.observeOnce 'id', @setupScope
   
   setupScope: =>
-    @scope = @associated_class.scoped @scopeOptions()
+    @scope = @associatedClass.scoped @scopeOptions()
     @scope.forEach (model) => @trigger 'add', model
     @scope.bind 'add', (args...) => @trigger 'add', args...
     @scope.bind 'remove', (args...) => @trigger 'remove', args...
@@ -20,7 +20,7 @@ module.exports = class HasManyAssociation extends Module
     options
   
   foreignKey: ->
-    Fleck.underscore(@model.constructor.name) + '_id'
+    Fleck.camelize(Fleck.underscore(@model.constructor.name)) + 'Id'
   
   count: ->
     if @scope
@@ -29,16 +29,16 @@ module.exports = class HasManyAssociation extends Module
       0
   
   buildOne: (hash) ->
-    foreign_id = @model.get('id')
-    throw new Error "Parent's ID must be set to use HasManyAssociation#build." unless foreign_id
-    hash[@foreignKey()] = foreign_id
-    new @associated_class hash
+    foreignId = @model.get('id')
+    throw new Error "Parent's ID must be set to use HasManyAssociation#build." unless foreignId
+    hash[@foreignKey()] = foreignId
+    new @associatedClass hash
   
-  build: (array_or_hash) ->
-    array = if Array.isArray(array_or_hash)
-      array_or_hash
+  build: (arrayOrHash) ->
+    array = if Array.isArray(arrayOrHash)
+      arrayOrHash
     else
-      [array_or_hash]
+      [arrayOrHash]
     
     @buildOne hash for hash in array
   

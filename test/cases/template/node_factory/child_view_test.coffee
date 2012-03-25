@@ -9,31 +9,31 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @parent = Wingman.document.createElement 'div'
     
   'test simple child view': ->
-    element_node =
-      type: 'child_view'
+    elementNode =
+      type: 'childView'
       name: 'user'
 
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
       templateSource: -> '<div>I am the user view</div>'
 
-    main_view = new MainView
-    new ChildView element_node, @parent, main_view
+    mainView = new MainView
+    new ChildView elementNode, @parent, mainView
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
   'test remove': ->
-    element_node =
-      type: 'child_view'
+    elementNode =
+      type: 'childView'
       name: 'user'
     
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
       templateSource: -> '<div>I am the user view</div>'
     
-    main_view = new MainView
-    child_view = new ChildView element_node, @parent, main_view
+    mainView = new MainView
+    childView = new ChildView elementNode, @parent, mainView
     
     @assertEqual 1, @parent.childNodes.length
     
-    child_view.remove()
+    childView.remove()
     @assertEqual 0, @parent.childNodes.length

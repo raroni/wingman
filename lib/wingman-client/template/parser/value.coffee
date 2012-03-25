@@ -1,11 +1,11 @@
 module.exports = class
   constructor: (@body) ->
     match = @body.match /^\{(.*?)\}$/
-    @is_dynamic = !!match
-    @body = match[1] if @is_dynamic
+    @isDynamic = !!match
+    @body = match[1] if @isDynamic
   
   get: (context) ->
-    if @is_dynamic && context
+    if @isDynamic && context
       context.get @body
     else
       @body

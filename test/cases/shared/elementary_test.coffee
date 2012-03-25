@@ -6,11 +6,11 @@ Module = require '../../../lib/wingman-client/shared/module'
 DummyObject = class extends Module
   @include Elementary
   constructor: ->
-    @dom_element = document.createElement 'div'
+    @domElement = document.createElement 'div'
 
 module.exports = class extends Janitor.TestCase
   setup: ->
-    @dummy_object = new DummyObject
+    @dummyObject = new DummyObject
   
   'test css property name convertion from dom to css notation': ->
     @assertEqual 'fontSize', Elementary.convertCssPropertyFromDomToCssNotation 'font-size'
@@ -18,13 +18,13 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'borderTopColor', Elementary.convertCssPropertyFromDomToCssNotation 'border-top-color'
   
   'test setting a style': ->
-    @dummy_object.setStyle 'color', 'red'
-    @assertEqual 'red', @dummy_object.dom_element.style.color
+    @dummyObject.setStyle 'color', 'red'
+    @assertEqual 'red', @dummyObject.domElement.style.color
   
   'test adding two identical classes': ->
-    @dummy_object.addClass 'user' for [1..2]
-    @assertEqual 'user', @dummy_object.dom_element.className
+    @dummyObject.addClass 'user' for [1..2]
+    @assertEqual 'user', @dummyObject.domElement.className
   
   'test setting attribute': ->
-    @dummy_object.setAttribute 'name', 'rasmus'
-    @assertEqual 'rasmus', @dummy_object.dom_element.getAttribute('name')
+    @dummyObject.setAttribute 'name', 'rasmus'
+    @assertEqual 'rasmus', @dummyObject.domElement.getAttribute('name')

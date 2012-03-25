@@ -1,7 +1,7 @@
 Wingman = require '../../../wingman-client'
 
 module.exports = class
-  auto_save: true
+  autoSave: true
   
   constructor: (@options) ->
   
@@ -11,17 +11,17 @@ module.exports = class
     options?.success?()
     
   update: (model, options) ->
-    @load model.get('id'), success: (existing_properties) =>
-      new_properties = model.toJSON()
-      for key, value of existing_properties
-        new_properties[key] = value unless new_properties[key]?
-      Wingman.localStorage.setItem @key(model.get('id')), JSON.stringify(new_properties)
+    @load model.get('id'), success: (existingProperties) =>
+      newProperties = model.toJSON()
+      for key, value of existingProperties
+        newProperties[key] = value unless newProperties[key]?
+      Wingman.localStorage.setItem @key(model.get('id')), JSON.stringify(newProperties)
       options?.success?()
   
   load: (id, options) ->
-    item_as_string = Wingman.localStorage.getItem @key(id)
-    item_as_json = JSON.parse item_as_string
-    options.success item_as_json
+    itemAsString = Wingman.localStorage.getItem @key(id)
+    itemAsJson = JSON.parse itemAsString
+    options.success itemAsJson
   
   key: (id) ->
     [@options.namespace, id].join '.'

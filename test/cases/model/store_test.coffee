@@ -20,19 +20,19 @@ module.exports = class StoreTest extends Janitor.TestCase
     @store.add user1
     @store.add user2
     
-    callback_values = []
-    @store.forEach (model) -> callback_values.push(model)
+    callbackValues = []
+    @store.forEach (model) -> callbackValues.push(model)
     
-    @assertEqual 2, callback_values.length
-    @assertEqual user1, callback_values[0]
-    @assertEqual user2, callback_values[1]
+    @assertEqual 2, callbackValues.length
+    @assertEqual user1, callbackValues[0]
+    @assertEqual user2, callbackValues[1]
     
   'test add event': ->
-    value_from_callback = undefined
-    @store.bind 'add', (model) -> value_from_callback = model
+    valueFromCallback = undefined
+    @store.bind 'add', (model) -> valueFromCallback = model
     user = new @User id: 1
     @store.add user
-    @assertEqual user, value_from_callback
+    @assertEqual user, valueFromCallback
   
   'test remove': ->
     Wingman.request.realRequest = (options) ->
@@ -42,15 +42,15 @@ module.exports = class StoreTest extends Janitor.TestCase
     @assertEqual 0, @store.count()
   
   'test remove event': ->
-    value_from_callback = undefined
+    valueFromCallback = undefined
     Wingman.request.realRequest = (options) ->
     user = new @User id: 1
     
-    @store.bind 'remove', (model) -> value_from_callback = model
+    @store.bind 'remove', (model) -> valueFromCallback = model
     
     @store.add user
     user.destroy()
-    @assertEqual value_from_callback, user
+    @assertEqual valueFromCallback, user
   
   'test add two models with same id': ->
     user1 = new @User id: 1, name: 'Megaman'

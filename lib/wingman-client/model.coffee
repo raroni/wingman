@@ -22,7 +22,7 @@ module.exports = class Model extends WingmanObject
       @loadMany args[0]
   
   @hasMany: (name) ->
-    (@has_many_names ||= []).push name
+    (@hasManyNames ||= []).push name
   
   @loadOne: (id, callback) ->
     @storageAdapter().load id, success: (hash) =>
@@ -32,8 +32,8 @@ module.exports = class Model extends WingmanObject
   @loadMany: (callback) ->
     @storageAdapter().load success: (array) =>
       models = []
-      for model_data in array
-        model = new @ model_data
+      for modelData in array
+        model = new @ modelData
         models.push model
       callback models if callback
   
@@ -44,28 +44,28 @@ module.exports = class Model extends WingmanObject
     @store().find id
   
   constructor: (properties, options) ->
-    @storage_adapter = @constructor.storageAdapter()
-    @dirty_static_property_names = []
-    @setupHasManyAssociations() if @constructor.has_many_names
+    @storageAdapter = @constructor.storageAdapter()
+    @dirtyStaticPropertyNames = []
+    @setupHasManyAssociations() if @constructor.hasManyNames
     @observeOnce 'id', =>
       @constructor.store().add @
     @set properties
   
   setupHasManyAssociations: ->
-    for has_many_name in @constructor.has_many_names
-      klass_name = Fleck.camelize Fleck.singularize(has_many_name), true
+    for hasManyName in @constructor.hasManyNames
+      klassName = Fleck.camelize(Fleck.singularize(Fleck.underscore(hasManyName)), true)
       
       # Ideally, we should not require an app to be instantiated to find other model classes.
       # But for now I cannot come up with a better solution than to find the model classes in the current apps constructor.
-      klass = Wingman.Application.instance.constructor[klass_name]
+      klass = Wingman.Application.instance.constructor[klassName]
       association = new HasManyAssociation @, klass
-      @setProperty has_many_name, association
-      association.bind 'add', (model) => @trigger "add:#{has_many_name}", model
-      association.bind 'remove', (model) => @trigger "remove:#{has_many_name}", model
+      @setProperty hasManyName, association
+      association.bind 'add', (model) => @trigger "add:#{hasManyName}", model
+      association.bind 'remove', (model) => @trigger "remove:#{hasManyName}", model
   
   save: (options = {}) ->
     operation = if @isPersisted() then 'update' else 'create'
-    @storage_adapter[operation] @,
+    @storageAdapter[operation] @,
       success: (data) =>
         if data
           delete data.id if operation == 'update'
@@ -76,37 +76,37 @@ module.exports = class Model extends WingmanObject
   
   destroy: ->
     @trigger 'destroy', @
-    @storage_adapter.delete @get('id')
+    @storageAdapter.delete @get('id')
   
   toParam: ->
     @get 'id'
   
   load: ->
-    @storage_adapter.load @get('id'), success: (hash) =>
+    @storageAdapter.load @get('id'), success: (hash) =>
       delete hash.id
       @set hash
   
   clean: ->
-    @dirty_static_property_names.length = 0
+    @dirtyStaticPropertyNames.length = 0
   
   dirtyStaticProperties: ->
-    @toJSON only: @dirty_static_property_names
+    @toJSON only: @dirtyStaticPropertyNames
   
   set: (hash) ->
     super hash
   
-  setProperty: (property_name, values) ->
-    throw new Error 'You cannot change the ID of a model when set.' if property_name == 'id' && @get('id')
+  setProperty: (propertyName, values) ->
+    throw new Error 'You cannot change the ID of a model when set.' if propertyName == 'id' && @get('id')
     
-    if @get(property_name) instanceof HasManyAssociation
-      @get(property_name).build values
+    if @get(propertyName) instanceof HasManyAssociation
+      @get(propertyName).build values
     else
-      @dirty_static_property_names.push property_name
-      super property_name, values
-      @save() if @storage_adapter.auto_save
+      @dirtyStaticPropertyNames.push propertyName
+      super propertyName, values
+      @save() if @storageAdapter.autoSave
   
   isPersisted: ->
     !!@get('id')
   
   isDirty: ->
-    @dirty_static_property_names.length != 0
+    @dirtyStaticPropertyNames.length != 0

@@ -6,11 +6,11 @@ module.exports = class extends Janitor.TestCase
   'test static': ->
     value = new Value 'test'
     @assertEqual 'test', value.get()
-    @assert !value.is_dynamic
+    @assert !value.isDynamic
 
   'test dynamic': ->
     value = new Value '{something}'
-    @assert value.is_dynamic
+    @assert value.isDynamic
 
     context = new RangoObject
     context.set something: 'my value'

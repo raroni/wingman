@@ -62,10 +62,10 @@ module.exports = class LocalStorageTest extends Janitor.TestCase
     user.set id: 1, name: 'RAS'
     storage.update user
     
-    age_from_callback = undefined
-    storage.load user.get('id'), success: (hash) => age_from_callback = hash.age
+    ageFromCallback = undefined
+    storage.load user.get('id'), success: (hash) => ageFromCallback = hash.age
     
-    @assertEqual 25, age_from_callback
+    @assertEqual 25, ageFromCallback
   
   teardown: ->
     Wingman.localStorage.clear()

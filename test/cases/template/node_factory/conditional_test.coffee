@@ -11,10 +11,10 @@ module.exports = class ConditionalTest extends Janitor.TestCase
     @parent = Wingman.document.createElement 'div'
 
   'test simple conditional': ->
-    node_data =
+    nodeData =
       type: 'conditional'
       source: 'something'
-      true_children: [
+      trueChildren: [
         {
           type: 'element'
           tag: 'span'
@@ -29,20 +29,20 @@ module.exports = class ConditionalTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set something: true
-    new Conditional node_data, @parent, context
+    new Conditional nodeData, @parent, context
     
-    child_nodes = @parent.childNodes
-    @assertEqual 2, child_nodes.length
-    @assertEqual 'user', child_nodes[0].innerHTML
-    @assertEqual 'user2', child_nodes[1].innerHTML
+    childNodes = @parent.childNodes
+    @assertEqual 2, childNodes.length
+    @assertEqual 'user', childNodes[0].innerHTML
+    @assertEqual 'user2', childNodes[1].innerHTML
     context.set something: false
-    @assertEqual 0, child_nodes.length
+    @assertEqual 0, childNodes.length
   
   'test if else conditonal': ->
-    node_data =
+    nodeData =
       type: 'conditional'
       source: 'early'
-      true_children: [
+      trueChildren: [
         {
           type: 'element'
           tag: 'span'
@@ -54,7 +54,7 @@ module.exports = class ConditionalTest extends Janitor.TestCase
           value: new Value('good morning again')
         }
       ]
-      false_children: [
+      falseChildren: [
         type: 'element'
         tag: 'span'
         value: new Value('good evening')
@@ -62,12 +62,12 @@ module.exports = class ConditionalTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set early: true
-    new Conditional node_data, @parent, context
+    new Conditional nodeData, @parent, context
     
-    child_nodes = @parent.childNodes
-    @assertEqual 2, child_nodes.length
-    @assertEqual 'good morning', child_nodes[0].innerHTML
-    @assertEqual 'good morning again', child_nodes[1].innerHTML
+    childNodes = @parent.childNodes
+    @assertEqual 2, childNodes.length
+    @assertEqual 'good morning', childNodes[0].innerHTML
+    @assertEqual 'good morning again', childNodes[1].innerHTML
     context.set early: false
-    @assertEqual 1, child_nodes.length
-    @assertEqual 'good evening', child_nodes[0].innerHTML
+    @assertEqual 1, childNodes.length
+    @assertEqual 'good evening', childNodes[0].innerHTML

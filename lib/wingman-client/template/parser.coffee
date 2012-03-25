@@ -1,7 +1,7 @@
 {StringScanner} = require "strscan"
 Value = require "./parser/value"
 
-self_closing_tags = ['input', 'img', 'br', 'hr']
+selfClosingTags = ['input', 'img', 'br', 'hr']
 
 # TODO
 # REFACTORING IDEA: Let each individual node type have its own class.
@@ -24,7 +24,7 @@ module.exports = class
     @scanner = new StringScanner @constructor.trimSource(source)
 
     @tree = { children: [] }
-    @current_scope = @tree
+    @currentScope = @tree
   
   execute: ->
     while !@done
@@ -39,100 +39,100 @@ module.exports = class
   scanForEndTag: ->
     result = @scanner.scan /<\/(.*?)>/
     if result
-      @current_scope = @current_scope.parent
+      @currentScope = @currentScope.parent
     result
   
   scanForStartTag: ->
     result = @scanner.scan /<([a-zA-Z0-9]+) *(.*?)>/
     if result
-      new_node =
+      newNode =
         tag: @scanner.getCapture(0)
         children: []
-        parent: @current_scope
+        parent: @currentScope
         type: 'element'
       
       if @scanner.getCapture(1)
         attributes = @parseAttributes @scanner.getCapture(1)
-        @addAttributes new_node, attributes
+        @addAttributes newNode, attributes
         
-      @current_scope.children.push new_node
-      @current_scope = new_node unless self_closing_tags.indexOf(new_node.tag) != -1
+      @currentScope.children.push newNode
+      @currentScope = newNode unless selfClosingTags.indexOf(newNode.tag) != -1
     result
   
   scanForForToken: ->
     result = @scanner.scan /\{for (.*?)\}/
     if result
-      new_node =
+      newNode =
         source: @scanner.getCapture(0)
         children: []
-        parent: @current_scope
+        parent: @currentScope
         type: 'for'
-      @current_scope.children.push new_node
-      @current_scope = new_node
+      @currentScope.children.push newNode
+      @currentScope = newNode
     result
     
   scanForViewToken: ->
     result = @scanner.scan /\{view (.*?)\}/
     if result
-      new_node =
+      newNode =
         name: @scanner.getCapture(0)
-        parent: @current_scope
-        type: 'child_view'
-      @current_scope.children.push new_node
+        parent: @currentScope
+        type: 'childView'
+      @currentScope.children.push newNode
     result
     
   scanForIfToken: ->
     result = @scanner.scan /\{if (.*?)\}/
     if result
-      new_node =
+      newNode =
         source: @scanner.getCapture(0)
-        parent: @current_scope
+        parent: @currentScope
         type: 'conditional'
         children: []
-      new_node.true_children = new_node.children
-      @current_scope.children.push new_node
-      @current_scope = new_node
+      newNode.trueChildren = newNode.children
+      @currentScope.children.push newNode
+      @currentScope = newNode
     result
     
   scanForElseToken: ->
     result = @scanner.scan /\{else\}/
     if result
-      @current_scope.children = @current_scope.false_children = []
+      @currentScope.children = @currentScope.falseChildren = []
     result
     
   scanForEndToken: ->
     result = @scanner.scan /\{end\}/
     if result
-      delete @current_scope.children if @current_scope.type == 'conditional'
-      @current_scope = @current_scope.parent
+      delete @currentScope.children if @currentScope.type == 'conditional'
+      @currentScope = @currentScope.parent
     result
 
   scanForText: ->
     result = @scanner.scanUntil /</
-    @current_scope.value = new Value(result.substr 0, result.length-1)
+    @currentScope.value = new Value(result.substr 0, result.length-1)
     @scanner.head -= 1
     result
 
-  parseAttributes: (attributes_as_string) ->
+  parseAttributes: (attributesAsString) ->
     attributes = {}
-    attributes_as_string.replace(
+    attributesAsString.replace(
       new RegExp('([a-z]+)="(.*?)"', "g"),
       ($0, $1, $2) ->
         attributes[$1] = $2
     )
     attributes
   
-  parseStyle: (styles_as_string) ->
+  parseStyle: (stylesAsString) ->
     re = new RegExp(' ', 'g')
     styles = {}
-    for style_as_string in styles_as_string.replace(re, '').split(';')
-      split = style_as_string.split ':'
+    for styleAsString in stylesAsString.replace(re, '').split(';')
+      split = styleAsString.split ':'
       styles[split[0]] = new Value split[1]
     styles
 
-  parseClass: (classes_as_string) ->
+  parseClass: (classesAsString) ->
     classes = []
-    for klass in classes_as_string.split(' ')
+    for klass in classesAsString.split(' ')
       classes.push new Value(klass)
     classes
   

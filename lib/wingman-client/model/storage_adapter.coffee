@@ -2,24 +2,24 @@ RestStorage = require './storage_adapters/rest'
 LocalStorage = require './storage_adapters/local'
 
 module.exports =
-  storage_types:
+  storageTypes:
     'rest': RestStorage
     'local': LocalStorage
   
   storage: (type, options = {}) ->
     throw new Error "Storage engine #{type} not supported." unless @storageAdapterTypeSupported(type)
     options.type = type
-    @storage_adapter_options = options
+    @storageAdapterOptions = options
   
   storageAdapterTypeSupported: (type) ->
-    !!@storage_types[type]
+    !!@storageTypes[type]
   
   storageAdapter: ->
-    @storage_adapter ||= @buildStorageAdapter()
+    @_storageAdapter ||= @buildStorageAdapter()
   
   buildStorageAdapter: ->
-    @storage_adapter_options ||= { type: 'rest' }
-    klass = @storage_types[@storage_adapter_options.type]
+    @storageAdapterOptions ||= { type: 'rest' }
+    klass = @storageTypes[@storageAdapterOptions.type]
     options = {}
-    options[key] = value for key, value of @storage_adapter_options when key != 'type'
+    options[key] = value for key, value of @storageAdapterOptions when key != 'type'
     new klass options

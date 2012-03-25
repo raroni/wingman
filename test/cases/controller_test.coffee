@@ -13,21 +13,21 @@ class ControllerWithView extends Wingman.Controller
 
 module.exports = class ControllerTest extends Janitor.TestCase
   'test ready callback': ->
-    callback_fired = false
+    callbackFired = false
     DummyController = class extends ControllerWithView
       ready: ->
-        callback_fired = true
+        callbackFired = true
       
     DummyView = class extends Wingman.View
       templateSource: -> '<div>test</div>'
       
-    dummy_view = new DummyView parent: { el: Wingman.document.createElement('div') }
-    dummy_controller = new DummyController view: dummy_view
+    dummyView = new DummyView parent: { el: Wingman.document.createElement('div') }
+    dummyController = new DummyController view: dummyView
     
-    @assert callback_fired
+    @assert callbackFired
   
   'test property dependencies': ->
-    callback_fired = false
+    callbackFired = false
     
     class MainView extends Wingman.View
     class MainController extends Wingman.Controller
@@ -35,7 +35,7 @@ module.exports = class ControllerTest extends Janitor.TestCase
         someMethod: 'app.test'
       
       someMethod: ->
-        callback_fired = true
+        callbackFired = true
     
     app = new WingmanObject
     view = new MainView { app }
@@ -43,4 +43,4 @@ module.exports = class ControllerTest extends Janitor.TestCase
     
     app.set test: 'something'
     
-    @assert callback_fired
+    @assert callbackFired

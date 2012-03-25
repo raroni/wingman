@@ -39,14 +39,14 @@ module.exports = class Application extends WingmanObject
     parts = view.path().split '.'
     scope = @constructor
     for part in parts
-      klass_name = Fleck.camelize "#{part}_controller", true
-      scope = scope[klass_name]
+      klassName = Fleck.camelize(part, true) + 'Controller'
+      scope = scope[klassName]
       return undefined unless scope
     scope
   
   handlePopStateChange: (e) =>
-    if Wingman.window.navigator.userAgent.match('WebKit') && !@_first_run
-      @_first_run = true
+    if Wingman.window.navigator.userAgent.match('WebKit') && !@_firstRun
+      @_firstRun = true
     else
       @updateNavigationOptions e.state
       @updatePath()
@@ -55,7 +55,7 @@ module.exports = class Application extends WingmanObject
     @set path: Wingman.document.location.pathname.substr(1)
   
   updateNavigationOptions: (options) ->
-    @set navigation_options: options
+    @set navigationOptions: options
   
   findView: (path) ->
     @view.get path

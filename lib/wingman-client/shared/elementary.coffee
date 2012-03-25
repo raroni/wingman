@@ -1,42 +1,42 @@
 module.exports =
-  # The class_cache hash is used to indicate how many times a given class is set on an element.
+  # The classCache hash is used to indicate how many times a given class is set on an element.
   # If for instance, 'user' has been added twice it would look lice this:
   #
   # { 'user': 2 }
   #
   classCache: ->
-    @class_cache ||= {}
+    @_classCache ||= {}
   
-  addClass: (class_name) ->
-    @classCache()[class_name] ||= 0
-    @classCache()[class_name]++
+  addClass: (className) ->
+    @classCache()[className] ||= 0
+    @classCache()[className]++
     
-    if @classCache()[class_name] == 1
-      @dom_element.className = if @dom_element.className
-       @dom_element.className.split(' ').concat(class_name).join ' '
+    if @classCache()[className] == 1
+      @domElement.className = if @domElement.className
+       @domElement.className.split(' ').concat(className).join ' '
       else
-       class_name
+       className
   
-  removeClass: (class_name) ->
-    @classCache()[class_name]-- if @classCache()[class_name]
+  removeClass: (className) ->
+    @classCache()[className]-- if @classCache()[className]
     
-    if @classCache()[class_name] == 0
-      reg = new RegExp '(\\s|^)' + class_name + '(\\s|$)'
-      @dom_element.className = @dom_element.className.replace reg, ''
+    if @classCache()[className] == 0
+      reg = new RegExp '(\\s|^)' + className + '(\\s|$)'
+      @domElement.className = @domElement.className.replace reg, ''
   
   setStyle: (key, value) ->
-    key_css_notation = @convertCssPropertyFromDomToCssNotation key
-    @dom_element.style[key_css_notation] = value
+    keyCssNotation = @convertCssPropertyFromDomToCssNotation key
+    @domElement.style[keyCssNotation] = value
   
   setAttribute: (key, value) ->
-    @dom_element.setAttribute key, value
+    @domElement.setAttribute key, value
   
   remove: ->
-    @dom_element.parentNode.removeChild @dom_element
+    @domElement.parentNode.removeChild @domElement
   
   # This method should probably not be an instance method. I could make it a private method,
   # but that would make it hard to test - so for now, it's just an instance method.
   # Should be refactored sometime.
-  convertCssPropertyFromDomToCssNotation: (property_name) ->
-    property_name.replace /(-[a-z]{1})/g, (s) ->
+  convertCssPropertyFromDomToCssNotation: (propertyName) ->
+    propertyName.replace /(-[a-z]{1})/g, (s) ->
       s[1].toUpperCase()

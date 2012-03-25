@@ -4,59 +4,59 @@ Elementary = require '../../shared/elementary'
 module.exports = class Element extends Module
   @include Elementary
   
-  constructor: (@element_data, @scope, @context) ->
-    @dom_element = Wingman.document.createElement @element_data.tag
+  constructor: (@elementData, @scope, @context) ->
+    @domElement = Wingman.document.createElement @elementData.tag
     @addToScope()
-    @setupStyles() if @element_data.styles
-    @setupClasses() if @element_data.classes
-    @setupAttributes() if @element_data.attributes
+    @setupStyles() if @elementData.styles
+    @setupClasses() if @elementData.classes
+    @setupAttributes() if @elementData.attributes
     
-    if @element_data.value
+    if @elementData.value
       @setupInnerHTML()
-    else if @element_data.children
+    else if @elementData.children
       @setupChildren()
   
   addToScope: ->
-    @scope.appendChild @dom_element
+    @scope.appendChild @domElement
   
   setupClasses: ->
-    for class_name in @element_data.classes
-      @observeClass class_name if class_name.is_dynamic
-      @addClass class_name.get @context
+    for className in @elementData.classes
+      @observeClass className if className.isDynamic
+      @addClass className.get @context
   
   setupAttributes: ->
-    for key, value of @element_data.attributes
+    for key, value of @elementData.attributes
       @setAttribute key, value.get(@context)
-      @observeAttribute key, value if value.is_dynamic
+      @observeAttribute key, value if value.isDynamic
   
   observeAttribute: (key, value) ->
-    @context.observe value.get(), (new_value) =>
-      @setAttribute key, new_value
+    @context.observe value.get(), (newValue) =>
+      @setAttribute key, newValue
   
-  observeClass: (class_name) ->
-    @context.observe class_name.get(), (new_class_name, old_class_name) =>
-      @removeClass old_class_name
-      @addClass new_class_name
+  observeClass: (className) ->
+    @context.observe className.get(), (newClassName, oldClassName) =>
+      @removeClass oldClassName
+      @addClass newClassName
   
   setupStyles: -> 
-    for key, value of @element_data.styles
-      @observeStyle key, value if value.is_dynamic
+    for key, value of @elementData.styles
+      @observeStyle key, value if value.isDynamic
       @setStyle key, value.get @context
   
   observeStyle: (key, value) ->
-    @context.observe value.get(), (new_value) => @setStyle key, new_value
+    @context.observe value.get(), (newValue) => @setStyle key, newValue
   
   setupInnerHTML: ->
-    @dom_element.innerHTML = if @element_data.value.is_dynamic
-      @context.observe @element_data.value.get(), (new_value) =>
-        @dom_element.innerHTML = new_value
-      @context.get @element_data.value.get()
+    @domElement.innerHTML = if @elementData.value.isDynamic
+      @context.observe @elementData.value.get(), (newValue) =>
+        @domElement.innerHTML = newValue
+      @context.get @elementData.value.get()
     else
-      @element_data.value.get()
+      @elementData.value.get()
   
   setupChildren: ->
-    for child in @element_data.children
-      NodeFactory.create child, @dom_element, @context
+    for child in @elementData.children
+      NodeFactory.create child, @domElement, @context
 
 Wingman = require '../../../wingman-client'
 NodeFactory = require '../node_factory'

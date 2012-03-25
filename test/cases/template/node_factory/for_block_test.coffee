@@ -11,7 +11,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @parent = Wingman.document.createElement 'div'
 
   'test simple for block': ->
-    node_data =
+    nodeData =
       type: 'for'
       source: 'users'
       children: [
@@ -23,15 +23,15 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
   
-    new ForBlock node_data, @parent, context
+    new ForBlock nodeData, @parent, context
     
-    child_elements = @parent.childNodes
-    @assertEqual 2, child_elements.length
-    @assertEqual 'Rasmus', child_elements[0].innerHTML
-    @assertEqual 'John', child_elements[1].innerHTML
+    childElements = @parent.childNodes
+    @assertEqual 2, childElements.length
+    @assertEqual 'Rasmus', childElements[0].innerHTML
+    @assertEqual 'John', childElements[1].innerHTML
   
   'test several children': ->
-    node_data =
+    nodeData =
       type: 'for'
       source: 'users'
       children: [
@@ -50,17 +50,17 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
   
-    new ForBlock node_data, @parent, context
+    new ForBlock nodeData, @parent, context
     
-    child_elements = @parent.childNodes
-    @assertEqual 4, child_elements.length
-    @assertEqual 'Username:', child_elements[0].innerHTML
-    @assertEqual 'Rasmus', child_elements[1].innerHTML
-    @assertEqual 'Username:', child_elements[2].innerHTML
-    @assertEqual 'John', child_elements[3].innerHTML
+    childElements = @parent.childNodes
+    @assertEqual 4, childElements.length
+    @assertEqual 'Username:', childElements[0].innerHTML
+    @assertEqual 'Rasmus', childElements[1].innerHTML
+    @assertEqual 'Username:', childElements[2].innerHTML
+    @assertEqual 'John', childElements[3].innerHTML
   
   'test for node with nested source path': ->
-    node_data =
+    nodeData =
       type: 'for'
       source: 'user.notifications'
       children: [
@@ -74,15 +74,15 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     user.set notifications: ['Hello', 'Hi']
     context.set { user }
   
-    new ForBlock node_data, @parent, context
+    new ForBlock nodeData, @parent, context
   
-    child_elements = @parent.childNodes
-    @assertEqual 2, child_elements.length
-    @assertEqual 'Hello', child_elements[0].innerHTML
-    @assertEqual 'Hi', child_elements[1].innerHTML
+    childElements = @parent.childNodes
+    @assertEqual 2, childElements.length
+    @assertEqual 'Hello', childElements[0].innerHTML
+    @assertEqual 'Hi', childElements[1].innerHTML
   
   'test for node with deferred push': ->
-    node_data =
+    nodeData =
       type: 'for'
       source: 'users'
       children: [
@@ -94,16 +94,16 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
     
-    new ForBlock node_data, @parent, context
+    new ForBlock nodeData, @parent, context
     
-    child_elements = @parent.childNodes
-    @assertEqual 2, child_elements.length
+    childElements = @parent.childNodes
+    @assertEqual 2, childElements.length
     context.get('users').push 'Joe'
-    @assertEqual 3, child_elements.length
-    @assertEqual 'Joe', child_elements[2].innerHTML
+    @assertEqual 3, childElements.length
+    @assertEqual 'Joe', childElements[2].innerHTML
   
   'test for node with deferred remove': ->
-    node_data =
+    nodeData =
       type: 'for'
       source: 'users'
       children: [
@@ -115,15 +115,15 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
   
-    new ForBlock node_data, @parent, context, 'users'
+    new ForBlock nodeData, @parent, context, 'users'
     
-    child_elements = @parent.childNodes
-    @assertEqual 2, child_elements.length
+    childElements = @parent.childNodes
+    @assertEqual 2, childElements.length
     context.get('users').remove 'John'
-    @assertEqual 1, child_elements.length
+    @assertEqual 1, childElements.length
   
   'test for node with deferred reset': ->
-    node_data =
+    nodeData =
       type: 'for'
       source: 'users'
       children: [
@@ -135,7 +135,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
   
-    new ForBlock node_data, @parent, context
+    new ForBlock nodeData, @parent, context
     
     @assertEqual 2, @parent.childNodes.length
     context.set users: ['Oliver']
@@ -143,7 +143,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @assertEqual 'Oliver', @parent.childNodes[0].innerHTML
   
   'test for node with no initial source': ->
-    node_data =
+    nodeData =
       type: 'for'
       source: 'users'
       children: [
@@ -154,21 +154,21 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     
     context = new WingmanObject
     
-    new ForBlock node_data, @parent, context, 'users'
-    child_elements = @parent.childNodes
+    new ForBlock nodeData, @parent, context, 'users'
+    childElements = @parent.childNodes
     
-    @assertEqual 0, child_elements.length
+    @assertEqual 0, childElements.length
     context.set users: ['Rasmus', 'Mario']
-    @assertEqual 2, child_elements.length
-    @assertEqual 'Rasmus', child_elements[0].innerHTML
-    @assertEqual 'Mario', child_elements[1].innerHTML
+    @assertEqual 2, childElements.length
+    @assertEqual 'Rasmus', childElements[0].innerHTML
+    @assertEqual 'Mario', childElements[1].innerHTML
   
   'test child view': ->
-    node_data =
+    nodeData =
       type: 'for'
       source: 'users'
       children: [
-        type: 'child_view'
+        type: 'childView'
         name: 'user'
       ]
     
@@ -176,8 +176,8 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     class MainView.UserView extends Wingman.View
       templateSource: -> '<div>{user}</div>'
     
-    main_view = new MainView
-    main_view.set users: ['Luigi', 'Yoshi']
-    new ForBlock node_data, @parent, main_view
+    mainView = new MainView
+    mainView.set users: ['Luigi', 'Yoshi']
+    new ForBlock nodeData, @parent, mainView
     @assertEqual '<div>Luigi</div>', @parent.childNodes[0].innerHTML
     @assertEqual '<div>Yoshi</div>', @parent.childNodes[1].innerHTML

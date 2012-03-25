@@ -14,15 +14,15 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'function', typeof(instance.testMethod)
   
   'test included callback': ->
-    callback_value = undefined
+    callbackValue = undefined
     TestModule =
       included: (base) ->
-        callback_value = base
+        callbackValue = base
     
     klass = class extends Module
       @include TestModule
     
-    @assertEqual callback_value, klass
+    @assertEqual callbackValue, klass
   
   'test extend': ->
     TestModule = { testMethod: -> 'result' }
@@ -34,12 +34,12 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'function', typeof(klass.testMethod)
 
   'test extended callback': ->
-    callback_value = undefined
+    callbackValue = undefined
     TestModule =
       extended: (base) ->
-        callback_value = base
+        callbackValue = base
 
     klass = class extends Module
       @extend TestModule
 
-    @assertEqual callback_value, klass
+    @assertEqual callbackValue, klass

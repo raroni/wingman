@@ -11,8 +11,8 @@ class History
   
   triggerPushEvent: (event) ->
     @window.document.location.pathname = event.location
-    if @window._popstate_callbacks?
-      for callback in @window._popstate_callbacks
+    if @window._popstateCallbacks?
+      for callback in @window._popstateCallbacks
         callback event
   
   go: (change) ->
@@ -28,12 +28,12 @@ class History
 module.exports =
   create: (window) ->
     window.history = new History window
-    original_add_event_listener = window.addEventListener
+    originalAddEventListener = window.addEventListener
      
     window.addEventListener = (type, callback) ->
       if type == 'popstate'
-        (window._popstate_callbacks ||= []).push callback
+        (window._popstateCallbacks ||= []).push callback
       else
-        original_add_event_listener.call window, type, callback
+        originalAddEventListener.call window, type, callback
     
     window

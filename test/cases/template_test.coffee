@@ -23,9 +23,9 @@ module.exports = class TemplateTest extends Janitor.TestCase
     template @parent
   
     @assertEqual 1, @parent.childNodes.length
-    ol_elm = @parent.childNodes[0]
-    @assertEqual 1, ol_elm.childNodes.length
-    @assertEqual 'hello', ol_elm.childNodes[0].innerHTML
+    olElm = @parent.childNodes[0]
+    @assertEqual 1, olElm.childNodes.length
+    @assertEqual 'hello', olElm.childNodes[0].innerHTML
   
   'test basic template with dynamic content': ->
     template = Wingman.Template.compile '<div>{greeting}</div>'
@@ -68,10 +68,10 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
     @assertEqual 1, @parent.childNodes.length
   
-    ol_elm = @parent.childNodes[0]
-    @assertEqual 2, ol_elm.childNodes.length
-    @assertEqual 'Rasmus', ol_elm.childNodes[0].innerHTML
-    @assertEqual 'John', ol_elm.childNodes[1].innerHTML
+    olElm = @parent.childNodes[0]
+    @assertEqual 2, olElm.childNodes.length
+    @assertEqual 'Rasmus', olElm.childNodes[0].innerHTML
+    @assertEqual 'John', olElm.childNodes[1].innerHTML
   
   'test for token with deferred push': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
@@ -80,12 +80,12 @@ module.exports = class TemplateTest extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
     template @parent, context
   
-    ol_elm = @parent.childNodes[0]
-    @assertEqual 2, ol_elm.childNodes.length
+    olElm = @parent.childNodes[0]
+    @assertEqual 2, olElm.childNodes.length
   
     context.get('users').push 'Oliver'
-    @assertEqual 3, ol_elm.childNodes.length
-    @assertEqual 'Oliver', ol_elm.childNodes[2].innerHTML
+    @assertEqual 3, olElm.childNodes.length
+    @assertEqual 'Oliver', olElm.childNodes[2].innerHTML
   
   'test for token with deferred remove': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
@@ -94,11 +94,11 @@ module.exports = class TemplateTest extends Janitor.TestCase
     context.set users: ['Rasmus', 'John']
     template @parent, context
   
-    ol_elm = @parent.childNodes[0]
-    @assertEqual 2, ol_elm.childNodes.length
+    olElm = @parent.childNodes[0]
+    @assertEqual 2, olElm.childNodes.length
   
     context.get('users').remove 'John'
-    @assertEqual 1, ol_elm.childNodes.length
+    @assertEqual 1, olElm.childNodes.length
   
   'test for token with deferred reset': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
@@ -106,10 +106,10 @@ module.exports = class TemplateTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
     template @parent, context
-    ol_elm = @parent.childNodes[0]
+    olElm = @parent.childNodes[0]
     context.set users: ['Oliver']
-    @assertEqual 1, ol_elm.childNodes.length
-    @assertEqual 'Oliver', ol_elm.childNodes[0].innerHTML
+    @assertEqual 1, olElm.childNodes.length
+    @assertEqual 'Oliver', olElm.childNodes[0].innerHTML
   
   'test element with single static style': ->
     template = Wingman.Template.compile '<div style="color:red">yo</div>'
@@ -259,10 +259,10 @@ module.exports = class TemplateTest extends Janitor.TestCase
     class MainView.UserView extends Wingman.View
       templateSource: -> '<div>{user}</div>'
     
-    main_view = new MainView
-    template = Wingman.Template.compile main_view.templateSource()
-    template @parent, main_view
-    main_view.set users: ['Rasmus', 'John']
+    mainView = new MainView
+    template = Wingman.Template.compile mainView.templateSource()
+    template @parent, mainView
+    mainView.set users: ['Rasmus', 'John']
     
     @assertEqual 2, @parent.childNodes[0].childNodes.length
     @assertEqual 'Rasmus', @parent.childNodes[0].childNodes[0].childNodes[0].innerHTML
@@ -273,20 +273,20 @@ module.exports = class TemplateTest extends Janitor.TestCase
     template = Wingman.Template.compile '{if something}<div>hello</div>{end}'
     template @parent, context
     
-    child_nodes = @parent.childNodes
-    @assertEqual 0, child_nodes.length
+    childNodes = @parent.childNodes
+    @assertEqual 0, childNodes.length
     context.set something: true
-    @assertEqual 1, child_nodes.length
-    @assertEqual 'hello', child_nodes[0].innerHTML
+    @assertEqual 1, childNodes.length
+    @assertEqual 'hello', childNodes[0].innerHTML
     
   'test if else conditional': ->
     context = new WingmanObject
     template = Wingman.Template.compile '{if early}<div>good morning</div>{else}<div>good evening</div>{end}'
     template @parent, context
     
-    child_nodes = @parent.childNodes
-    @assertEqual 1, child_nodes.length
-    @assertEqual 'good evening', child_nodes[0].innerHTML
+    childNodes = @parent.childNodes
+    @assertEqual 1, childNodes.length
+    @assertEqual 'good evening', childNodes[0].innerHTML
     context.set early: true
-    @assertEqual 1, child_nodes.length
-    @assertEqual 'good morning', child_nodes[0].innerHTML
+    @assertEqual 1, childNodes.length
+    @assertEqual 'good morning', childNodes[0].innerHTML

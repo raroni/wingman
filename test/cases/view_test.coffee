@@ -17,17 +17,17 @@ clickElement = (elm) ->
 module.exports = class ViewTest extends Janitor.TestCase
   setup: ->
     Wingman.document = document
-    View.template_sources = {}
+    View.templateSources = {}
   
   'test simple template': ->
-    View.template_sources.main = '<div>hello</div>'
+    View.templateSources.main = '<div>hello</div>'
     class MainView extends View
     
-    dummy_app =
+    dummyApp =
       pathKeys: -> []
       el: document.createElement('div')
     
-    view = new MainView parent: dummy_app, render: true
+    view = new MainView parent: dummyApp, render: true
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'hello', view.el.childNodes[0].innerHTML
     
@@ -39,99 +39,99 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assertEqual 'user', view.el.className
   
   'test simple template with dynamic values': ->
-    View.template_sources.simple_with_dynamic_values = '<div>{myName}</div>'
+    View.templateSources['simple_with_dynamic_values'] = '<div>{myName}</div>'
     class SimpleWithDynamicValuesView extends View
   
-    dummy_app =
+    dummyApp =
       pathKeys: -> []
       el: document.createElement('div')
   
-    view = new SimpleWithDynamicValuesView parent: dummy_app, render: true
+    view = new SimpleWithDynamicValuesView parent: dummyApp, render: true
     view.set myName: 'Razda'
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'Razda', view.el.childNodes[0].innerHTML
   
   'test parse events': ->
-    events_hash =
-      'click .user': 'user_clicked'
-      'hover button.some_class': 'button_hovered'
+    eventsHash =
+      'click .user': 'userClicked'
+      'hover button.some_class': 'buttonHovered'
       
-    events = View.parseEvents(events_hash).sort (e1, e2) -> e1.type > e2.type
+    events = View.parseEvents(eventsHash).sort (e1, e2) -> e1.type > e2.type
     
     @assertEqual 'click', events[0].type
-    @assertEqual 'user_clicked', events[0].trigger
+    @assertEqual 'userClicked', events[0].trigger
     @assertEqual '.user', events[0].selector
     
     @assertEqual 'hover', events[1].type
-    @assertEqual 'button_hovered', events[1].trigger
+    @assertEqual 'buttonHovered', events[1].trigger
     @assertEqual 'button.some_class', events[1].selector
   
   'test simple event': ->
-    View.template_sources.main = '<div><div class="user">Johnny</div></div>'
+    View.templateSources.main = '<div><div class="user">Johnny</div></div>'
     class MainView extends View
       @_name: 'test'
       events:
-        'click .user': 'user_clicked'
+        'click .user': 'userClicked'
     
-    dummy_app =
+    dummyApp =
       pathKeys: -> []
       el: document.createElement('div')
     
-    view = new MainView parent: dummy_app, render: true
+    view = new MainView parent: dummyApp, render: true
     clicked = false
-    view.bind 'user_clicked', ->
+    view.bind 'userClicked', ->
       clicked = true
     
     clickElement view.el.childNodes[0].childNodes[0]
     @assert clicked
     
   'test event bubbling': ->
-    View.template_sources.main = '<div class="outer"><div class="user">Johnny</div></div>'
+    View.templateSources.main = '<div class="outer"><div class="user">Johnny</div></div>'
     class MainView extends View
       @_name: 'test'
       events:
-        'click .outer': 'outer_clicked'
+        'click .outer': 'outerClicked'
     
     view = new MainView render: true
     clicked = false
-    view.bind 'outer_clicked', -> clicked = true
+    view.bind 'outerClicked', -> clicked = true
     clickElement view.el.childNodes[0].childNodes[0]
     @assert clicked
     
   'test click on views mother element': ->
-    event_from_callback = undefined
-    did_maintain_context = false
+    eventFromCallback = undefined
+    didMaintainContext = false
     class MainView extends View
       randomProperty: true
       click: (event) ->
-        did_maintain_context = @randomProperty
-        event_from_callback = event
+        didMaintainContext = @randomProperty
+        eventFromCallback = event
       templateSource: -> '<div><a>BOING</a></div>'
     
     view = new MainView render: true
     clickElement view.el.childNodes[0].childNodes[0]
-    @assert event_from_callback
-    @assertEqual 'A', event_from_callback.target.tagName
-    @assert did_maintain_context
+    @assert eventFromCallback
+    @assertEqual 'A', eventFromCallback.target.tagName
+    @assert didMaintainContext
   
   'test trigger arguments': ->
-    View.template_sources.main = '<div>Something</div>'
+    View.templateSources.main = '<div>Something</div>'
     class MainView extends View
       @_name: 'test'
       events:
-        'click div': 'something_happened'
+        'click div': 'somethingHappened'
       
       somethingHappenedArguments: ->
         ['a', 'b']
     
-    dummy_app =
+    dummyApp =
       pathKeys: -> []
       el: document.createElement('div')
     
-    view = new MainView parent: dummy_app, render: true
+    view = new MainView parent: dummyApp, render: true
     a = null
     b = null
-    view.bind 'something_happened', (x,y) ->
+    view.bind 'somethingHappened', (x,y) ->
       a = x
       b = y
     
@@ -170,21 +170,30 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assert view.createChildView('user').createChildView('name').get('parent.parent') instanceof MainView
     
   'test ready callback': ->
-    callback_fired = false
+    callbackFired = false
     class MainView extends ViewWithTemplateSource
-      ready: -> callback_fired = true
+      ready: -> callbackFired = true
     
     view = new MainView render: true
-    @assert callback_fired
+    @assert callbackFired
   
-  'test build sub view': ->
+  'test create child view': ->
     class MainView extends ViewWithTemplateSource
     class MainView.UserView extends ViewWithTemplateSource
     
     view = new MainView render: true
-    sub_view = view.createChildView 'user'
-    @assert sub_view instanceof MainView.UserView
-    @assert view, sub_view.parent
+    childView = view.createChildView 'user'
+    @assert childView instanceof MainView.UserView
+    @assert view, childView.parent
+  
+  'test create child view with two word name': ->
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserNameView extends ViewWithTemplateSource
+
+    view = new MainView render: true
+    childView = view.createChildView 'userName'
+    @assert childView instanceof MainView.UserNameView
+    @assert view, childView.parent
   
   'test descendant view event': ->
     class MainView extends ViewWithTemplateSource
@@ -192,45 +201,45 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView.NameView extends ViewWithTemplateSource
     
     main = new MainView
-    callback_values = []
-    main.bind 'descendantCreated', (view) -> callback_values.push view
+    callbackValues = []
+    main.bind 'descendantCreated', (view) -> callbackValues.push view
     user = main.createChildView('user')
     name = user.createChildView('name')
     
-    @assertEqual 2, callback_values.length
-    @assertEqual user, callback_values[0]
-    @assertEqual name, callback_values[1]
+    @assertEqual 2, callbackValues.length
+    @assertEqual user, callbackValues[0]
+    @assertEqual name, callbackValues[1]
   
   'test custom tag': ->
     class MainView extends ViewWithTemplateSource
       tag: 'tr'
     
-    main_view = new MainView render: true
-    @assertEqual 'TR', main_view.el.tagName
+    mainView = new MainView render: true
+    @assertEqual 'TR', mainView.el.tagName
 
   'test custom template name': ->
-    View.template_sources =
+    View.templateSources =
       'my_custom_name': '<div>hi</div>'
     
     class MainView extends Wingman.View
       templateName: 'my_custom_name'
     
-    main_view = new MainView render: true
-    @assertEqual 'hi', main_view.el.childNodes[0].innerHTML
+    mainView = new MainView render: true
+    @assertEqual 'hi', mainView.el.childNodes[0].innerHTML
   
   'test template source as a string': ->
     class MainView extends Wingman.View
       templateSource: '<div>hello</div>'
     
-    main_view = new MainView render: true
-    @assertEqual 'hello', main_view.el.childNodes[0].innerHTML
+    mainView = new MainView render: true
+    @assertEqual 'hello', mainView.el.childNodes[0].innerHTML
   
   'test disabling template': ->
     class MainView extends Wingman.View
       templateSource: null
     
-    main_view = new MainView render: true
-    @assertEqual 0, main_view.el.childNodes.length
+    mainView = new MainView render: true
+    @assertEqual 0, mainView.el.childNodes.length
     
   'test appending view': ->
     class MainView extends Wingman.View
@@ -239,11 +248,11 @@ module.exports = class ViewTest extends Janitor.TestCase
     class SubView extends Wingman.View
       templateSource: '<div>hello</div>'
     
-    main_view = new MainView render: true
-    sub_view = new SubView render: true
-    main_view.append sub_view
+    mainView = new MainView render: true
+    subView = new SubView render: true
+    mainView.append subView
     
-    @assertEqual '<div class="sub"><div>hello</div></div>', main_view.el.innerHTML
+    @assertEqual '<div class="sub"><div>hello</div></div>', mainView.el.innerHTML
   
   teardown: ->
-    delete View.template_sources
+    delete View.templateSources

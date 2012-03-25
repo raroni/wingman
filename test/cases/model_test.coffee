@@ -1,6 +1,7 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
 WingmanObject = require '../../lib/wingman-client/shared/object'
+HasManyAssociation = require '../../lib/wingman-client/model/has_many_association'
 sinon = require 'sinon'
 RestStorage = require '../../lib/wingman-client/model/storage_adapters/rest'
 
@@ -28,7 +29,7 @@ module.exports = class ModelTest extends Janitor.TestCase
   'test setting default storage adapter': ->
     User = class extends Wingman.Model
     user = new User
-    @assert user.storage_adapter instanceof RestStorage
+    @assert user.storageAdapter instanceof RestStorage
   
   'test request parameters when saving new rest model': ->
     User = class extends Wingman.Model
@@ -39,12 +40,12 @@ module.exports = class ModelTest extends Janitor.TestCase
     user = new User name: 'Rasmus', age: 25
     user.save()
     
-    first_argument = Wingman.request.realRequest.args[0][0]
-    @assertEqual 'POST', first_argument.type
-    @assertEqual '/users', first_argument.url
-    @assertEqual 'Rasmus', first_argument.data.name
-    @assertEqual 25, first_argument.data.age
-    @assertEqual 2, Object.keys(first_argument.data).length
+    firstArgument = Wingman.request.realRequest.args[0][0]
+    @assertEqual 'POST', firstArgument.type
+    @assertEqual '/users', firstArgument.url
+    @assertEqual 'Rasmus', firstArgument.data.name
+    @assertEqual 25, firstArgument.data.age
+    @assertEqual 2, Object.keys(firstArgument.data).length
     
   'test request parameters when updating existing rest model': ->
     User = class extends Wingman.Model
@@ -57,11 +58,11 @@ module.exports = class ModelTest extends Janitor.TestCase
     user.set name: 'Rasmus RN'
     user.save()
     
-    first_argument = Wingman.request.realRequest.args[0][0]
-    @assertEqual 'PUT', first_argument.type
-    @assertEqual "/users/#{user.get('id')}", first_argument.url
-    @assertEqual 'Rasmus RN', first_argument.data.name
-    @assertEqual 1, Object.keys(first_argument.data).length
+    firstArgument = Wingman.request.realRequest.args[0][0]
+    @assertEqual 'PUT', firstArgument.type
+    @assertEqual "/users/#{user.get('id')}", firstArgument.url
+    @assertEqual 'Rasmus RN', firstArgument.data.name
+    @assertEqual 1, Object.keys(firstArgument.data).length
   
   'test setting properties returned by server after succesfull rest save': ->
     User = class extends Wingman.Model
@@ -83,14 +84,14 @@ module.exports = class ModelTest extends Janitor.TestCase
     Wingman.request.realRequest = (options) ->
       options.success id: 1
     
-    callback_called = false
+    callbackCalled = false
     
     user = new User name: 'Rasmus', age: 25
     user.save
       success: ->
-        callback_called = true
+        callbackCalled = true
   
-    @assert callback_called
+    @assert callbackCalled
     
   'test error callback for rest model': ->
     User = class extends Wingman.Model
@@ -99,14 +100,14 @@ module.exports = class ModelTest extends Janitor.TestCase
     Wingman.request.realRequest = (options) ->
       options.error()
     
-    callback_called = false
+    callbackCalled = false
     
     user = new User name: 'Rasmus', age: 25
     user.save
       error: ->
-        callback_called = true
+        callbackCalled = true
     
-    @assert callback_called
+    @assert callbackCalled
   
   'test auto save with local storage': ->
     User = class extends Wingman.Model
@@ -118,25 +119,25 @@ module.exports = class ModelTest extends Janitor.TestCase
     @assert !user.isDirty()
     
   'test load with local storage': ->
-    Wingman.localStorage.setItem "sessions.1", JSON.stringify({ user_id: 27 })
+    Wingman.localStorage.setItem "sessions.1", JSON.stringify({ userId: 27 })
     
     class Session extends Wingman.Model
       @storage 'local', namespace: 'sessions'
     
     session = new Session id: 1, name: 'Rasmus'
     session.load()
-    @assertEqual 27, session.get('user_id')
+    @assertEqual 27, session.get('userId')
     
   'test load via id without an instance with local storage': ->
-    Wingman.localStorage.setItem "sessions.10", JSON.stringify({ user_id: 27 })
+    Wingman.localStorage.setItem "sessions.10", JSON.stringify({ userId: 27 })
     class Session extends Wingman.Model
       @storage 'local', namespace: 'sessions'
     
-    user_id_from_callback = undefined
+    userIdFromCallback = undefined
     Session.load 10, (session) ->
-      user_id_from_callback = session.get('user_id')
+      userIdFromCallback = session.get('userId')
     
-    @assertEqual 27, user_id_from_callback
+    @assertEqual 27, userIdFromCallback
     
   'test load via id without an instance with rest storage': ->
     Wingman.request.realRequest = (options) ->
@@ -145,10 +146,10 @@ module.exports = class ModelTest extends Janitor.TestCase
     class User extends Wingman.Model
       @storage 'rest', url: '/users'
     
-    name_from_callback = undefined
-    User.load 10, (user) -> name_from_callback = user.get('name')
+    nameFromCallback = undefined
+    User.load 10, (user) -> nameFromCallback = user.get('name')
     
-    @assertEqual 'Ras', name_from_callback
+    @assertEqual 'Ras', nameFromCallback
   
   'test count when loading by id with rest storage': ->
     Wingman.request.realRequest = (options) ->
@@ -175,14 +176,14 @@ module.exports = class ModelTest extends Janitor.TestCase
     class Car extends Wingman.Model
       @storage 'rest', url: '/cars'
     
-    array_from_callback = undefined
-    Car.load (array) -> array_from_callback = array
+    arrayFromCallback = undefined
+    Car.load (array) -> arrayFromCallback = array
     
-    @assertEqual 2, array_from_callback.length
-    @assertEqual 'McQueen', array_from_callback[0].get('name')
-    @assertEqual 'Mater', array_from_callback[1].get('name')
-    @assert array_from_callback[0] instanceof Car
-    @assert array_from_callback[1] instanceof Car
+    @assertEqual 2, arrayFromCallback.length
+    @assertEqual 'McQueen', arrayFromCallback[0].get('name')
+    @assertEqual 'Mater', arrayFromCallback[1].get('name')
+    @assert arrayFromCallback[0] instanceof Car
+    @assert arrayFromCallback[1] instanceof Car
     
   'test count when loading many with rest storage': ->
     Wingman.request.realRequest = (options) ->
@@ -195,68 +196,88 @@ module.exports = class ModelTest extends Janitor.TestCase
     class Car extends Wingman.Model
       @storage 'rest', url: '/cars'
     
-    array_from_callback = undefined
+    arrayFromCallback = undefined
     
     @assertEqual 0, Car.count()
-    Car.load (array) -> array_from_callback = array
+    Car.load (array) -> arrayFromCallback = array
     @assertEqual 2, Car.count()
   
   'test destroy': ->
-    correct_request = undefined
+    correctRequest = undefined
     Wingman.request.realRequest = (options) ->
-      correct_request = options.url == '/cars/1' && options.type == 'DELETE'
+      correctRequest = options.url == '/cars/1' && options.type == 'DELETE'
     
     class Car extends Wingman.Model
       @storage 'rest', url: '/cars'
       
     car = new Car id: 1, name: 'Toyota'
     
-    value_from_callback = undefined
-    car.bind 'destroy', (model) -> value_from_callback = model
+    valueFromCallback = undefined
+    car.bind 'destroy', (model) -> valueFromCallback = model
     car.destroy()
-    @assertEqual 'Toyota', value_from_callback.get('name')
-    @assert correct_request
+    @assertEqual 'Toyota', valueFromCallback.get('name')
+    @assert correctRequest
   
   'test scope with rest': ->
     Wingman.request.realRequest = (options) ->
       data = [
-        { id: 1, name: 'McQueen', user_id: 1 }
-        { id: 2, name: 'Mater', user_id: 1 }
-        { id: 3, name: 'Batmobile', user_id: 2 }
+        { id: 1, name: 'McQueen', userId: 1 }
+        { id: 2, name: 'Mater', userId: 1 }
+        { id: 3, name: 'Batmobile', userId: 2 }
       ]
       options.success data
     
     class Car extends Wingman.Model
       @storage 'rest', url: '/cars'
     
-    scope = Car.scoped user_id: 1
-    values_from_callback = []
+    scope = Car.scoped userId: 1
+    valuesFromCallback = []
     scope.bind 'add', (model) ->
-      values_from_callback.push(model)
+      valuesFromCallback.push(model)
     Car.load()
     
     @assertEqual 2, scope.count()
-    @assertEqual 'McQueen', values_from_callback[0].get('name')
-    @assertEqual 'Mater', values_from_callback[1].get('name')
+    @assertEqual 'McQueen', valuesFromCallback[0].get('name')
+    @assertEqual 'Mater', valuesFromCallback[1].get('name')
   
-  'test has many association': ->
-    id = 1
-    Wingman.request.realRequest = (options) ->
-      options.data.id = id++
-      options.success options.data
-    
+  'test initialization of has many association': ->
     class User extends Wingman.Model
       @hasMany 'notifications'
     
     class Notification extends Wingman.Model
     
     uglyAssociationHack Notification
+    user = new User()
+    @assertEqual Notification, user.get('notifications').associatedClass
+  
+  'test initialization of has many association with a two word name': ->
+    class User extends Wingman.Model
+      @hasMany 'forumTopics'
     
+    class ForumTopic extends Wingman.Model
+    
+    uglyAssociationHack ForumTopic
+    user = new User()
+    @assertEqual ForumTopic, user.get('forumTopics').associatedClass
+  
+  'test has many association count': ->
+    id = 1
+    Wingman.request.realRequest = (options) ->
+      options.data.id = id++
+      options.success options.data
+  
+    class User extends Wingman.Model
+      @hasMany 'notifications'
+  
+    class Notification extends Wingman.Model
+  
+    uglyAssociationHack Notification
+  
     user = new User()
     user.save()
     
-    new Notification(user_id: 1).save() for [1..2]
-    new Notification(user_id: 2).save()
+    new Notification(userId: 1).save() for [1..2]
+    new Notification(userId: 2).save()
     
     @assertEqual 2, user.get('notifications').count()
     delete Wingman.Application.instance
@@ -276,23 +297,23 @@ module.exports = class ModelTest extends Janitor.TestCase
     uglyAssociationHack Notification
     
     context = new WingmanObject
-    callback_values = []
-    context.observe 'user.notifications', 'add', (model) -> callback_values.push model
+    callbackValues = []
+    context.observe 'user.notifications', 'add', (model) -> callbackValues.push model
     
     user = new User()
     user.save()
     context.set { user }
     
     notifications = [
-      new Notification(user_id: 1)
-      new Notification(user_id: 2)
-      new Notification(user_id: 1)
+      new Notification(userId: 1)
+      new Notification(userId: 2)
+      new Notification(userId: 1)
     ]
     notification.save() for notification in notifications
     
-    @assertEqual 2, callback_values.length
-    @assertEqual notifications[0], callback_values[0]
-    @assertEqual notifications[2], callback_values[1]
+    @assertEqual 2, callbackValues.length
+    @assertEqual notifications[0], callbackValues[0]
+    @assertEqual notifications[2], callbackValues[1]
     delete Wingman.Application.instance
   
   'test has many nested population': ->
@@ -323,8 +344,8 @@ module.exports = class ModelTest extends Janitor.TestCase
     user = new User()
     user.save()
     
-    new Notification(user_id: 1).save() for [1..2]
-    new Notification(user_id: 2).save()
+    new Notification(userId: 1).save() for [1..2]
+    new Notification(userId: 2).save()
     
     @assert !user.toJSON().notifications
     
