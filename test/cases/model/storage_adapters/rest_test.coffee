@@ -6,8 +6,10 @@ sinon = require 'sinon'
 
 class DummyUser extends WingmanObject
   get: (key) -> @[key]
+  
   set: (hash) ->
     @[key] = value for key, value of hash
+  
   dirtyStaticProperties: ->
     @_dirtyStaticProperties
 
