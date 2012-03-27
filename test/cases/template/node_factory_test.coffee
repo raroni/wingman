@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
-NodeFactory = require '../../../lib/wingman-client/template/node_factory'
-Value = require '../../../lib/wingman-client/template/parser/value'
-WingmanObject = require '../../../lib/wingman-client/shared/object'
+NodeFactory = require '../../../lib/wingman/template/node_factory'
+Value = require '../../../lib/wingman/template/parser/value'
+WingmanObject = require '../../../lib/wingman/shared/object'
 Wingman = require '../../..'
 CustomAssertions = require '../../custom_assertions'
 Wingman.document = require('jsdom').jsdom()

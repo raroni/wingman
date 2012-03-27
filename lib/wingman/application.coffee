@@ -1,4 +1,4 @@
-Wingman = require '../wingman-client'
+Wingman = require '../wingman'
 Events = require './shared/events'
 WingmanObject = require './shared/object'
 Navigator = require './shared/navigator'

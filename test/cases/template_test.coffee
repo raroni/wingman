@@ -1,6 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../..'
-WingmanObject = require '../../lib/wingman-client/shared/object'
+WingmanObject = require '../../lib/wingman/shared/object'
 document = require('jsdom').jsdom()
 CustomAssertions = require '../custom_assertions'
 Wingman.document = document

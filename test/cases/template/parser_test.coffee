@@ -1,4 +1,4 @@
-Parser = require '../../../lib/wingman-client/template/parser'
+Parser = require '../../../lib/wingman/template/parser'
 Janitor = require 'janitor'
 
 module.exports = class extends Janitor.TestCase

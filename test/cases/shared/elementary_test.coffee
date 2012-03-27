@@ -1,7 +1,7 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
-Elementary = require '../../../lib/wingman-client/shared/elementary'
-Module = require '../../../lib/wingman-client/shared/module'
+Elementary = require '../../../lib/wingman/shared/elementary'
+Module = require '../../../lib/wingman/shared/module'
 
 DummyObject = class extends Module
   @include Elementary

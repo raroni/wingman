@@ -1,5 +1,5 @@
 WingmanObject = require './shared/object'
-Wingman = require '../wingman-client'
+Wingman = require '../wingman'
 Navigator = require './shared/navigator'
 
 module.exports = class extends WingmanObject

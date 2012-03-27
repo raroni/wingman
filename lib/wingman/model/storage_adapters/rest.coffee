@@ -1,4 +1,4 @@
-Wingman = require '../../../wingman-client'
+Wingman = require '../../../wingman'
 
 module.exports = class
   constructor: (@options) ->

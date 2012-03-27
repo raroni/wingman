@@ -1,9 +1,9 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
-WingmanObject = require '../../lib/wingman-client/shared/object'
-HasManyAssociation = require '../../lib/wingman-client/model/has_many_association'
+WingmanObject = require '../../lib/wingman/shared/object'
+HasManyAssociation = require '../../lib/wingman/model/has_many_association'
 sinon = require 'sinon'
-RestStorage = require '../../lib/wingman-client/model/storage_adapters/rest'
+RestStorage = require '../../lib/wingman/model/storage_adapters/rest'
 
 uglyAssociationHack = (klass) ->
   # For now we have no better solution than this

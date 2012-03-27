@@ -1,4 +1,4 @@
-Wingman = require '../wingman-client'
+Wingman = require '../wingman'
 
 request = (args...) ->
   if Wingman.Application.instance?.host?

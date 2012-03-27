@@ -13,7 +13,7 @@ task 'build', 'Build dist file', ->
     source = """
       (function(window) {
         #{source}
-        window.Wingman = require('wingman-client');
+        window.Wingman = require('wingman');
       })(window);
     """
     fs.writeFileSync __dirname + '/wingman.js', source

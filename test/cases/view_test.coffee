@@ -1,6 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
-WingmanObject = require '../../lib/wingman-client/shared/object'
+WingmanObject = require '../../lib/wingman/shared/object'
 View = Wingman.View
 document = require('jsdom').jsdom(null, null, features: {
         QuerySelector : true

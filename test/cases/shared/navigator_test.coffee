@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
-WingmanObject = require '../../../lib/wingman-client/shared/object'
-Module = require '../../../lib/wingman-client/shared/module'
-Navigator = require '../../../lib/wingman-client/shared/navigator'
+WingmanObject = require '../../../lib/wingman/shared/object'
+Module = require '../../../lib/wingman/shared/module'
+Navigator = require '../../../lib/wingman/shared/navigator'
 Wingman = require '../../../.'
 JSDomWindowPopStateDecorator = require '../../jsdom_window_pop_state_decorator'
 

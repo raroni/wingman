@@ -58,5 +58,5 @@ module.exports = class Element extends Module
     for child in @elementData.children
       NodeFactory.create child, @domElement, @context
 
-Wingman = require '../../../wingman-client'
+Wingman = require '../../../wingman'
 NodeFactory = require '../node_factory'

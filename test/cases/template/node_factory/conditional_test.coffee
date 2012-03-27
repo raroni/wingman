@@ -1,9 +1,9 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
-Conditional = require '../../../../lib/wingman-client/template/node_factory/conditional'
+Conditional = require '../../../../lib/wingman/template/node_factory/conditional'
 Wingman = require '../../../../.'
-Value = require '../../../../lib/wingman-client/template/parser/value'
-WingmanObject = require '../../../../lib/wingman-client/shared/object'
+Value = require '../../../../lib/wingman/template/parser/value'
+WingmanObject = require '../../../../lib/wingman/shared/object'
 
 module.exports = class ConditionalTest extends Janitor.TestCase
   setup: ->

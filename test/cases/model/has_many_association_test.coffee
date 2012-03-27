@@ -1,6 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../../../.'
-HasManyAssociation = require '../../../lib/wingman-client/model/has_many_association'
+HasManyAssociation = require '../../../lib/wingman/model/has_many_association'
 
 module.exports = class HasManyAssociationTest extends Janitor.TestCase
   setup: ->

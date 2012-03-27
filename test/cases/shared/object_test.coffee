@@ -1,5 +1,5 @@
 Janitor = require 'janitor'
-WingmanObject = require '../../../lib/wingman-client/shared/object'
+WingmanObject = require '../../../lib/wingman/shared/object'
 
 module.exports = class ObjectTest extends Janitor.TestCase
   'test simple set/get': ->

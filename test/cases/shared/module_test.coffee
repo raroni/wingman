@@ -1,5 +1,5 @@
 Janitor = require 'janitor'
-Module = require '../../../lib/wingman-client/shared/module'
+Module = require '../../../lib/wingman/shared/module'
 
 module.exports = class extends Janitor.TestCase
   'test include': ->

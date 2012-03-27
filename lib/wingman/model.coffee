@@ -1,4 +1,4 @@
-Wingman = require '../wingman-client'
+Wingman = require '../wingman'
 WingmanObject = require './shared/object'
 StorageAdapter = require './model/storage_adapter'
 Store = require './model/store'

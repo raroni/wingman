@@ -1,4 +1,4 @@
-Wingman = require '../wingman-client'
+Wingman = require '../wingman'
 WingmanObject = require './shared/object'
 Elementary = require './shared/elementary'
 Fleck = require 'fleck'

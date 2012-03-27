@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
 Wingman = require '../../../.'
-Scope = require '../../../lib/wingman-client/model/scope'
-Store = require '../../../lib/wingman-client/model/store'
+Scope = require '../../../lib/wingman/model/scope'
+Store = require '../../../lib/wingman/model/store'
 
 module.exports = class StoreTest extends Janitor.TestCase
   setup: ->

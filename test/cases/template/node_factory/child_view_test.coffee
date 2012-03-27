@@ -1,6 +1,6 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
-ChildView = require '../../../../lib/wingman-client/template/node_factory/child_view'
+ChildView = require '../../../../lib/wingman/template/node_factory/child_view'
 Wingman = require '../../../../.'
 
 module.exports = class ForBlockTest extends Janitor.TestCase
