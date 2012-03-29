@@ -254,5 +254,38 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     @assertEqual '<div class="sub"><div>hello</div></div>', mainView.el.innerHTML
   
+  'test style property': ->
+    class MainView extends Wingman.View
+      templateSource: null
+      left: '10px'
+    
+    view = new MainView render: true
+    @assertEqual "10px", view.el.style.left
+  
+  'test computed style property': ->
+    class MainView extends Wingman.View
+      templateSource: null
+      
+      backgroundImage: ->
+        "url('/something.jpg')"
+    
+    view = new MainView render: true
+    @assertEqual "url('/something.jpg')", view.el.style.backgroundImage
+  
+  'test computed style property with dependency': ->
+    class MainView extends Wingman.View
+      myCode: 1
+      templateSource: null
+      @propertyDependencies
+        backgroundImage: 'myCode'
+      
+      backgroundImage: ->
+        "url('/#{@get('myCode')}.jpg')"
+    
+    view = new MainView render: true
+    @assertEqual "url('/1.jpg')", view.el.style.backgroundImage
+    view.set myCode: 2
+    @assertEqual "url('/2.jpg')", view.el.style.backgroundImage
+  
   teardown: ->
     delete View.templateSources

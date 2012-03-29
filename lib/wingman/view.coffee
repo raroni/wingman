@@ -3,6 +3,15 @@ WingmanObject = require './shared/object'
 Elementary = require './shared/elementary'
 Fleck = require 'fleck'
 
+STYLE_NAMES = [
+  'backgroundImage'
+  'left'
+  'right'
+  'top'
+  'bottom'
+  'backgroundPosition'
+]
+
 module.exports = class extends WingmanObject
   @include Elementary
   
@@ -32,6 +41,7 @@ module.exports = class extends WingmanObject
     
     @addClass @pathName()
     @setupListeners()
+    @setupStyles()
     @ready?()
   
   createChildView: (viewName) ->
@@ -97,3 +107,11 @@ module.exports = class extends WingmanObject
       'root'
     else
       @pathKeys().join '.'
+  
+  setupStyles: ->
+    for name, property of @
+      @setupStyle name if name in STYLE_NAMES
+  
+  setupStyle: (name) ->
+    @setStyle name, @get(name)
+    @observe name, (newValue) => @setStyle name, newValue
