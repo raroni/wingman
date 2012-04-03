@@ -5,11 +5,12 @@ Fleck = require 'fleck'
 
 STYLE_NAMES = [
   'backgroundImage'
+  'backgroundColor'
+  'backgroundPosition'
   'left'
   'right'
   'top'
   'bottom'
-  'backgroundPosition'
 ]
 
 module.exports = class extends WingmanObject
