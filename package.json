@@ -1,6 +1,6 @@
 {
   "name": "wingman",
-  "description": "TODO.",
+  "description": "Single page app framework - focusing on programmer happiness, simplicity, and declarative design.",
   "author": "Rasmus Rønn Nielsen <rasmusrnielsen@gmail.com>",
   "version": "0.1.0",
   "main": "lib/wingman",
