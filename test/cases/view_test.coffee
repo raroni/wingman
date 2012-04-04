@@ -147,9 +147,9 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView.NameView.FirstView extends ViewWithTemplateSource
     
     main = new MainView parent: { el: document.createElement('div') }, render: true
-    user = main.createChildView 'user', render: true
-    name = user.createChildView 'name', render: true
-    first = name.createChildView 'first', render: true
+    user = main.createChildView 'user'
+    name = user.createChildView 'name'
+    first = name.createChildView 'first'
     @assertEqual 'user.name.first', first.path()
   
   'test app instance sharing': ->
@@ -185,6 +185,15 @@ module.exports = class ViewTest extends Janitor.TestCase
     childView = view.createChildView 'user'
     @assert childView instanceof MainView.UserView
     @assert view, childView.parent
+    @assert !childView.el.innerHTML
+  
+  'test create child view with immediate render': ->
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    
+    view = new MainView render: true
+    childView = view.createChildView 'user', render: true
+    @assert childView.el.innerHTML
   
   'test create child view with two word name': ->
     class MainView extends ViewWithTemplateSource
