@@ -185,6 +185,13 @@ module.exports = class ViewTest extends Janitor.TestCase
     childView = view.createChildView 'user'
     @assert childView instanceof MainView.UserView
     @assert view, childView.parent
+  
+  'test child views are not rendered by default': ->
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    
+    view = new MainView render: true
+    childView = view.createChildView 'user'
     @assert !childView.el.innerHTML
   
   'test create child view with immediate render': ->
