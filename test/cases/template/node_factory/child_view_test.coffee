@@ -21,6 +21,42 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     new ChildView elementNode, @parent, mainView
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
+  'test passing value from context': ->
+    elementNode =
+      type: 'childView'
+      name: 'user'
+
+    class MainView extends Wingman.View
+    class MainView.UserView extends Wingman.View
+      templateSource: -> null
+
+      left: ->
+        "#{@get('user.level')*10}px"
+
+    mainView = new MainView
+    user = { name: 'Rasmus' }
+    mainView.set { user }
+    child_view = new ChildView elementNode, @parent, mainView
+    view = child_view.view
+    @assertEqual 'Rasmus', view.get('user.name')
+  
+  'test using passed value in automatic styles': ->
+    elementNode =
+      type: 'childView'
+      name: 'user'
+    
+    class MainView extends Wingman.View
+    class MainView.UserView extends Wingman.View
+      templateSource: -> null
+      
+      left: ->
+        "#{@get('user.level')*10}px"
+    
+    mainView = new MainView
+    mainView.set user: { level: 3 }
+    view = new ChildView elementNode, @parent, mainView
+    @assertEqual '30px', @parent.childNodes[0].style.left
+  
   'test remove': ->
     elementNode =
       type: 'childView'

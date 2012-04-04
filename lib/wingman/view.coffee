@@ -45,13 +45,13 @@ module.exports = class extends WingmanObject
     @setupStyles()
     @ready?()
   
-  createChildView: (viewName) ->
+  createChildView: (viewName, options) ->
     className = Fleck.camelize(Fleck.underscore(viewName), true) + 'View'
     klass = @constructor[className]
     view = new klass parent: @, app: @get('app')
     view.bind 'descendantCreated', (view) => @trigger 'descendantCreated', view
     @trigger 'descendantCreated', view
-    view.render()
+    view.render() if options?.render
     view
   
   templateSource: ->
