@@ -32,6 +32,7 @@ module.exports = class extends WingmanObject
     @set parent: options.parent if options?.parent?
     @set app: options.app if options?.app?
     @el = @domElement = options?.el || Wingman.document.createElement(@tag || 'div')
+    @set children: []
     @render() if options?.render
   
   render: ->
@@ -48,10 +49,16 @@ module.exports = class extends WingmanObject
   createChildView: (viewName, options) ->
     className = Fleck.camelize(Fleck.underscore(viewName), true) + 'View'
     klass = @constructor[className]
+    
     view = new klass parent: @, app: @get('app')
+    
     view.bind 'descendantCreated', (view) => @trigger 'descendantCreated', view
     @trigger 'descendantCreated', view
+    
+    @get('children').push view
+    view.bind 'remove', => @get('children').remove view
     view.render() if options?.render
+    
     view
   
   templateSource: ->
@@ -108,6 +115,10 @@ module.exports = class extends WingmanObject
       'root'
     else
       @pathKeys().join '.'
+  
+  remove: ->
+    Elementary.remove.call @ if @el.parentNode
+    @trigger 'remove'
   
   setupStyles: ->
     for name, property of @

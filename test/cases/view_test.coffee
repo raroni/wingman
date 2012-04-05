@@ -177,16 +177,47 @@ module.exports = class ViewTest extends Janitor.TestCase
     view = new MainView render: true
     @assert callbackFired
   
-  'test create child view': ->
-    class MainView extends ViewWithTemplateSource
+  'test view with child view': ->
+    class MainView extends Wingman.View
+      templateSource: '{view user}'
+    
     class MainView.UserView extends ViewWithTemplateSource
     
     view = new MainView render: true
+    childView = view.get('children')[0]
+    @assert childView instanceof MainView.UserView
+    @assert view, childView.parent
+  
+  'test manual creation of child view': ->
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    
+    view = new MainView
     childView = view.createChildView 'user'
     @assert childView instanceof MainView.UserView
     @assert view, childView.parent
   
-  'test child views are not rendered by default': ->
+  'test children list' :->
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    class MainView.StatusView extends ViewWithTemplateSource
+    
+    view = new MainView
+    @assertEqual 0, view.get('children').length
+    
+    userView = view.createChildView 'user'
+    @assertEqual 1, view.get('children').length
+    
+    statusView = view.createChildView 'status'
+    @assertEqual 2, view.get('children').length
+    
+    statusView.remove()
+    @assertEqual 1, view.get('children').length
+    
+    userView.remove()
+    @assertEqual 0, view.get('children').length
+  
+  'test manualle created child views are not rendered by default': ->
     class MainView extends ViewWithTemplateSource
     class MainView.UserView extends ViewWithTemplateSource
     
@@ -194,18 +225,18 @@ module.exports = class ViewTest extends Janitor.TestCase
     childView = view.createChildView 'user'
     @assert !childView.el.innerHTML
   
-  'test create child view with immediate render': ->
+  'test immediate render when manually creating child view': ->
     class MainView extends ViewWithTemplateSource
     class MainView.UserView extends ViewWithTemplateSource
     
     view = new MainView render: true
     childView = view.createChildView 'user', render: true
     @assert childView.el.innerHTML
-  
-  'test create child view with two word name': ->
+    
+  'test manual creation of child view with two word name': ->
     class MainView extends ViewWithTemplateSource
     class MainView.UserNameView extends ViewWithTemplateSource
-
+    
     view = new MainView render: true
     childView = view.createChildView 'userName'
     @assert childView instanceof MainView.UserNameView
