@@ -177,6 +177,16 @@ module.exports = class ViewTest extends Janitor.TestCase
     view = new MainView render: true
     @assert callbackFired
   
+  'test single word name': ->
+    class MainView extends ViewWithTemplateSource
+    view = new MainView
+    @assertEqual 'main', view.get('name')
+  
+  'test double word name': ->
+    class UserNameView extends ViewWithTemplateSource
+    view = new UserNameView
+    @assertEqual 'userName', view.get('name')
+  
   'test view with child view': ->
     class MainView extends Wingman.View
       templateSource: '{view user}'

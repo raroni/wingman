@@ -35,6 +35,10 @@ module.exports = class extends WingmanObject
     @set children: []
     @render() if options?.render
   
+  name: ->
+    withoutView = @constructor.name.replace ///View$///, ''
+    Fleck.camelize Fleck.underscore(withoutView)
+  
   render: ->
     templateSource = @get 'templateSource'
     if templateSource
