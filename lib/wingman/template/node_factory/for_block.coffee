@@ -15,7 +15,7 @@ module.exports = class ForBlock
     
     newContext = new WingmanObject
     if @context.createChildView
-      # The line below would be prettier, but Function#bind is now supported on iOS5.
+      # The line below would be prettier, but Function#bind is not supported on iOS5.
       # newContext.createChildView = @context.createChildView.bind @context
       newContext.createChildView = (name) => @context.createChildView.call @context, name
     key = Fleck.singularize @nodeData.source.split('.').pop()
