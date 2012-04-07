@@ -44,3 +44,19 @@ module.exports = class ControllerTest extends Janitor.TestCase
     app.set test: 'something'
     
     @assert callbackFired
+  
+  'test bindings': ->
+    numberFromSave = false
+    
+    class MainView extends Wingman.View
+    class MainController extends Wingman.Controller
+      bindings:
+        'playerClicked': 'save'
+      
+      save: (number) ->
+        numberFromSave = number
+    
+    view = new MainView
+    controller = new MainController view
+    view.trigger 'playerClicked', 123
+    @assertEqual 123, numberFromSave
