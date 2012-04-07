@@ -36,8 +36,8 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     mainView = new MainView
     user = { name: 'Rasmus' }
     mainView.set { user }
-    child_view = new ChildView elementNode, @parent, mainView
-    view = child_view.view
+    childView = new ChildView elementNode, @parent, mainView
+    view = childView.view
     @assertEqual 'Rasmus', view.get('user.name')
   
   'test using passed value in automatic styles': ->
