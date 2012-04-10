@@ -5,12 +5,14 @@ HasManyAssociation = require '../../lib/wingman/model/has_many_association'
 sinon = require 'sinon'
 RestStorage = require '../../lib/wingman/model/storage_adapters/rest'
 
-uglyAssociationHack = (klass) ->
-  # For now we have no better solution than this
-  Wingman.Application.instance = { constructor: {} }
-  Wingman.Application.instance.constructor[klass.name] = klass
-
 module.exports = class ModelTest extends Janitor.TestCase
+  setup: ->
+    Wingman.global = {}
+  
+  teardown: ->
+    delete Wingman.global
+    delete Wingman.request.realRequest
+  
   'test setting attributes via constructor': ->
     User = class extends Wingman.Model
     user = new User name: 'Rasmus', age: 25
@@ -244,21 +246,19 @@ module.exports = class ModelTest extends Janitor.TestCase
     class User extends Wingman.Model
       @hasMany 'notifications'
     
-    class Notification extends Wingman.Model
+    class Wingman.global.Notification extends Wingman.Model
     
-    uglyAssociationHack Notification
     user = new User()
-    @assertEqual Notification, user.get('notifications').associatedClass
+    @assertEqual Wingman.global.Notification, user.get('notifications').associatedClass
   
   'test initialization of has many association with a two word name': ->
     class User extends Wingman.Model
       @hasMany 'forumTopics'
     
-    class ForumTopic extends Wingman.Model
+    class Wingman.global.ForumTopic extends Wingman.Model
     
-    uglyAssociationHack ForumTopic
     user = new User()
-    @assertEqual ForumTopic, user.get('forumTopics').associatedClass
+    @assertEqual Wingman.global.ForumTopic, user.get('forumTopics').associatedClass
   
   'test has many association count': ->
     id = 1
@@ -269,18 +269,15 @@ module.exports = class ModelTest extends Janitor.TestCase
     class User extends Wingman.Model
       @hasMany 'notifications'
   
-    class Notification extends Wingman.Model
-  
-    uglyAssociationHack Notification
+    class Wingman.global.Notification extends Wingman.Model
   
     user = new User()
     user.save()
     
-    new Notification(userId: 1).save() for [1..2]
-    new Notification(userId: 2).save()
+    new Wingman.global.Notification(userId: 1).save() for [1..2]
+    new Wingman.global.Notification(userId: 2).save()
     
     @assertEqual 2, user.get('notifications').count()
-    delete Wingman.Application.instance
   
   'test has many association add event': ->
     id = 1
@@ -291,10 +288,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     class User extends Wingman.Model
       @hasMany 'notifications'
     
-    class Notification extends Wingman.Model
-    
-    # For now we have no better solution than
-    uglyAssociationHack Notification
+    class Wingman.global.Notification extends Wingman.Model
     
     context = new WingmanObject
     callbackValues = []
@@ -305,27 +299,24 @@ module.exports = class ModelTest extends Janitor.TestCase
     context.set { user }
     
     notifications = [
-      new Notification(userId: 1)
-      new Notification(userId: 2)
-      new Notification(userId: 1)
+      new Wingman.global.Notification(userId: 1)
+      new Wingman.global.Notification(userId: 2)
+      new Wingman.global.Notification(userId: 1)
     ]
     notification.save() for notification in notifications
     
     @assertEqual 2, callbackValues.length
     @assertEqual notifications[0], callbackValues[0]
     @assertEqual notifications[2], callbackValues[1]
-    delete Wingman.Application.instance
   
   'test has many nested population': ->
     class User extends Wingman.Model
       @hasMany 'notifications'
     
-    class Notification extends Wingman.Model
-      
-    uglyAssociationHack Notification
+    class Wingman.global.Notification extends Wingman.Model
     
     user = new User id: 1, name: 'Rasmus', notifications: [ { id: 1, title: 'yeah' }, { id: 2, title: 'something else' } ]
-    @assertEqual 2, Notification.count()
+    @assertEqual 2, Wingman.global.Notification.count()
     @assertEqual 2, user.get('notifications').count()
   
   'test has many association with json export': ->
@@ -337,19 +328,15 @@ module.exports = class ModelTest extends Janitor.TestCase
     class User extends Wingman.Model
       @hasMany 'notifications'
     
-    class Notification extends Wingman.Model
-    
-    uglyAssociationHack Notification
+    class Wingman.global.Notification extends Wingman.Model
     
     user = new User()
     user.save()
     
-    new Notification(userId: 1).save() for [1..2]
-    new Notification(userId: 2).save()
+    new Wingman.global.Notification(userId: 1).save() for [1..2]
+    new Wingman.global.Notification(userId: 2).save()
     
     @assert !user.toJSON().notifications
-    
-    delete Wingman.Application.instance
   
   'test store add': ->
     class User extends Wingman.Model
@@ -367,8 +354,5 @@ module.exports = class ModelTest extends Janitor.TestCase
     class User extends Wingman.Model
     user = new User id: 1
     @assertThrows -> user.set id: 2
-  
-  teardown: ->
-    delete Wingman.request.realRequest
 
 # TODO: LOAD AND DESTROY

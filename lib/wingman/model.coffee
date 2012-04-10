@@ -55,9 +55,7 @@ module.exports = class Model extends WingmanObject
     for hasManyName in @constructor.hasManyNames
       klassName = Fleck.camelize(Fleck.singularize(Fleck.underscore(hasManyName)), true)
       
-      # Ideally, we should not require an app to be instantiated to find other model classes.
-      # But for now I cannot come up with a better solution than to find the model classes in the current apps constructor.
-      klass = Wingman.Application.instance.constructor[klassName]
+      klass = Wingman.global[klassName]
       association = new HasManyAssociation @, klass
       @setProperty hasManyName, association
       association.bind 'add', (model) => @trigger "add:#{hasManyName}", model
