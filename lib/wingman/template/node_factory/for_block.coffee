@@ -17,7 +17,7 @@ module.exports = class ForBlock
     if @context.createChildView
       # The line below would be prettier, but Function#bind is not supported on iOS5.
       # newContext.createChildView = @context.createChildView.bind @context
-      newContext.createChildView = (name) => @context.createChildView.call @context, name
+      newContext.createChildView = (args...) => @context.createChildView.call @context, args...
     key = Fleck.singularize @nodeData.source.split('.').pop()
     hash = {}
     hash[key] = value

@@ -207,6 +207,14 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assert childView instanceof MainView.UserView
     @assert view, childView.parent
   
+  'test manual creation of child view with properties': ->
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    
+    view = new MainView
+    childView = view.createChildView 'user', properties: { user: 'Rasmus' }
+    @assertEqual 'Rasmus', childView.get('user')
+  
   'test children list' :->
     class MainView extends ViewWithTemplateSource
     class MainView.UserView extends ViewWithTemplateSource
@@ -260,12 +268,23 @@ module.exports = class ViewTest extends Janitor.TestCase
     main = new MainView
     callbackValues = []
     main.bind 'descendantCreated', (view) -> callbackValues.push view
-    user = main.createChildView('user')
-    name = user.createChildView('name')
+    user = main.createChildView 'user'
+    name = user.createChildView 'name'
     
     @assertEqual 2, callbackValues.length
     @assertEqual user, callbackValues[0]
     @assertEqual name, callbackValues[1]
+  
+  'test properties with descendant view event': ->
+    class MainView extends ViewWithTemplateSource
+    class MainView.UserView extends ViewWithTemplateSource
+    
+    main = new MainView
+    callbackValue = undefined
+    main.bind 'descendantCreated', (view) -> callbackValue = view.get('user')
+    user = main.createChildView 'user', properties: { user: 'Ras' }
+    
+    @assertEqual 'Ras', callbackValue
   
   'test custom tag': ->
     class MainView extends ViewWithTemplateSource
@@ -273,7 +292,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     mainView = new MainView render: true
     @assertEqual 'TR', mainView.el.tagName
-
+  
   'test custom template name': ->
     View.templateSources =
       'my_custom_name': '<div>hi</div>'

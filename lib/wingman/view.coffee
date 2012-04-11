@@ -55,12 +55,14 @@ module.exports = class extends WingmanObject
     klass = @constructor[className]
     
     view = new klass parent: @, app: @get('app')
+    view.set options.properties if options?.properties
+    
+    @get('children').push view
+    view.bind 'remove', => @get('children').remove view
     
     view.bind 'descendantCreated', (view) => @trigger 'descendantCreated', view
     @trigger 'descendantCreated', view
     
-    @get('children').push view
-    view.bind 'remove', => @get('children').remove view
     view.render() if options?.render
     
     view
