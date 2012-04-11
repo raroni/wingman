@@ -23,12 +23,11 @@ module.exports = class ApplicationTest extends Janitor.TestCase
   
   'test most basic application': ->
     class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends Wingman.View
-      templateSource: -> '<div>Hi</div>'
-      
+      templateSource: '<div>Hi</div>'
+    
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert '<div>Hi</div>', app.el.innerHTML
+    @assertEqual '<div>Hi</div>', app.el.innerHTML
   
   'test simple child view': ->
     class MyApp extends Wingman.Application
