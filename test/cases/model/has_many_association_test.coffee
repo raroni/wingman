@@ -52,8 +52,9 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     user = new @User id: 13
     association = new HasManyAssociation user, @Notification
     
-    association.build id: 1, title: 'YO'
+    notification = association.build id: 1, title: 'YO'
     
+    @assertEqual @Notification, notification.constructor
     @assertEqual 'YO', @Notification.find(1).get('title')
     @assertEqual 13, @Notification.find(1).get('userId')
   
@@ -61,11 +62,13 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     user = new @User id: 13
     association = new HasManyAssociation user, @Notification
     
-    association.build [
+    notifications = association.build [
       { id: 1, title: 'YO' },
       { id: 2, title: 'HI' }
     ]
     
+    @assert Array.isArray(notifications)
+    @assertEqual @Notification, notifications[0].constructor
     @assertEqual 'YO', @Notification.find(1).get('title')
     @assertEqual 13, @Notification.find(1).get('userId')
     @assertEqual 'HI', @Notification.find(2).get('title')

@@ -35,12 +35,10 @@ module.exports = class HasManyAssociation extends Module
     new @associatedClass hash
   
   build: (arrayOrHash) ->
-    array = if Array.isArray(arrayOrHash)
-      arrayOrHash
+    if Array.isArray(arrayOrHash)
+      @buildOne hash for hash in arrayOrHash
     else
-      [arrayOrHash]
-    
-    @buildOne hash for hash in array
+      @buildOne arrayOrHash
   
   forEach: (callback) ->
     callback(model) for model in @models()
