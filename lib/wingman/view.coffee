@@ -58,18 +58,17 @@ module.exports = class extends WingmanObject
     className = Fleck.camelize(Fleck.underscore(name), true) + 'View'
     klass = @get('childClasses')[className]
     
-    view = new klass parent: @, app: @get('app')
-    view.set options.properties if options?.properties
+    child = new klass parent: @, app: @get('app')
+    child.set options.properties if options?.properties
     
-    @get('children').push view
-    view.bind 'remove', => @get('children').remove view
+    @get('children').push child
+    child.bind 'remove', => @get('children').remove child
     
-    view.bind 'descendantCreated', (view) => @trigger 'descendantCreated', view
-    @trigger 'descendantCreated', view
+    child.bind 'descendantCreated', (child) => @trigger 'descendantCreated', child
+    @trigger 'descendantCreated', child
     
-    view.render() if options?.render
-    
-    view
+    child.render() if options?.render
+    child
   
   templateSource: ->
     name = @get 'templateName'
