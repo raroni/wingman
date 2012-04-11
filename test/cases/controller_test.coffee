@@ -1,7 +1,7 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
 WingmanObject = require '../../lib/wingman/shared/object'
-Wingman.document = require('jsdom').jsdom()
+jsdom = require 'jsdom'
 
 class DummyView extends Wingman.View
   templateSource: -> '<div>test</div>'
@@ -12,6 +12,12 @@ class ControllerWithView extends Wingman.Controller
     super options
 
 module.exports = class ControllerTest extends Janitor.TestCase
+  setup: ->
+    Wingman.document = jsdom.jsdom()
+  
+  teardown: ->
+    delete Wingman.document
+  
   'test ready callback': ->
     callbackFired = false
     DummyController = class extends ControllerWithView

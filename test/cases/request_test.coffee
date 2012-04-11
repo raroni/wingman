@@ -2,8 +2,17 @@ Janitor = require 'janitor'
 Wingman = require '../../.'
 Wingman.document = require('jsdom').jsdom()
 sinon = require 'sinon'
+jsdom = require 'jsdom'
 
 module.exports = class extends Janitor.TestCase
+  setup: ->
+    Wingman.document = jsdom.jsdom()
+    Wingman.window = Wingman.document.createWindow()
+  
+  teardown: ->
+    delete Wingman.document
+    delete Wingman.window
+  
   'test host addition': ->
     Wingman.request.realRequest = sinon.spy()
     class FunkySocks extends Wingman.Application

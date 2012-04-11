@@ -1,5 +1,6 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
+jsdom = require 'jsdom'
 JSDomWindowPopStateDecorator = require '../jsdom_window_pop_state_decorator'
 Wingman.localStorage = require 'localStorage'
 
@@ -18,8 +19,14 @@ class ControllerWithView extends Wingman.Controller
 
 module.exports = class ApplicationTest extends Janitor.TestCase
   setup: ->
-    Wingman.document = require('jsdom').jsdom()
+    Wingman.document = jsdom.jsdom()
     Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
+  
+  teardown: ->
+    delete Wingman.Application.instance
+    Wingman.View.templateSources = {}
+    delete Wingman.document
+    delete Wingman.window
   
   'test most basic application': ->
     class MyApp extends Wingman.Application
@@ -252,7 +259,3 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     
     new MyApp
     @assertEqual '<div>hello</div>', Wingman.document.body.innerHTML
-  
-  teardown: ->
-    delete Wingman.Application.instance
-    Wingman.View.templateSources = {}
