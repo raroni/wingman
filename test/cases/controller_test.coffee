@@ -51,7 +51,7 @@ module.exports = class ControllerTest extends Janitor.TestCase
     class MainView extends Wingman.View
     class MainController extends Wingman.Controller
       bindings:
-        'playerClicked': 'save'
+        playerClicked: 'save'
       
       save: (number) ->
         numberFromSave = number
