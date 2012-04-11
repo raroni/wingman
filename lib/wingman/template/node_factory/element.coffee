@@ -22,7 +22,7 @@ module.exports = class Element extends Module
   setupClasses: ->
     for className in @elementData.classes
       @observeClass className if className.isDynamic
-      @addClass className.get @context
+      @addClass klass if klass = className.get(@context)
   
   setupAttributes: ->
     for key, value of @elementData.attributes
@@ -35,8 +35,8 @@ module.exports = class Element extends Module
   
   observeClass: (className) ->
     @context.observe className.get(), (newClassName, oldClassName) =>
-      @removeClass oldClassName
-      @addClass newClassName
+      @removeClass oldClassName if oldClassName
+      @addClass newClassName if newClassName
   
   setupStyles: -> 
     for key, value of @elementData.styles

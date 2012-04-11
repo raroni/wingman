@@ -219,6 +219,36 @@ module.exports = class TemplateTest extends Janitor.TestCase
     @assertElementHasClass element, 'user'
     @assertElementHasClass element, 'premium'
   
+  'test element with dynamic and static class': ->
+    template = Wingman.Template.compile '<div class="user {selectedCls}">something</div>'
+    context = new WingmanObject
+    context.set selectedCls: 'selected'
+    
+    template @parent, context
+    element = @parent.childNodes[0]
+    @assertElementHasClass element, 'user'
+    @assertElementHasClass element, 'selected'
+  
+  'test deactivated dynamic class when also having static class': ->
+    template = Wingman.Template.compile '<div class="user {selectedCls}">something</div>'
+    context = new WingmanObject
+    context.set selectedCls: undefined
+    
+    template @parent, context
+    element = @parent.childNodes[0]
+    @assertEqual 'user', element.className
+  
+  'test deferred deactivation of dynamic class when also having static class': ->
+    template = Wingman.Template.compile '<div class="user {selectedCls}">something</div>'
+    context = new WingmanObject
+    context.set selectedCls: 'selected'
+    
+    template @parent, context
+    element = @parent.childNodes[0]
+    
+    context.set selectedCls: undefined
+    @assertEqual 'user', element.className
+  
   'test child view': ->
     template = Wingman.Template.compile '<div>Test</div>{view user}'
     

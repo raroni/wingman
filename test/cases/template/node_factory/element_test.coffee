@@ -282,3 +282,52 @@ module.exports = class ElementTest extends Janitor.TestCase
     @assertEqual 'funny_pic.png', element.getAttribute('src')
     context.set mySrc: 'funny_pic2.png'
     @assertEqual 'funny_pic2.png', element.getAttribute('src')
+  
+  'test dynamic and static class': ->
+    elementNode =
+      type: 'element'
+      tag: 'div'
+      classes: [
+        new Value('user'),
+        new Value('{selectedCls}')
+      ]
+    
+    context = new WingmanObject
+    context.set selectedCls: 'selected'
+    element = new Element(elementNode, @parent, context).domElement
+    
+    @assertDOMElementHasClass element, 'user'
+    @assertDOMElementHasClass element, 'selected'
+
+  'test deactivated dynamic class when also having static class': ->
+    elementNode =
+      type: 'element'
+      tag: 'div'
+      classes: [
+        new Value('user'),
+        new Value('{selectedCls}')
+      ]
+    
+    context = new WingmanObject
+    context.set selectedCls: undefined
+    element = new Element(elementNode, @parent, context).domElement
+    
+    element = @parent.childNodes[0]
+    @assertEqual 'user', element.className
+  
+  'test deferred deactivation of dynamic class when also having static class': ->
+    elementNode =
+      type: 'element'
+      tag: 'div'
+      classes: [
+        new Value('user'),
+        new Value('{selectedCls}')
+      ]
+    
+    context = new WingmanObject
+    context.set selectedCls: 'selected'
+    
+    element = new Element(elementNode, @parent, context).domElement
+    
+    context.set selectedCls: undefined
+    @assertEqual 'user', element.className
