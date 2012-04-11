@@ -147,9 +147,9 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView.NameView.FirstView extends ViewWithTemplateSource
     
     main = new MainView parent: { el: document.createElement('div') }, render: true
-    user = main.createChildView 'user'
-    name = user.createChildView 'name'
-    first = name.createChildView 'first'
+    user = main.createChild 'user'
+    name = user.createChild 'name'
+    first = name.createChild 'first'
     @assertEqual 'user.name.first', first.path()
   
   'test app instance sharing': ->
@@ -159,7 +159,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     app = new WingmanObject
     view = new MainView { app, render: true }
-    @assertEqual app, view.createChildView('user').createChildView('name').get('app')
+    @assertEqual app, view.createChild('user').createChild('name').get('app')
   
   'test access to parent': ->
     class MainView extends ViewWithTemplateSource
@@ -167,7 +167,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView.NameView extends ViewWithTemplateSource
     
     view = new MainView render: true
-    @assert view.createChildView('user').createChildView('name').get('parent.parent') instanceof MainView
+    @assert view.createChild('user').createChild('name').get('parent.parent') instanceof MainView
     
   'test ready callback': ->
     callbackFired = false
@@ -203,7 +203,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView extends ViewWithTemplateSource
     
     view = new MainView
-    childView = view.createChildView 'user'
+    childView = view.createChild 'user'
     @assert childView instanceof MainView.UserView
     @assert view, childView.parent
   
@@ -212,7 +212,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView extends ViewWithTemplateSource
     
     view = new MainView
-    childView = view.createChildView 'user', properties: { user: 'Rasmus' }
+    childView = view.createChild 'user', properties: { user: 'Rasmus' }
     @assertEqual 'Rasmus', childView.get('user')
   
   'test children list' :->
@@ -223,10 +223,10 @@ module.exports = class ViewTest extends Janitor.TestCase
     view = new MainView
     @assertEqual 0, view.get('children').length
     
-    userView = view.createChildView 'user'
+    userView = view.createChild 'user'
     @assertEqual 1, view.get('children').length
     
-    statusView = view.createChildView 'status'
+    statusView = view.createChild 'status'
     @assertEqual 2, view.get('children').length
     
     statusView.remove()
@@ -240,7 +240,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView extends ViewWithTemplateSource
     
     view = new MainView render: true
-    childView = view.createChildView 'user'
+    childView = view.createChild 'user'
     @assert !childView.el.innerHTML
   
   'test immediate render when manually creating child view': ->
@@ -248,7 +248,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView extends ViewWithTemplateSource
     
     view = new MainView render: true
-    childView = view.createChildView 'user', render: true
+    childView = view.createChild 'user', render: true
     @assert childView.el.innerHTML
     
   'test manual creation of child view with two word name': ->
@@ -256,7 +256,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserNameView extends ViewWithTemplateSource
     
     view = new MainView render: true
-    childView = view.createChildView 'userName'
+    childView = view.createChild 'userName'
     @assert childView instanceof MainView.UserNameView
     @assert view, childView.parent
   
@@ -268,8 +268,8 @@ module.exports = class ViewTest extends Janitor.TestCase
     main = new MainView
     callbackValues = []
     main.bind 'descendantCreated', (view) -> callbackValues.push view
-    user = main.createChildView 'user'
-    name = user.createChildView 'name'
+    user = main.createChild 'user'
+    name = user.createChild 'name'
     
     @assertEqual 2, callbackValues.length
     @assertEqual user, callbackValues[0]
@@ -282,7 +282,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     main = new MainView
     callbackValue = undefined
     main.bind 'descendantCreated', (view) -> callbackValue = view.get('user')
-    user = main.createChildView 'user', properties: { user: 'Ras' }
+    user = main.createChild 'user', properties: { user: 'Ras' }
     
     @assertEqual 'Ras', callbackValue
   
@@ -372,7 +372,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       templateSource: null
     
     view = new MainView childClasses: MyViews
-    view.createChildView 'name'
+    view.createChild 'name'
   
   teardown: ->
     delete View.templateSources

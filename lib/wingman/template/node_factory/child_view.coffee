@@ -1,6 +1,6 @@
 module.exports = class ChildView
   constructor: (@nodeData, @scope, @context) ->
-    @view = @context.createChildView @nodeData.name, @options()
+    @view = @context.createChild @nodeData.name, @options()
     element = @view.el
     @scope.appendChild element
   

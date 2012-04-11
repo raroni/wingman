@@ -54,8 +54,8 @@ module.exports = class extends WingmanObject
   childClasses: ->
     @constructor
   
-  createChildView: (viewName, options) ->
-    className = Fleck.camelize(Fleck.underscore(viewName), true) + 'View'
+  createChild: (name, options) ->
+    className = Fleck.camelize(Fleck.underscore(name), true) + 'View'
     klass = @get('childClasses')[className]
     
     view = new klass parent: @, app: @get('app')
