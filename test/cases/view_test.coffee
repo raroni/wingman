@@ -363,5 +363,16 @@ module.exports = class ViewTest extends Janitor.TestCase
     view.set myCode: 2
     @assertEqual "url('/2.jpg')", view.el.style.backgroundImage
   
+  'test child views object': ->
+    class MainView extends Wingman.View
+      templateSource: null
+    
+    MyViews = {}
+    class MyViews.NameView extends Wingman.View
+      templateSource: null
+    
+    view = new MainView childClasses: MyViews
+    view.createChildView 'name'
+  
   teardown: ->
     delete View.templateSources

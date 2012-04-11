@@ -26,6 +26,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends Wingman.View
       templateSource: -> '<div>Hi</div>'
+      
     app = new MyApp el: Wingman.document.createElement('div')
     @assert '<div>Hi</div>', app.el.innerHTML
   
@@ -43,7 +44,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     rootEl = Wingman.document.createElement 'div'
     app = new MyApp el: rootEl
     @assert rootEl.innerHTML.match('stubbing the source')
-
+  
   'test access to application instance': ->
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
@@ -128,7 +129,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp extends Wingman.Application
     MyApp.RootController = class extends Wingman.Controller
     MyApp.RootView = class extends ViewWithTemplateSource
-
+  
     app = new MyApp el: Wingman.document.createElement 'div'
     app.navigate 'user', level: 2
     @assertEqual 'user', app.get('path')
@@ -192,14 +193,16 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app = new MyApp el: Wingman.document.createElement('div')
     @assert viewFromMainController instanceof MyApp.MainView.UserView
   
-  'test setting correct classes on RootView': ->
+  'test passing correct view classes': ->
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends ViewWithTemplateSource
     class MyApp.MainView extends ViewWithTemplateSource
-    new MyApp el: Wingman.document.createElement('div') 
-    @assertEqual MyApp.MainView, MyApp.RootView.MainView
-    @assert !MyApp.RootView.RootController
+    rootViewSiblings = MyApp.rootViewSiblings()
+    
+    @assert rootViewSiblings.MainView
+    @assert !rootViewSiblings.RootController
+    @assert !rootViewSiblings.RootView
   
   'test view depending on properties of shared': ->
     callbackFired = false
@@ -242,7 +245,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp extends Wingman.Application
     class MyApp.RootView extends ViewWithTemplateSource
     @refuteThrows -> new MyApp el: Wingman.document.createElement('div')
-
+  
   'test using document.body as default parent': ->
     class MyApp extends Wingman.Application
     class MyApp.RootView extends Wingman.View

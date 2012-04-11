@@ -8,12 +8,15 @@ module.exports = class Application extends WingmanObject
   @include Navigator
   @include Events
   
+  @rootViewSiblings: ->
+    views = {}
+    for key, value of @
+      views[key] = value if key.match("(.+)View$") && key != 'RootView'
+    views
+  
   constructor: (options) ->
     throw new Error 'You cannot instantiate two Wingman apps at the same time.' if @constructor.__super__.constructor.instance
     @constructor.__super__.constructor.instance = @
-    
-    for key, value of @constructor
-      @constructor.RootView[key] = value if key.match("(.+)View$") && key != 'RootView'
     
     @bind 'viewCreated', @buildController
     
@@ -25,7 +28,7 @@ module.exports = class Application extends WingmanObject
     @ready?()
   
   buildView: ->
-    view = new @constructor.RootView parent: @, el: @el, app: @
+    view = new @constructor.RootView parent: @, el: @el, app: @, childClasses: @constructor.rootViewSiblings()
     view.bind 'descendantCreated', (view) => @trigger 'viewCreated', view
     @trigger 'viewCreated', view
     view.render()

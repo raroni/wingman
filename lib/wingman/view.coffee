@@ -31,6 +31,7 @@ module.exports = class extends WingmanObject
     super()
     @set parent: options.parent if options?.parent?
     @set app: options.app if options?.app?
+    @set childClasses: options.childClasses if options?.childClasses?
     @el = @domElement = options?.el || Wingman.document.createElement(@tag || 'div')
     @set children: []
     @render() if options?.render
@@ -50,9 +51,12 @@ module.exports = class extends WingmanObject
     @setupStyles()
     @ready?()
   
+  childClasses: ->
+    @constructor
+  
   createChildView: (viewName, options) ->
     className = Fleck.camelize(Fleck.underscore(viewName), true) + 'View'
-    klass = @constructor[className]
+    klass = @get('childClasses')[className]
     
     view = new klass parent: @, app: @get('app')
     view.set options.properties if options?.properties
