@@ -2,18 +2,12 @@
 
 Wingman is a Javascript framework for creating single page apps. It strikes a fine balance between providing great leverage while still being easy to understand.
 
-Great leverage:
-
-* Templates update automatically
-* Great separation of concerns via MVC
-* Decoupled application structure that makes testing very easy
-
-Simple and easy:
-
+* Automatically updating templates
+* Decoupled application structure that makes testing easy
+* Great separation of concerns through MVC
 * Only a handful of classes to get familiar with
-* Source code very modular
 
-At the moment Wingman is intended to be used with Coffeescript - but plain Javascript will be supported in the future.
+At the moment Wingman is intended to be used with Coffeescript. Support for plain Javascript will be added in the future.
 
 ## Simplest application
 
