@@ -223,8 +223,6 @@ module.exports = class ApplicationTest extends Janitor.TestCase
         callbackFired = true
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert callbackFired # fired because rootView's shared is set during its constructor
-    callbackFired = false
     app.set test: 'something'
     @assert callbackFired
     
@@ -242,8 +240,6 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp.RootView extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    @assert callbackFired # fired because rootController's shared is set during its constructor
-    callbackFired = false
     app.set test: 'something'
     @assert callbackFired
   

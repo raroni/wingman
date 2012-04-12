@@ -66,3 +66,14 @@ module.exports = class ControllerTest extends Janitor.TestCase
     controller = new MainController view
     view.trigger 'playerClicked', 123
     @assertEqual 123, numberFromSave
+  
+  'test methods depending on app property not being called upon initialization': ->
+    called = false
+    class MainController extends Wingman.Controller
+      @propertyDependencies
+        something: 'app.loggedIn'
+
+      something: -> called = true
+
+    view = new MainController app: {}
+    @assert !called

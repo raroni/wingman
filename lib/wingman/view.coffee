@@ -28,12 +28,12 @@ module.exports = class extends WingmanObject
     }
   
   constructor: (options) ->
-    super()
     @set parent: options.parent if options?.parent?
     @set app: options.app if options?.app?
     @set childClasses: options.childClasses if options?.childClasses?
     @el = @domElement = options?.el || Wingman.document.createElement(@tag || 'div')
     @set children: []
+    super()
     @render() if options?.render
   
   name: ->

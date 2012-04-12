@@ -374,5 +374,17 @@ module.exports = class ViewTest extends Janitor.TestCase
     view = new MainView childClasses: MyViews
     view.createChild 'name'
   
+  'test computed properties depending on app property not being called upon initialization': ->
+    called = false
+    class NameView extends Wingman.View
+      templateSource: null
+      @propertyDependencies
+        something: 'app.loggedIn'
+      
+      something: -> called = true
+    
+    view = new NameView app: {}
+    @assert !called
+  
   teardown: ->
     delete View.templateSources
