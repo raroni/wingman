@@ -41,11 +41,11 @@ module.exports = class ViewTest extends Janitor.TestCase
   'test simple template with dynamic values': ->
     View.templateSources['simple_with_dynamic_values'] = '<div>{myName}</div>'
     class SimpleWithDynamicValuesView extends View
-  
+    
     dummyApp =
       pathKeys: -> []
       el: document.createElement('div')
-  
+    
     view = new SimpleWithDynamicValuesView parent: dummyApp, render: true
     view.set myName: 'Razda'
     @assertEqual 1, view.el.childNodes.length

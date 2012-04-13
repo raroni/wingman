@@ -6,7 +6,7 @@ module.exports = class Template
   
   constructor: (source) ->
     @tree = Parser.parse source
-
+  
   evaluate: (el, context) ->
     for nodeData in @tree.children
       NodeFactory.create nodeData, el, context

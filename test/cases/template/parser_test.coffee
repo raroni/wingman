@@ -1,84 +1,100 @@
 Parser = require '../../../lib/wingman/template/parser'
 Janitor = require 'janitor'
 
-module.exports = class extends Janitor.TestCase
+module.exports = class ParserTest extends Janitor.TestCase
   parse: (source) ->
     Parser.parse source
-
+  
   'test empty tag': ->
     tree = @parse '<div></div>'
-
+    
     @assertEqual 1, tree.children.length
     @assertEqual 'div', tree.children[0].tag
     @assertEqual 'element', tree.children[0].type
-    @assertEqual undefined, tree.children[0].value
+    @assertEqual 0, tree.children[0].children.length
     @assert !tree.children[0].isDynamic
-
+  
   'test empty tag with tag name containing numbers': ->
     tree = @parse '<h1></h1>'
-
+    
     @assertEqual 1, tree.children.length
     @assertEqual 'h1', tree.children[0].tag
-
+  
   'test tag with static text': ->
     tree = @parse '<div>hi</div>'
-
+    
     @assertEqual 1, tree.children.length
     @assertEqual 'div', tree.children[0].tag
-    @assertEqual 'hi', tree.children[0].value.get()
-    @assert !tree.children[0].isDynamic
-
+    
+    textNode = tree.children[0].children[0]
+    
+    @assertEqual 'text', textNode.type
+    @assertEqual 'hi', textNode.value
+    @assert !textNode.isDynamic
+  
   'test use of newlines and tabs': ->
     templateSource = """
       <div>
         Raz to the mouse!
       </div>
     """
-
+    
     tree = @parse templateSource
-
+    
     @assertEqual 1, tree.children.length
     @assertEqual 'div', tree.children[0].tag
-    @assertEqual 'Raz to the mouse!', tree.children[0].value.get()
-    @assert !tree.children[0].isDynamic
-
+    
+    textNode = tree.children[0].children[0]
+    @assertEqual 'Raz to the mouse!', textNode.value
+    @assert !textNode.isDynamic
+  
   'test multiple tags': ->
     tree = @parse '<div>one</div><span>two</span>'
-
+    
     @assertEqual 2, tree.children.length
-
+    
     firstElement = tree.children[0]
     @assertEqual 'div', firstElement.tag
-    @assertEqual 'one', firstElement.value.get()
-
+    @assertEqual 'one', firstElement.children[0].value
+    
     lastElement = tree.children[1]
     @assertEqual 'span', lastElement.tag
-    @assertEqual 'two', lastElement.value.get()
+    @assertEqual 'two', lastElement.children[0].value
   
   'test nested tags': ->
     tree = @parse '<ol><li>One</li><li>Two</li></ol>'
-
+    
     @assertEqual 1, tree.children.length
-
+    
     firstElement = tree.children[0]
     @assertEqual 'ol', firstElement.tag
-
+    
     for value, i in ['One', 'Two']
       element = firstElement.children[i]
       @assertEqual 'li', element.tag
-      @assertEqual value, element.value.get()
+      @assertEqual value, element.children[0].value
   
-  'test tag with dynamic text': ->
+  'test tag with source': ->
     tree = @parse '<div>{greeting}</div>'
-
+    
     @assertEqual 1, tree.children.length
-    @assertEqual 'div', tree.children[0].tag
-    @assertEqual 'greeting', tree.children[0].value.get()
-    @assert tree.children[0].value.isDynamic
-
+    
+    divNode = tree.children[0]
+    @assertEqual 'div', divNode.tag
+    @assertEqual 'greeting', divNode.source
+  
+  'test tag with source with two words in its name': ->
+    tree = @parse '<div>{myName}</div>'
+    
+    @assertEqual 1, tree.children.length
+    
+    divNode = tree.children[0]
+    @assertEqual 'div', divNode.tag
+    @assertEqual 'myName', divNode.source
+  
   'test for token': ->
     tree = @parse '<ol>{for users}<li>{user}</li>{end}</ol>'
-
+    
     @assertEqual 1, tree.children.length
     
     olNode = tree.children[0]
@@ -88,76 +104,94 @@ module.exports = class extends Janitor.TestCase
     
     liElm = forNode.children[0]
     @assertEqual 'li', liElm.tag
-    @assertEqual 'user', liElm.value.get()
-    @assert liElm.value.isDynamic
+    @assertEqual 'user', liElm.source
   
   'test element with single static style': ->
     tree = @parse '<div style="color: red">funky text</div>'
-
-    @assertEqual 1, tree.children.length
-    @assert tree.children[0].styles
-    @assertEqual 'red', tree.children[0].styles.color.get()
-
-  'test element with single dynamic style': ->
-    tree = @parse '<div style="color: {color}">funky text</div>'
-
-    @assertEqual 1, tree.children.length
-    @assert tree.children[0].styles
-    @assertEqual 'color', tree.children[0].styles.color.get()
-    @assert tree.children[0].styles.color.isDynamic
-  
-  'test element with several static styles': ->
-    tree = @parse '<div style="color: blue; font-size: 14px">funky text</div>'
-
-    @assertEqual 1, tree.children.length
-    element = tree.children[0]
-    @assert element.styles
-    @assertEqual 'blue', element.styles.color.get()
-    @assertEqual '14px', element.styles['font-size'].get()
-
-  'test element with static and dynamic styles': ->
-    tree = @parse '<div style="color: blue; font-size: {someFontSize}">funky text</div>'
-
+    
     @assertEqual 1, tree.children.length
     styles = tree.children[0].styles
     @assert styles
-    @assertEqual 'blue', styles.color.get()
-    @assert !styles.color.isDynamic
-    @assertEqual 'someFontSize', styles['font-size'].get()
-    @assert styles['font-size'].isDynamic
+    colorStyle = styles.color
+    @assertEqual 'red', colorStyle.value
+    @assert !colorStyle.isDynamic
+  
+  'test element with single dynamic style': ->
+    tree = @parse '<div style="color: {color}">funky text</div>'
+    
+    @assertEqual 1, tree.children.length
+    styles = tree.children[0].styles
+    @assert styles
+    colorStyle = styles.color
+    @assertEqual 'color', colorStyle.value
+    @assert colorStyle.isDynamic
+  
+  'test element with several static styles': ->
+    tree = @parse '<div style="color: blue; font-size: 14px">funky text</div>'
+    
+    @assertEqual 1, tree.children.length
+    element = tree.children[0]
+    styles = element.styles
+    @assert styles
+    
+    colorStyle = styles.color
+    @assertEqual 'blue', colorStyle.value
+    @assert !colorStyle.isDynamic
+    
+    fontSizeStyle = styles['font-size']
+    @assertEqual '14px', fontSizeStyle.value
+    @assert !fontSizeStyle.isDynamic
+  
+  'test element with static and dynamic styles': ->
+    tree = @parse '<div style="color: blue; font-size: {someFontSize}">funky text</div>'
+    
+    @assertEqual 1, tree.children.length
+    styles = tree.children[0].styles
+    @assert styles
+    
+    colorStyle = styles.color
+    @assertEqual 'blue', colorStyle.value
+    @assert !colorStyle.isDynamic
+    
+    fontSizeStyle = styles['font-size']
+    @assertEqual 'someFontSize', fontSizeStyle.value
+    @assert fontSizeStyle.isDynamic
   
   'test element with single static class': ->
     tree = @parse '<div class="funny_class">funky text</div>'
     classes = tree.children[0].classes
     @assert classes
     @assertEqual 1, classes.length
-    @assertEqual 'funny_class', classes[0].get()
-    @assert !classes[0].isDynamic
-
+    firstClass = classes[0]
+    @assertEqual 'funny_class', firstClass.value
+    @assert !firstClass.isDynamic
+  
   'test element with two static classes': ->
     tree = @parse '<div class="funny_class another_funny_class">funky text</div>'
     classes = tree.children[0].classes
     @assert classes
     @assertEqual 2, classes.length
-    @assertEqual 'funny_class', classes[0].get()
-    @assertEqual 'another_funny_class', classes[1].get()
+    @assertEqual 'funny_class', classes[0].value
+    @assertEqual 'another_funny_class', classes[1].value
     @assert !klass.isDynamic for klass in classes
-
+  
   'test element with single dynamic class': ->
     tree = @parse '<div class="{funnyClass}">funky text</div>'
     classes = tree.children[0].classes
     @assert classes
     @assertEqual 1, classes.length
-    @assertEqual 'funnyClass', classes[0].get()
-    @assert classes[0].isDynamic
     
+    firstClass = classes[0]
+    @assertEqual 'funnyClass', firstClass.value
+    @assert firstClass.isDynamic
+  
   'test element with two dynamic classes': ->
     tree = @parse '<div class="{funnyClass} {anotherFunnyClass}">funky text</div>'
     classes = tree.children[0].classes
     @assert classes
     @assertEqual 2, classes.length
-    @assertEqual 'funnyClass', classes[0].get()
-    @assertEqual 'anotherFunnyClass', classes[1].get()
+    @assertEqual 'funnyClass', classes[0].value
+    @assertEqual 'anotherFunnyClass', classes[1].value
     @assert klass.isDynamic for klass in classes
   
   'test non closing tag': ->
@@ -192,8 +226,8 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'input', input.tag
     @assert input.attributes
     @assertEqual 2, Object.keys(input.attributes).length
-    @assertEqual 'email', input.attributes.name.get()
-    @assertEqual 'Email...', input.attributes.placeholder.get()
+    @assertEqual 'email', input.attributes.name.value
+    @assertEqual 'Email...', input.attributes.placeholder.value
 
   'test regular attributes with dynamic values': ->
     tree = @parse '<img src="{mySrc}">'
@@ -205,7 +239,7 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'img', input.tag
     @assert input.attributes
     @assertEqual 1, Object.keys(input.attributes).length
-    @assertEqual 'mySrc', input.attributes.src.get()
+    @assertEqual 'mySrc', input.attributes.src.value
     @assert input.attributes.src.isDynamic
     
   'test simple conditional': ->
@@ -224,7 +258,7 @@ module.exports = class extends Janitor.TestCase
     div = children[0]
     @assertEqual 'element', div.type
     @assertEqual 'div', div.tag
-    @assertEqual 'hej', div.value.get()
+    @assertEqual 'hej', div.children[0].value
   
   'test if else conditional': ->
     tree = @parse '{if early}<div>good morning</div>{else}<div>good evening</div>{end}'
@@ -241,9 +275,9 @@ module.exports = class extends Janitor.TestCase
     div1 = node.trueChildren[0]
     @assertEqual 'element', div1.type
     @assertEqual 'div', div1.tag
-    @assertEqual 'good morning', div1.value.get()
+    @assertEqual 'good morning', div1.children[0].value
     
     div1 = node.falseChildren[0]
     @assertEqual 'element', div1.type
     @assertEqual 'div', div1.tag
-    @assertEqual 'good evening', div1.value.get()
+    @assertEqual 'good evening', div1.children[0].value

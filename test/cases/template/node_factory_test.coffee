@@ -1,14 +1,17 @@
 Janitor = require 'janitor'
 NodeFactory = require '../../../lib/wingman/template/node_factory'
-Value = require '../../../lib/wingman/template/parser/value'
 WingmanObject = require '../../../lib/wingman/shared/object'
 Wingman = require '../../..'
 CustomAssertions = require '../../custom_assertions'
-Wingman.document = require('jsdom').jsdom()
+jsdom = require 'jsdom'
 
 module.exports = class NodeFactoryTest extends Janitor.TestCase
   setup: ->
+    Wingman.document = jsdom.jsdom()
     @parent = Wingman.document.createElement 'div'
+  
+  teardown: ->
+    delete Wingman.document
   
   assertDOMElementHasClass: CustomAssertions.assertDOMElementHasClass
   refuteDOMElementHasClass: CustomAssertions.refuteDOMElementHasClass
@@ -17,7 +20,10 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
     
     NodeFactory.create nodeData, @parent
     element = @parent.childNodes[0]
@@ -32,7 +38,10 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'span'
-        value: new Value('test')
+        children: [
+          type: 'text'
+          value: 'test'
+        ]
       ]
   
     NodeFactory.create nodeData, @parent
@@ -47,35 +56,35 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('{name}')
-  
+      source: 'name'
+    
     context = new WingmanObject
     context.set name: 'Rasmus'
     NodeFactory.create nodeData, @parent, context
-  
+    
     @assertEqual 'Rasmus', @parent.childNodes[0].innerHTML
   
   'test element node with dynamic value and defered update': ->
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('{name}')
-  
+      source: 'name'
+    
     context = new WingmanObject
     context.set name: 'John'
     NodeFactory.create nodeData, @parent, context
     element = @parent.childNodes[0]
     @assertEqual 'John', element.innerHTML
     context.set name: 'Rasmus'
-  
+    
     @assertEqual 'Rasmus', element.innerHTML
   
   'test element node with dynamic nested value and defered update': ->
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('{user.name}')
-  
+      source: 'user.name'
+    
     user = new WingmanObject
     user.set name: 'John'
     context = new WingmanObject
@@ -94,7 +103,7 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'li'
-        value: new Value('{user}')
+        source: 'user'
       ]
     
     context = new WingmanObject
@@ -113,7 +122,7 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'li'
-        value: new Value('{user}')
+        source: 'user'
       ]
     
     context = new WingmanObject
@@ -134,7 +143,7 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'li'
-        value: new Value('{user}')
+        source: 'user'
       ]
     
     context = new WingmanObject
@@ -154,7 +163,7 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'span'
-        value: new Value('{user}')
+        source: 'user'
       ]
     
     context = new WingmanObject
@@ -171,9 +180,14 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
       styles:
-        color: new Value('red')
+        color:
+          type: 'text'
+          value: 'red'
     
     NodeFactory.create nodeData, @parent
     @assertEqual 'red', @parent.childNodes[0].style.color
@@ -182,9 +196,15 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
       styles:
-        color: new Value('{color}')
+        color:
+          type: 'text'
+          value: 'color'
+          isDynamic: true
     
     context = new WingmanObject
     context.set color: 'red'
@@ -197,9 +217,15 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
       styles:
-        color: new Value('{color}')
+        color:
+          type: 'text'
+          value: 'color'
+          isDynamic: true
     
     context = new WingmanObject
     context.set color: 'red'
@@ -211,10 +237,17 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
       styles:
-        color: new Value('red')
-        'font-size': new Value('15px')
+        color:
+          type: 'text'
+          value: 'red'
+        'font-size':
+          type: 'text'
+          value: '15px'
     
     NodeFactory.create nodeData, @parent
     element = @parent.childNodes[0]
@@ -225,13 +258,22 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
       styles:
-        color: new Value('{myColor}')
-        'font-size': new Value('{myFontSize}')
+        color:
+          type: 'text'
+          value: 'myColor'
+          isDynamic: true
+        'font-size':
+          type: 'text'
+          value: 'myFontSize'
+          isDynamic: true
     
     context = new WingmanObject
-  
+    
     context.set myColor: 'red', myFontSize: '15px'
     NodeFactory.create nodeData, @parent, context
     style = @parent.childNodes[0].style
@@ -246,10 +288,19 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
       styles:
-        color: new Value('{myColor}')
-        'font-size': new Value('{myFontSize}')
+        color:
+          type: 'text'
+          value: 'myColor'
+          isDynamic: true
+        'font-size':
+          type: 'text'
+          value: 'myFontSize'
+          isDynamic: true
     
     context = new WingmanObject
     context.set myColor: 'red', myFontSize: '15px'
@@ -258,7 +309,7 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     element = @parent.childNodes[0]
     @assertEqual 'red', element.style.color
     @assertEqual '15px', element.style.fontSize
-  
+    
     context.set myColor: 'blue', myFontSize: '13px'
     @assertEqual 'blue', element.style.color
     @assertEqual '13px', element.style.fontSize
@@ -267,8 +318,10 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('user')]
+      classes: [
+        type: 'text'
+        value: 'user'
+      ]
     
     NodeFactory.create nodeData, @parent
     @assertEqual @parent.childNodes[0].className, 'user'
@@ -277,8 +330,16 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('user'), new Value('premium')]
+      classes: [
+        {
+          type: 'text'
+          value: 'user'
+        }
+        {
+          type: 'text'
+          value: 'premium'
+        }
+      ]
     
     NodeFactory.create nodeData, @parent
     element = @parent.childNodes[0]
@@ -289,8 +350,11 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('{myAwesomeClass}')]
+      classes: [
+        type: 'text'
+        value: 'myAwesomeClass'
+        isDynamic: true
+      ]
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
@@ -302,8 +366,11 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('{myAwesomeClass}')]
+      classes: [
+        type: 'text'
+        value: 'myAwesomeClass'
+        isDynamic: true
+      ]
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
@@ -318,8 +385,11 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     nodeData =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('{myAwesomeClass}')]
+      classes: [
+        type: 'text'
+        value: 'myAwesomeClass'
+        isDynamic: true
+      ]
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
@@ -334,15 +404,22 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
       classes: [
-        new Value('{myAwesomeClass}'),
-        new Value('{mySuperbClass}')
+        {
+          type: 'text'
+          value: 'myAwesomeClass'
+          isDynamic: true
+        }
+        {
+          type: 'text'
+          value: 'mySuperbClass'
+          isDynamic: true
+        }
       ]
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
-  
+    
     NodeFactory.create elementNode, @parent, context
     @assertEqual @parent.childNodes[0].className, 'user'
   
@@ -350,15 +427,22 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
       classes: [
-        new Value('{myAwesomeClass}'),
-        new Value('{mySuperbClass}')
+        {
+          type: 'text'
+          value: 'myAwesomeClass'
+          isDynamic: true
+        }
+        {
+          type: 'text'
+          value: 'mySuperbClass'
+          isDynamic: true
+        }
       ]
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
-  
+    
     NodeFactory.create elementNode, @parent, context
     context.set myAwesomeClass: 'premium'
     
@@ -387,12 +471,18 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
         {
           type: 'element'
           tag: 'span'
-          value: new Value('user')
+          children: [
+            type: 'text'
+            value: 'user'
+          ]
         },
         {
           type: 'element'
           tag: 'span'
-          value: new Value('user2')
+          children: [
+            type: 'text'
+            value: 'user2'
+          ]
         }
       ]
     
@@ -415,18 +505,27 @@ module.exports = class NodeFactoryTest extends Janitor.TestCase
         {
           type: 'element'
           tag: 'span'
-          value: new Value('good morning')
-        },
+          children: [
+            type: 'text'
+            value: 'good morning'
+          ]
+        }
         {
           type: 'element'
           tag: 'span'
-          value: new Value('good morning again')
+          children: [
+            type: 'text'
+            value: 'good morning again'
+          ]
         }
       ]
       falseChildren: [
         type: 'element'
         tag: 'span'
-        value: new Value('good evening')
+        children: [
+          type: 'text'
+          value: 'good evening'
+        ]
       ]
     
     context = new WingmanObject

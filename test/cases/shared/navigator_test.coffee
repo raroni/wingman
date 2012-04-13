@@ -4,15 +4,20 @@ Module = require '../../../lib/wingman/shared/module'
 Navigator = require '../../../lib/wingman/shared/navigator'
 Wingman = require '../../../.'
 JSDomWindowPopStateDecorator = require '../../jsdom_window_pop_state_decorator'
+jsdom = require 'jsdom'
 
 class DummyController extends Module
   @include Navigator
 
 module.exports = class NavigatorTest extends Janitor.TestCase
   setup: ->
-    Wingman.document = require('jsdom').jsdom()
+    Wingman.document = jsdom.jsdom()
     Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
     @controller = new DummyController
+  
+  teardown: ->
+    delete Wingman.document
+    delete Wingman.window
   
   'test simple navigate': ->
     @controller.navigate 'something'

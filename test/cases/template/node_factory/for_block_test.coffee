@@ -1,6 +1,5 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
-Value = require '../../../../lib/wingman/template/parser/value'
 WingmanObject = require '../../../../lib/wingman/shared/object'
 ForBlock = require '../../../../lib/wingman/template/node_factory/for_block'
 Wingman = require '../../../../.'
@@ -9,7 +8,10 @@ module.exports = class ForBlockTest extends Janitor.TestCase
   setup: ->
     Wingman.document = document
     @parent = Wingman.document.createElement 'div'
-
+  
+  teardown: ->
+    delete Wingman.document
+  
   'test simple for block': ->
     nodeData =
       type: 'for'
@@ -17,7 +19,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'span'
-        value: new Value('{user}')
+        source: 'user'
       ]
     
     context = new WingmanObject
@@ -38,12 +40,15 @@ module.exports = class ForBlockTest extends Janitor.TestCase
         {
           type: 'element'
           tag: 'span'
-          value: new Value('Username:')
+          children: [
+            type: 'text'
+            value: 'Username:'
+          ]
         }
         {
           type: 'element'
           tag: 'span'
-          value: new Value('{user}')
+          source: 'user'
         }
       ]
     
@@ -66,7 +71,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'span'
-        value: new Value('{notification}')
+        source: 'notification'
       ]
   
     context = new WingmanObject
@@ -88,7 +93,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'span'
-        value: new Value('{user}')
+        source: 'user'
       ]
     
     context = new WingmanObject
@@ -109,7 +114,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'span'
-        value: new Value('{user}')
+        source: 'user'
       ]
     
     context = new WingmanObject
@@ -129,7 +134,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'span'
-        value: new Value('{user}')
+        source: 'user'
       ]
     
     context = new WingmanObject
@@ -149,7 +154,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'span'
-        value: new Value('{user}')
+        source: 'user'
       ]
     
     context = new WingmanObject

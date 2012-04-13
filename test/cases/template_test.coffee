@@ -1,13 +1,16 @@
 Janitor = require 'janitor'
 Wingman = require '../..'
 WingmanObject = require '../../lib/wingman/shared/object'
-document = require('jsdom').jsdom()
+jsdom = require 'jsdom'
 CustomAssertions = require '../custom_assertions'
-Wingman.document = document
 
 module.exports = class TemplateTest extends Janitor.TestCase
   setup: ->
+    Wingman.document = jsdom.jsdom()
     @parent = Wingman.document.createElement 'div'
+  
+  teardown: ->
+    delete Wingman.document
   
   assertElementHasClass: CustomAssertions.assertDOMElementHasClass
   refuteElementHasClass: CustomAssertions.refuteDOMElementHasClass

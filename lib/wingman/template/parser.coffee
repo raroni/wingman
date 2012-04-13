@@ -1,5 +1,4 @@
 {StringScanner} = require "strscan"
-Value = require "./parser/value"
 
 selfClosingTags = ['input', 'img', 'br', 'hr']
 
@@ -7,6 +6,15 @@ selfClosingTags = ['input', 'img', 'br', 'hr']
 # REFACTORING IDEA: Let each individual node type have its own class.
 # That would make it possible to extract parseStyle, parseClass and so on into a ElementNode class or the like
 # This would in turn make this class simpler :)
+
+buildText = (value) ->
+  value = value.substring 1, value.length-1 if isDynamic = value.match /^\{(.*?)\}$/
+  
+  newNode = {
+    type: 'text'
+    value
+    isDynamic
+  }
 
 module.exports = class
   @parse: (source) ->
@@ -22,7 +30,7 @@ module.exports = class
   
   constructor: (source) ->
     @scanner = new StringScanner @constructor.trimSource(source)
-
+    
     @tree = { children: [] }
     @currentScope = @tree
   
@@ -34,7 +42,7 @@ module.exports = class
         @scan()
   
   scan: ->
-    @scanForEndTag() || @scanForStartTag() || @scanForIfToken() || @scanForElseToken() || @scanForViewToken() || @scanForForToken() || @scanForEndToken() || @scanForText()
+    @scanForEndTag() || @scanForStartTag() || @scanForIfToken() || @scanForElseToken() || @scanForViewToken() || @scanForForToken() || @scanForEndToken() || @scanForSource() || @scanForText()
   
   scanForEndTag: ->
     result = @scanner.scan /<\/(.*?)>/
@@ -99,20 +107,30 @@ module.exports = class
     if result
       @currentScope.children = @currentScope.falseChildren = []
     result
-    
+  
   scanForEndToken: ->
     result = @scanner.scan /\{end\}/
     if result
       delete @currentScope.children if @currentScope.type == 'conditional'
       @currentScope = @currentScope.parent
     result
-
+  
+  scanForSource: ->
+    result = @scanner.scanUntil /\{[a-zA-Z\.]+\}\<\//
+    if result
+      value = result.substr 1, result.length-4
+      @currentScope.source = value
+      @scanner.head -= 2
+    result
+  
   scanForText: ->
     result = @scanner.scanUntil /</
-    @currentScope.value = new Value(result.substr 0, result.length-1)
+    value = result.substr 0, result.length-1
+    newNode = buildText value
+    @currentScope.children.push newNode
     @scanner.head -= 1
     result
-
+  
   parseAttributes: (attributesAsString) ->
     attributes = {}
     attributesAsString.replace(
@@ -127,13 +145,13 @@ module.exports = class
     styles = {}
     for styleAsString in stylesAsString.replace(re, '').split(';')
       split = styleAsString.split ':'
-      styles[split[0]] = new Value split[1]
+      styles[split[0]] = buildText split[1]
     styles
 
   parseClass: (classesAsString) ->
     classes = []
     for klass in classesAsString.split(' ')
-      classes.push new Value(klass)
+      classes.push buildText(klass)
     classes
   
   addAttributes: (node, attributes) ->
@@ -146,4 +164,4 @@ module.exports = class
     if Object.keys(attributes).length != 0
       node.attributes = {}
       for key, value of attributes
-        node.attributes[key] = new Value(value)
+        node.attributes[key] = buildText value

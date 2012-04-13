@@ -1,15 +1,17 @@
-document = require('jsdom').jsdom()
+jsdom = require 'jsdom'
 Janitor = require 'janitor'
 Conditional = require '../../../../lib/wingman/template/node_factory/conditional'
 Wingman = require '../../../../.'
-Value = require '../../../../lib/wingman/template/parser/value'
 WingmanObject = require '../../../../lib/wingman/shared/object'
 
 module.exports = class ConditionalTest extends Janitor.TestCase
   setup: ->
-    Wingman.document = document
+    Wingman.document = jsdom.jsdom()
     @parent = Wingman.document.createElement 'div'
-
+  
+  teardown: ->
+    delete Wingman.document
+  
   'test simple conditional': ->
     nodeData =
       type: 'conditional'
@@ -18,12 +20,18 @@ module.exports = class ConditionalTest extends Janitor.TestCase
         {
           type: 'element'
           tag: 'span'
-          value: new Value('user')
-        },
+          children: [
+            type: 'text'
+            value: 'user'
+          ]
+        }
         {
           type: 'element'
           tag: 'span'
-          value: new Value('user2')
+          children: [
+            type: 'text'
+            value: 'user2'
+          ]
         }
       ]
     
@@ -46,18 +54,27 @@ module.exports = class ConditionalTest extends Janitor.TestCase
         {
           type: 'element'
           tag: 'span'
-          value: new Value('good morning')
-        },
+          children: [
+            type: 'text'
+            value: 'good morning'
+          ]
+        }
         {
           type: 'element'
           tag: 'span'
-          value: new Value('good morning again')
+          children: [
+            type: 'text'
+            value: 'good morning again'
+          ]
         }
       ]
       falseChildren: [
         type: 'element'
         tag: 'span'
-        value: new Value('good evening')
+        children: [
+          type: 'text'
+          value: 'good evening'
+        ]
       ]
     
     context = new WingmanObject

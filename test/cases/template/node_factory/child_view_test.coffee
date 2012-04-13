@@ -3,7 +3,7 @@ Janitor = require 'janitor'
 ChildView = require '../../../../lib/wingman/template/node_factory/child_view'
 Wingman = require '../../../../.'
 
-module.exports = class ForBlockTest extends Janitor.TestCase
+module.exports = class ChildViewTest extends Janitor.TestCase
   setup: ->
     Wingman.document = document
     @parent = Wingman.document.createElement 'div'
@@ -12,11 +12,11 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     elementNode =
       type: 'childView'
       name: 'user'
-
+  
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
       templateSource: -> '<div>I am the user view</div>'
-
+  
     mainView = new MainView
     new ChildView elementNode, @parent, mainView
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
@@ -25,14 +25,14 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     elementNode =
       type: 'childView'
       name: 'user'
-
+  
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
       templateSource: -> null
-
+  
       left: ->
         "#{@get('user.level')*10}px"
-
+  
     mainView = new MainView
     user = { name: 'Rasmus' }
     mainView.set { user }

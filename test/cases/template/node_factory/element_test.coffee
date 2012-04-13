@@ -1,14 +1,17 @@
 Janitor = require 'janitor'
-Value = require '../../../../lib/wingman/template/parser/value'
 Element = require '../../../../lib/wingman/template/node_factory/element'
 Wingman = require '../../../../.'
 WingmanObject = require '../../../../lib/wingman/shared/object'
 CustomAssertions = require '../../../custom_assertions'
-Wingman.document = require('jsdom').jsdom()
+jsdom = require 'jsdom'
 
 module.exports = class ElementTest extends Janitor.TestCase
   setup: ->
+    Wingman.document = jsdom.jsdom()
     @parent = Wingman.document.createElement 'div'
+  
+  teardown: ->
+    delete Wingman.document
   
   assertDOMElementHasClass: CustomAssertions.assertDOMElementHasClass
   refuteDOMElementHasClass: CustomAssertions.refuteDOMElementHasClass
@@ -17,12 +20,25 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: []
     
     element = new Element elementNode, @parent
     @assert element.domElement
     @assertEqual 'DIV', element.domElement.tagName
     @assertEqual @parent, element.domElement.parentNode
+  
+  'test element with text': ->
+    elementNode =
+      type: 'element'
+      tag: 'div'
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
+    
+    element = new Element elementNode, @parent
+    @assert element.domElement
+    @assertEqual 'test', element.domElement.innerHTML
   
   'test nested elements': ->
     elementNode = 
@@ -31,7 +47,10 @@ module.exports = class ElementTest extends Janitor.TestCase
       children: [
         type: 'element'
         tag: 'span'
-        value: new Value('test')
+        children: [
+          type: 'text'
+          value: 'test'
+        ]
       ]
   
     element = new Element elementNode, @parent
@@ -45,8 +64,8 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode = 
       type: 'element'
       tag: 'div'
-      value: new Value('{name}')
-  
+      source: 'name'
+    
     context = new WingmanObject
     context.set name: 'Rasmus'
     element = new Element elementNode, @parent, context
@@ -57,8 +76,8 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode = 
       type: 'element'
       tag: 'div'
-      value: new Value('{name}')
-  
+      source: 'name'
+    
     context = new WingmanObject
     context.set name: 'John'
     element = new Element elementNode, @parent, context
@@ -71,8 +90,8 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode = 
       type: 'element'
       tag: 'div'
-      value: new Value('{user.name}')
-  
+      source: 'user.name'
+    
     user = new WingmanObject
     user.set name: 'John'
     context = new WingmanObject
@@ -87,9 +106,14 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
       styles:
-        color: new Value('red')
+        color:
+          type: 'text'
+          value: 'red'
     
     element = new Element elementNode, @parent
     
@@ -99,9 +123,15 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        text: 'test'
+        type: 'text'
+      ]
       styles:
-        color: new Value('{color}')
+        color:
+          type: 'text'
+          value: 'color'
+          isDynamic: true
     
     context = new WingmanObject
     context.set color: 'red'
@@ -113,9 +143,15 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        text: 'test'
+        type: 'text'
+      ]
       styles:
-        color: new Value('{color}')
+        color:
+          type: 'text'
+          value: 'color'
+          isDynamic: true
     
     context = new WingmanObject
     context.set color: 'red'
@@ -127,10 +163,17 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
+      children: [
+        type: 'text'
+        value: 'test'
+      ]
       styles:
-        color: new Value('red')
-        'font-size': new Value('15px')
+        color:
+          type: 'text'
+          value: 'red'
+        'font-size':
+          type: 'text'
+          value: '15px'
     
     element = new Element elementNode, @parent
     
@@ -141,10 +184,15 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode = 
       type: 'element'
       tag: 'div'
-      value: new Value('test')
       styles:
-        color: new Value('{myColor}')
-        'font-size': new Value('{myFontSize}')
+        color:
+          type: 'text'
+          value: 'myColor'
+          isDynamic: true
+        'font-size':
+          type: 'text'
+          value: 'myFontSize'
+          isDynamic: true
     
     context = new WingmanObject
     context.set myColor: 'red', myFontSize: '15px'
@@ -161,8 +209,10 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('user')]
+      classes: [
+        type: 'text'
+        value: 'user'
+      ]
     
     element = new Element elementNode, @parent
     @assertEqual element.domElement.className, 'user'
@@ -171,8 +221,16 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('user'), new Value('premium')]
+      classes: [
+        {
+          type: 'text'
+          value: 'user'
+        }
+        {
+          type: 'text'
+          value: 'premium'
+        }
+      ]
     
     element = new Element elementNode, @parent
     @assertDOMElementHasClass element.domElement, 'user'
@@ -182,8 +240,11 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('{myAwesomeClass}')]
+      classes: [
+        type: 'text'
+        value: 'myAwesomeClass'
+        isDynamic: true
+      ]
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
@@ -195,8 +256,11 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('{myAwesomeClass}')]
+      classes: [
+        type: 'text'
+        value: 'myAwesomeClass'
+        isDynamic: true
+      ]
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
@@ -210,12 +274,15 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
-      classes: [new Value('{myAwesomeClass}')]
+      classes: [
+        type: 'text'
+        value: 'myAwesomeClass'
+        isDynamic: true
+      ]
     
     context = new WingmanObject
     context.set myAwesomeClass: 'user'
-  
+    
     element = new Element elementNode, @parent, context
     @assertEqual element.domElement.className, 'user'
     context.set myAwesomeClass: null
@@ -225,10 +292,17 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
       classes: [
-        new Value('{myAwesomeClass}'),
-        new Value('{mySuperbClass}')
+        {
+          type: 'text'
+          value: 'myAwesomeClass'
+          isDynamic: true
+        }
+        {
+          type: 'text'
+          value: 'mySuperbClass'
+          isDynamic: true
+        }
       ]
     
     context = new WingmanObject
@@ -241,10 +315,17 @@ module.exports = class ElementTest extends Janitor.TestCase
     elementNode =
       type: 'element'
       tag: 'div'
-      value: new Value('Something')
       classes: [
-        new Value('{myAwesomeClass}'),
-        new Value('{mySuperbClass}')
+        {
+          type: 'text'
+          value: 'myAwesomeClass'
+          isDynamic: true
+        }
+        {
+          type: 'text'
+          value: 'mySuperbClass'
+          isDynamic: true
+        }
       ]
     
     context = new WingmanObject
@@ -261,8 +342,12 @@ module.exports = class ElementTest extends Janitor.TestCase
       type: 'element'
       tag: 'input'
       attributes:
-        name: new Value('email')
-        placeholder: new Value('Email...')
+        name:
+          type: 'text'
+          value: 'email'
+        placeholder:
+          type: 'text'
+          value: 'Email...'
     
     element = new Element(elementNode, @parent).domElement
     @assertEqual 'email', element.getAttribute('name')
@@ -273,7 +358,10 @@ module.exports = class ElementTest extends Janitor.TestCase
       type: 'element'
       tag: 'img'
       attributes:
-        src: new Value('{mySrc}')
+        src:
+          type: 'text'
+          value: 'mySrc'
+          isDynamic: true
     
     context = new WingmanObject
     context.set mySrc: 'funny_pic.png'
@@ -288,8 +376,15 @@ module.exports = class ElementTest extends Janitor.TestCase
       type: 'element'
       tag: 'div'
       classes: [
-        new Value('user'),
-        new Value('{selectedCls}')
+        {
+          type: 'text'
+          value: 'user'
+        }
+        {
+          type: 'text'
+          value: 'selectedCls'
+          isDynamic: true
+        }
       ]
     
     context = new WingmanObject
@@ -298,14 +393,21 @@ module.exports = class ElementTest extends Janitor.TestCase
     
     @assertDOMElementHasClass element, 'user'
     @assertDOMElementHasClass element, 'selected'
-
+  
   'test deactivated dynamic class when also having static class': ->
     elementNode =
       type: 'element'
       tag: 'div'
       classes: [
-        new Value('user'),
-        new Value('{selectedCls}')
+        {
+          type: 'text'
+          value: 'user'
+        }
+        {
+          type: 'text'
+          value: 'selectedCls'
+          isDynamic: true
+        }
       ]
     
     context = new WingmanObject
@@ -320,8 +422,15 @@ module.exports = class ElementTest extends Janitor.TestCase
       type: 'element'
       tag: 'div'
       classes: [
-        new Value('user'),
-        new Value('{selectedCls}')
+        {
+          type: 'text'
+          value: 'user'
+        }
+        {
+          type: 'text'
+          value: 'selectedCls'
+          isDynamic: true
+        }
       ]
     
     context = new WingmanObject

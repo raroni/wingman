@@ -11,8 +11,8 @@ module.exports = class Element extends Module
     @setupClasses() if @elementData.classes
     @setupAttributes() if @elementData.attributes
     
-    if @elementData.value
-      @setupInnerHTML()
+    if @elementData.source
+      @setupSource()
     else if @elementData.children
       @setupChildren()
   
@@ -20,39 +20,45 @@ module.exports = class Element extends Module
     @scope.appendChild @domElement
   
   setupClasses: ->
-    for className in @elementData.classes
-      @observeClass className if className.isDynamic
-      @addClass klass if klass = className.get(@context)
+    for klass in @elementData.classes
+      if klass.isDynamic
+        @observeClass klass
+        @addClass klassValue if klassValue = @context.get(klass.value)
+      else
+        @addClass klass.value
   
   setupAttributes: ->
     for key, value of @elementData.attributes
-      @setAttribute key, value.get(@context)
-      @observeAttribute key, value if value.isDynamic
+      if value.isDynamic
+        @observeAttribute key, value
+        @setAttribute key, @context.get(value.value)
+      else
+        @setAttribute key, value.value
   
   observeAttribute: (key, value) ->
-    @context.observe value.get(), (newValue) =>
+    @context.observe value.value, (newValue) =>
       @setAttribute key, newValue
   
-  observeClass: (className) ->
-    @context.observe className.get(), (newClassName, oldClassName) =>
+  observeClass: (klass) ->
+    @context.observe klass.value, (newClassName, oldClassName) =>
       @removeClass oldClassName if oldClassName
       @addClass newClassName if newClassName
   
   setupStyles: -> 
     for key, value of @elementData.styles
-      @observeStyle key, value if value.isDynamic
-      @setStyle key, value.get @context
+      if value.isDynamic
+        @observeStyle key, value
+        @setStyle key, @context.get(value.value)
+      else
+        @setStyle key, value.value
   
   observeStyle: (key, value) ->
-    @context.observe value.get(), (newValue) => @setStyle key, newValue
+    @context.observe value.value, (newValue) => @setStyle key, newValue
   
-  setupInnerHTML: ->
-    @domElement.innerHTML = if @elementData.value.isDynamic
-      @context.observe @elementData.value.get(), (newValue) =>
-        @domElement.innerHTML = newValue
-      @context.get @elementData.value.get()
-    else
-      @elementData.value.get()
+  setupSource: ->
+    @domElement.innerHTML = @context.get @elementData.source
+    @context.observe @elementData.source, (newValue) =>
+      @domElement.innerHTML = newValue
   
   setupChildren: ->
     for child in @elementData.children

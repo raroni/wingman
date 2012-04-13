@@ -8,7 +8,7 @@ module.exports = class ChildView
     options = { render: true }
     options.properties = properties if properties = @properties()
     options
-    
+  
   properties: ->
     if @context.get @nodeData.name
       properties = {}
