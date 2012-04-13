@@ -7,13 +7,11 @@ module.exports = class ConditionalHandler
     @update @context.get(@options.source)
   
   add: (currentValue) ->
-    if currentValue
-      for childOptions in @options.trueChildren
-        handler = HandlerFactory.create childOptions, @scope, @context
-        @handlers.push handler
-    else if @options.falseChildren
-      for childOptions in @options.falseChildren
-        handler = HandlerFactory.create childOptions, @scope, @context
+    children = (currentValue && @options.trueChildren) || @options.falseChildren
+    
+    if children
+      for options in children
+        handler = HandlerFactory.create options, @scope, @context
         @handlers.push handler
   
   remove: ->
