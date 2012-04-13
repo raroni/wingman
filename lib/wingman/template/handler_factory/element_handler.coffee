@@ -28,15 +28,15 @@ module.exports = class ElementHandler extends Module
         @addClass klass.value
   
   setupAttributes: ->
-    for key, value of @elementData.attributes
-      if value.isDynamic
-        @observeAttribute key, value
-        @setAttribute key, @context.get(value.value)
+    for key, attribute of @elementData.attributes
+      if attribute.isDynamic
+        @observeAttribute key, attribute
+        @setAttribute key, @context.get(attribute.value)
       else
-        @setAttribute key, value.value
+        @setAttribute key, attribute.value
   
-  observeAttribute: (key, value) ->
-    @context.observe value.value, (newValue) =>
+  observeAttribute: (key, attribute) ->
+    @context.observe attribute.value, (newValue) =>
       @setAttribute key, newValue
   
   observeClass: (klass) ->
@@ -45,15 +45,15 @@ module.exports = class ElementHandler extends Module
       @addClass newClassName if newClassName
   
   setupStyles: -> 
-    for key, value of @elementData.styles
-      if value.isDynamic
-        @observeStyle key, value
-        @setStyle key, @context.get(value.value)
+    for key, style of @elementData.styles
+      if style.isDynamic
+        @observeStyle key, style
+        @setStyle key, @context.get(style.value)
       else
-        @setStyle key, value.value
+        @setStyle key, style.value
   
-  observeStyle: (key, value) ->
-    @context.observe value.value, (newValue) => @setStyle key, newValue
+  observeStyle: (key, style) ->
+    @context.observe style.value, (newValue) => @setStyle key, newValue
   
   setupSource: ->
     @domElement.innerHTML = @context.get @elementData.source
