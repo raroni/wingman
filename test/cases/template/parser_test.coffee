@@ -237,7 +237,7 @@ module.exports = class ParserTest extends Janitor.TestCase
     @assertEqual 2, Object.keys(input.attributes).length
     @assertEqual 'email', input.attributes.name.value
     @assertEqual 'Email...', input.attributes.placeholder.value
-
+  
   'test regular attributes with dynamic values': ->
     tree = @parse '<img src="{mySrc}">'
     nodes = tree.children
@@ -290,3 +290,44 @@ module.exports = class ParserTest extends Janitor.TestCase
     @assertEqual 'element', div1.type
     @assertEqual 'div', div1.tag
     @assertEqual 'good evening', div1.children[0].value
+  
+  'test element surrounded by text': ->
+    tree = @parse 'Hello <span>Rasmus</span>, how are you?'
+    nodes = tree.children
+    
+    @assertEqual 3, tree.children.length
+    
+    firstText = tree.children[0]
+    @assertEqual 'text', firstText.type
+    @assertEqual 'Hello ', firstText.value
+    
+    element = tree.children[1]
+    @assertEqual 'element', element.type
+    @assertEqual 'span', element.tag
+    @assertEqual 1, element.children.length
+    elementChild = element.children[0]
+    @assertEqual 'text', elementChild.type
+    @assertEqual 'Rasmus', elementChild.value
+    
+    secondText = tree.children[2]
+    @assertEqual 'text', secondText.type
+    @assertEqual ', how are you?', secondText.value
+  
+  'test element with source surrounded by text': ->
+    tree = @parse 'Hello <span>{name}</span>, how are you?'
+    nodes = tree.children
+    
+    @assertEqual 3, tree.children.length
+    
+    firstText = tree.children[0]
+    @assertEqual 'text', firstText.type
+    @assertEqual 'Hello ', firstText.value
+    
+    element = tree.children[1]
+    @assertEqual 'element', element.type
+    @assertEqual 'span', element.tag
+    @assertEqual 'name', element.source
+    
+    secondText = tree.children[2]
+    @assertEqual 'text', secondText.type
+    @assertEqual ', how are you?', secondText.value

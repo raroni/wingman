@@ -116,7 +116,7 @@ module.exports = class
     result
   
   scanForSource: ->
-    result = @scanner.scanUntil /\{[a-zA-Z\.]+\}\<\//
+    result = @scanner.scan /\{[a-zA-Z\.]+\}\<\//
     if result
       value = result.substr 1, result.length-4
       @currentScope.source = value
@@ -133,6 +133,7 @@ module.exports = class
     if result
       value = result.substr 0, result.length-1
       newNode = buildText value
+      
       @currentScope.children.push newNode
       @scanner.head -= 1
     else

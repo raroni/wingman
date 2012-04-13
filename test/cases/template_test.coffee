@@ -345,3 +345,31 @@ module.exports = class TemplateTest extends Janitor.TestCase
     context.set early: true
     @assertEqual 1, childNodes.length
     @assertEqual 'good morning', childNodes[0].innerHTML
+  
+  'test element surrounded by text': ->
+    
+    context = new WingmanObject
+    template = Wingman.Template.compile 'Hello <span>Rasmus</span>, how are you?'
+    template @parent, context
+    
+    @assertEqual 'Hello <span>Rasmus</span>, how are you?', @parent.innerHTML
+  
+  'test element with source surrounded by text': ->
+    context = new WingmanObject
+    context.set name: 'Rasmus'
+    
+    template = Wingman.Template.compile 'Hello <span>{name}</span>, how are you?'
+    template @parent, context
+    
+    @assertEqual 'Hello <span>Rasmus</span>, how are you?', @parent.innerHTML
+  
+  'test deferred context update with source element surrounded by text': ->
+    context = new WingmanObject
+    context.set name: 'Rasmus'
+    
+    template = Wingman.Template.compile 'Hello <span>{name}</span>, how are you?'
+    template @parent, context
+    
+    context.set name: 'Monkey Joe'
+    
+    @assertEqual 'Hello <span>Monkey Joe</span>, how are you?', @parent.innerHTML
