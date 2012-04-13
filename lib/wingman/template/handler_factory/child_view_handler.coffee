@@ -1,8 +1,7 @@
 module.exports = class ChildViewHandler
   constructor: (@options, @scope, @context) ->
     @view = @context.createChild @options.name, @viewOptions()
-    element = @view.el
-    @scope.appendChild element
+    @scope.appendChild @view.el
   
   viewOptions: ->
     options = { render: true }
