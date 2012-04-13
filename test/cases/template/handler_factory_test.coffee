@@ -421,7 +421,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
     @assertEqual element.className, ''
   
   'test element node with two dynamic classes that evaluates to the same value': ->
-    elementNode =
+    options =
       type: 'element'
       tag: 'div'
       scope: @parent
@@ -441,11 +441,11 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
     context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
     
-    HandlerFactory.create elementNode, context
+    HandlerFactory.create options, context
     @assertEqual @parent.childNodes[0].className, 'user'
   
   'test deferred reset of dynamic class that evaluates to the same value as another dynamic class in node element': ->
-    elementNode =
+    options =
       type: 'element'
       tag: 'div'
       scope: @parent
@@ -465,7 +465,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
     context = new WingmanObject
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
     
-    HandlerFactory.create elementNode, context
+    HandlerFactory.create options, context
     context.set myAwesomeClass: 'premium'
     
     element = @parent.childNodes[0]
@@ -473,7 +473,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
     @assertDOMElementHasClass element, 'premium'
   
   'test child view': ->
-    elementNode =
+    options =
       type: 'childView'
       name: 'user'
       scope: @parent
@@ -483,7 +483,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
       templateSource: -> '<div>I am the user view</div>'
     
     mainView = new MainView
-    HandlerFactory.create elementNode, mainView
+    HandlerFactory.create options, mainView
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
   'test conditional': ->
