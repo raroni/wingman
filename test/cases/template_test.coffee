@@ -15,7 +15,13 @@ module.exports = class TemplateTest extends Janitor.TestCase
   assertElementHasClass: CustomAssertions.assertDOMElementHasClass
   refuteElementHasClass: CustomAssertions.refuteDOMElementHasClass
   
-  'test basic template with static value': ->
+  'test template with only static text': ->
+    template = Wingman.Template.compile 'hello'
+    template @parent
+    @assertEqual 1, @parent.childNodes.length
+    @assertEqual 'hello', @parent.innerHTML
+  
+  'test simple template with tag containing static value': ->
     template = Wingman.Template.compile '<div>hello</div>'
     template @parent
     @assertEqual 1, @parent.childNodes.length

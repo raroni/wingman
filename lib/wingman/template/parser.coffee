@@ -125,10 +125,15 @@ module.exports = class
   
   scanForText: ->
     result = @scanner.scanUntil /</
-    value = result.substr 0, result.length-1
-    newNode = buildText value
-    @currentScope.children.push newNode
-    @scanner.head -= 1
+    if result
+      value = result.substr 0, result.length-1
+      newNode = buildText value
+      @currentScope.children.push newNode
+      @scanner.head -= 1
+    else
+      value = @scanner.scanUntil /$/
+      newNode = buildText value
+      @currentScope.children.push newNode
     result
   
   parseAttributes: (attributesAsString) ->

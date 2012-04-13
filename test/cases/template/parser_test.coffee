@@ -5,6 +5,15 @@ module.exports = class ParserTest extends Janitor.TestCase
   parse: (source) ->
     Parser.parse source
   
+  'test text string': ->
+    tree = @parse 'hello everybody'
+    @assertEqual 1, tree.children.length
+    
+    textChild = tree.children[0]
+    @assertEqual 'text', textChild.type
+    @assertEqual 'hello everybody', textChild.value
+    @assert !textChild.children
+  
   'test empty tag': ->
     tree = @parse '<div></div>'
     
