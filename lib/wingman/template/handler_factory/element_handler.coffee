@@ -4,23 +4,23 @@ Elementary = require '../../shared/elementary'
 module.exports = class ElementHandler extends Module
   @include Elementary
   
-  constructor: (@elementData, @scope, @context) ->
-    @domElement = Wingman.document.createElement @elementData.tag
+  constructor: (@options, @scope, @context) ->
+    @domElement = Wingman.document.createElement @options.tag
     @addToScope()
-    @setupStyles() if @elementData.styles
-    @setupClasses() if @elementData.classes
-    @setupAttributes() if @elementData.attributes
+    @setupStyles() if @options.styles
+    @setupClasses() if @options.classes
+    @setupAttributes() if @options.attributes
     
-    if @elementData.source
+    if @options.source
       @setupSource()
-    else if @elementData.children
+    else if @options.children
       @setupChildren()
   
   addToScope: ->
     @scope.appendChild @domElement
   
   setupClasses: ->
-    for klass in @elementData.classes
+    for klass in @options.classes
       if klass.isDynamic
         @observeClass klass
         @addClass klassValue if klassValue = @context.get(klass.value)
@@ -28,7 +28,7 @@ module.exports = class ElementHandler extends Module
         @addClass klass.value
   
   setupAttributes: ->
-    for key, attribute of @elementData.attributes
+    for key, attribute of @options.attributes
       if attribute.isDynamic
         @observeAttribute key, attribute
         @setAttribute key, @context.get(attribute.value)
@@ -45,7 +45,7 @@ module.exports = class ElementHandler extends Module
       @addClass newClassName if newClassName
   
   setupStyles: -> 
-    for key, style of @elementData.styles
+    for key, style of @options.styles
       if style.isDynamic
         @observeStyle key, style
         @setStyle key, @context.get(style.value)
@@ -56,12 +56,12 @@ module.exports = class ElementHandler extends Module
     @context.observe style.value, (newValue) => @setStyle key, newValue
   
   setupSource: ->
-    @domElement.innerHTML = @context.get @elementData.source
-    @context.observe @elementData.source, (newValue) =>
+    @domElement.innerHTML = @context.get @options.source
+    @context.observe @options.source, (newValue) =>
       @domElement.innerHTML = newValue
   
   setupChildren: ->
-    for child in @elementData.children
+    for child in @options.children
       HandlerFactory.create child, @domElement, @context
 
 Wingman = require '../../../wingman'
