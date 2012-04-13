@@ -41,7 +41,7 @@ module.exports = class ParserTest extends Janitor.TestCase
     
     @assertEqual 1, tree.children.length
     @assertEqual 'div', tree.children[0].tag
-    @assertEqual 'Raz to the mouse!', tree.children[0].children[0]
+    @assertEqual 'Raz to the mouse!', tree.children[0].children[0].value
   
   'test multiple tags': ->
     tree = @parse '<div>one</div><span>two</span>'
