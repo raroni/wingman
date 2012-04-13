@@ -14,7 +14,6 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
   
   'test simple for block': ->
     options =
-      type: 'for'
       source: 'users'
       scope: @parent
       children: [
@@ -35,7 +34,6 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
   
   'test several children': ->
     options =
-      type: 'for'
       source: 'users'
       scope: @parent
       children: [
@@ -68,7 +66,6 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
   
   'test for node with nested source path': ->
     options =
-      type: 'for'
       source: 'user.notifications'
       scope: @parent
       children: [
@@ -91,7 +88,6 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
   
   'test for node with deferred push': ->
     options =
-      type: 'for'
       source: 'users'
       scope: @parent
       children: [
@@ -113,7 +109,6 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
   
   'test for node with deferred remove': ->
     options =
-      type: 'for'
       source: 'users'
       scope: @parent
       children: [
@@ -134,7 +129,6 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
   
   'test for node with deferred reset': ->
     options =
-      type: 'for'
       source: 'users'
       scope: @parent
       children: [
@@ -155,7 +149,6 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
   
   'test for node with no initial source': ->
     options =
-      type: 'for'
       source: 'users'
       scope: @parent
       children: [
@@ -177,7 +170,6 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
   
   'test child view': ->
     options =
-      type: 'for'
       source: 'users'
       scope: @parent
       children: [

@@ -13,7 +13,6 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
   
   'test simple child view': ->
     options =
-      type: 'childView'
       name: 'user'
       scope: @parent
     
@@ -27,7 +26,6 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
   
   'test passing value from context': ->
     options =
-      type: 'childView'
       name: 'user'
       scope: @parent
     
@@ -47,7 +45,6 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
   
   'test using passed value in automatic styles': ->
     options =
-      type: 'childView'
       name: 'user'
       scope: @parent
     
@@ -65,7 +62,6 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
   
   'test remove': ->
     options =
-      type: 'childView'
       name: 'user'
       scope: @parent
     

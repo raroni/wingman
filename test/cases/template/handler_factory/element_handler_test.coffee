@@ -18,7 +18,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test simple element': ->
     options =
-      type: 'element'
       tag: 'div'
       children: []
       scope: @parent
@@ -30,7 +29,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with text': ->
     options =
-      type: 'element'
       tag: 'div'
       children: [
         type: 'text'
@@ -45,7 +43,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   'test nested elements': ->
     options =
       scope: @parent
-      type: 'element'
       tag: 'div'
       children: [
         type: 'element'
@@ -65,7 +62,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with dynamic value': ->
     options = 
-      type: 'element'
       tag: 'div'
       source: 'name'
       scope: @parent
@@ -78,7 +74,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with dynamic value and defered update': ->
     options = 
-      type: 'element'
       tag: 'div'
       source: 'name'
       scope: @parent
@@ -93,7 +88,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with dynamic nested value and defered update': ->
     options = 
-      type: 'element'
       tag: 'div'
       source: 'user.name'
       scope: @parent
@@ -110,7 +104,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with single static style': ->
     options = 
-      type: 'element'
       tag: 'div'
       scope: @parent
       children: [
@@ -128,7 +121,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with single dynamic style': ->
     options = 
-      type: 'element'
       tag: 'div'
       scope: @parent
       children: [
@@ -149,7 +141,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test deferred reset with element with single dynamic style': ->
     options = 
-      type: 'element'
       tag: 'div'
       scope: @parent
       children: [
@@ -170,7 +161,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with two static styles': ->
     options = 
-      type: 'element'
       tag: 'div'
       scope: @parent
       children: [
@@ -192,7 +182,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with two dynamic styles': ->
     options = 
-      type: 'element'
       tag: 'div'
       scope: @parent
       styles:
@@ -218,7 +207,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with single static class': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [
@@ -231,7 +219,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with two static classes': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [
@@ -251,7 +238,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with single dynamic class': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [
@@ -268,7 +254,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test deferred reset with element with single dynamic class': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [
@@ -287,7 +272,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test deferred reset to falsy value with element with single dynamic class': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [
@@ -306,7 +290,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test element with two dynamic classes that evaluates to the same value': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [
@@ -330,7 +313,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test deferred reset of dynamic class that evaluates to the same value as another dynamic class': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [
@@ -357,7 +339,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test regular attributes': ->
     options =
-      type: 'element'
       tag: 'input'
       scope: @parent
       attributes:
@@ -374,7 +355,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test regular attributes with a dynamic value': ->
     options =
-      type: 'element'
       tag: 'img'
       scope: @parent
       attributes:
@@ -393,7 +373,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test dynamic and static class': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [
@@ -417,7 +396,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test deactivated dynamic class when also having static class': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [
@@ -441,7 +419,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
   
   'test deferred deactivation of dynamic class when also having static class': ->
     options =
-      type: 'element'
       tag: 'div'
       scope: @parent
       classes: [

@@ -13,7 +13,6 @@ module.exports = class TextHandlerTest extends Janitor.TestCase
   
   'test simple text node': ->
     textNode =
-      type: 'text'
       value: 'hello'
       scope: @parent
     
@@ -25,7 +24,6 @@ module.exports = class TextHandlerTest extends Janitor.TestCase
   
   'test remove': ->
     textNode =
-      type: 'text'
       value: 'hello'
       scope: @parent
     

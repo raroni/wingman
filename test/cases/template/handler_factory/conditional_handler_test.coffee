@@ -15,7 +15,6 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
   'test simple conditional': ->
     options =
       scope: @parent
-      type: 'conditional'
       source: 'something'
       trueChildren: [
         {
@@ -49,7 +48,6 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
   
   'test if else conditonal': ->
     options =
-      type: 'conditional'
       source: 'early'
       scope: @parent
       trueChildren: [
