@@ -11,10 +11,10 @@ MAP =
   element: ElementHandler
   text: TextHandler
 
-exports.create = (@options, @context) ->
-  klass = MAP[@options.type]
+exports.create = (options, context) ->
+  klass = MAP[options.type]
   if klass
     delete options.type
-    new klass @options, @context
+    new klass options, context
   else
-    throw new Error "Cannot create unknown node type (#{@options.type})!"
+    throw new Error "Cannot create unknown node type (#{options.type})!"
