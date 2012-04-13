@@ -1,10 +1,10 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
 WingmanObject = require '../../../../lib/wingman/shared/object'
-ForBlock = require '../../../../lib/wingman/template/node_factory/for_block'
+ForBlockHandler = require '../../../../lib/wingman/template/handler_factory/for_block_handler'
 Wingman = require '../../../../.'
 
-module.exports = class ForBlockTest extends Janitor.TestCase
+module.exports = class ForBlockHandlerTest extends Janitor.TestCase
   setup: ->
     Wingman.document = document
     @parent = Wingman.document.createElement 'div'
@@ -13,7 +13,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     delete Wingman.document
   
   'test simple for block': ->
-    nodeData =
+    options =
       type: 'for'
       source: 'users'
       children: [
@@ -24,8 +24,8 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
-  
-    new ForBlock nodeData, @parent, context
+    
+    new ForBlockHandler options, @parent, context
     
     childElements = @parent.childNodes
     @assertEqual 2, childElements.length
@@ -33,7 +33,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @assertEqual 'John', childElements[1].innerHTML
   
   'test several children': ->
-    nodeData =
+    options =
       type: 'for'
       source: 'users'
       children: [
@@ -55,7 +55,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
   
-    new ForBlock nodeData, @parent, context
+    new ForBlockHandler options, @parent, context
     
     childElements = @parent.childNodes
     @assertEqual 4, childElements.length
@@ -65,7 +65,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @assertEqual 'John', childElements[3].innerHTML
   
   'test for node with nested source path': ->
-    nodeData =
+    options =
       type: 'for'
       source: 'user.notifications'
       children: [
@@ -79,7 +79,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     user.set notifications: ['Hello', 'Hi']
     context.set { user }
   
-    new ForBlock nodeData, @parent, context
+    new ForBlockHandler options, @parent, context
   
     childElements = @parent.childNodes
     @assertEqual 2, childElements.length
@@ -87,7 +87,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @assertEqual 'Hi', childElements[1].innerHTML
   
   'test for node with deferred push': ->
-    nodeData =
+    options =
       type: 'for'
       source: 'users'
       children: [
@@ -99,7 +99,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
     
-    new ForBlock nodeData, @parent, context
+    new ForBlockHandler options, @parent, context
     
     childElements = @parent.childNodes
     @assertEqual 2, childElements.length
@@ -108,7 +108,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @assertEqual 'Joe', childElements[2].innerHTML
   
   'test for node with deferred remove': ->
-    nodeData =
+    options =
       type: 'for'
       source: 'users'
       children: [
@@ -120,7 +120,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
   
-    new ForBlock nodeData, @parent, context, 'users'
+    new ForBlockHandler options, @parent, context, 'users'
     
     childElements = @parent.childNodes
     @assertEqual 2, childElements.length
@@ -128,7 +128,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @assertEqual 1, childElements.length
   
   'test for node with deferred reset': ->
-    nodeData =
+    options =
       type: 'for'
       source: 'users'
       children: [
@@ -140,7 +140,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     context = new WingmanObject
     context.set users: ['Rasmus', 'John']
   
-    new ForBlock nodeData, @parent, context
+    new ForBlockHandler options, @parent, context
     
     @assertEqual 2, @parent.childNodes.length
     context.set users: ['Oliver']
@@ -148,7 +148,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @assertEqual 'Oliver', @parent.childNodes[0].innerHTML
   
   'test for node with no initial source': ->
-    nodeData =
+    options =
       type: 'for'
       source: 'users'
       children: [
@@ -159,7 +159,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     
     context = new WingmanObject
     
-    new ForBlock nodeData, @parent, context, 'users'
+    new ForBlockHandler options, @parent, context, 'users'
     childElements = @parent.childNodes
     
     @assertEqual 0, childElements.length
@@ -169,7 +169,7 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     @assertEqual 'Mario', childElements[1].innerHTML
   
   'test child view': ->
-    nodeData =
+    options =
       type: 'for'
       source: 'users'
       children: [
@@ -183,6 +183,6 @@ module.exports = class ForBlockTest extends Janitor.TestCase
     
     mainView = new MainView
     mainView.set users: ['Luigi', 'Yoshi']
-    new ForBlock nodeData, @parent, mainView
+    new ForBlockHandler options, @parent, mainView
     @assertEqual '<div>Luigi</div>', @parent.childNodes[0].innerHTML
     @assertEqual '<div>Yoshi</div>', @parent.childNodes[1].innerHTML

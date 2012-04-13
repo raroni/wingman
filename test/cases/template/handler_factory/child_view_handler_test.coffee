@@ -1,9 +1,9 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
-ChildView = require '../../../../lib/wingman/template/node_factory/child_view'
+ChildViewHandler = require '../../../../lib/wingman/template/handler_factory/child_view_handler'
 Wingman = require '../../../../.'
 
-module.exports = class ChildViewTest extends Janitor.TestCase
+module.exports = class ChildViewHandlerTest extends Janitor.TestCase
   setup: ->
     Wingman.document = document
     @parent = Wingman.document.createElement 'div'
@@ -18,7 +18,7 @@ module.exports = class ChildViewTest extends Janitor.TestCase
       templateSource: -> '<div>I am the user view</div>'
   
     mainView = new MainView
-    new ChildView elementNode, @parent, mainView
+    new ChildViewHandler elementNode, @parent, mainView
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
   'test passing value from context': ->
@@ -36,8 +36,8 @@ module.exports = class ChildViewTest extends Janitor.TestCase
     mainView = new MainView
     user = { name: 'Rasmus' }
     mainView.set { user }
-    childView = new ChildView elementNode, @parent, mainView
-    view = childView.view
+    handler = new ChildViewHandler elementNode, @parent, mainView
+    view = handler.view
     @assertEqual 'Rasmus', view.get('user.name')
   
   'test using passed value in automatic styles': ->
@@ -54,7 +54,7 @@ module.exports = class ChildViewTest extends Janitor.TestCase
     
     mainView = new MainView
     mainView.set user: { level: 3 }
-    view = new ChildView elementNode, @parent, mainView
+    new ChildViewHandler elementNode, @parent, mainView
     @assertEqual '30px', @parent.childNodes[0].style.left
   
   'test remove': ->
@@ -67,9 +67,9 @@ module.exports = class ChildViewTest extends Janitor.TestCase
       templateSource: -> '<div>I am the user view</div>'
     
     mainView = new MainView
-    childView = new ChildView elementNode, @parent, mainView
+    handler = new ChildViewHandler elementNode, @parent, mainView
     
     @assertEqual 1, @parent.childNodes.length
     
-    childView.remove()
+    handler.remove()
     @assertEqual 0, @parent.childNodes.length

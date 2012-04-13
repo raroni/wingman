@@ -1,7 +1,7 @@
 Module = require '../../shared/module'
 Elementary = require '../../shared/elementary'
 
-module.exports = class Element extends Module
+module.exports = class ElementHandler extends Module
   @include Elementary
   
   constructor: (@elementData, @scope, @context) ->
@@ -62,7 +62,7 @@ module.exports = class Element extends Module
   
   setupChildren: ->
     for child in @elementData.children
-      NodeFactory.create child, @domElement, @context
+      HandlerFactory.create child, @domElement, @context
 
 Wingman = require '../../../wingman'
-NodeFactory = require '../node_factory'
+HandlerFactory = require '../handler_factory'

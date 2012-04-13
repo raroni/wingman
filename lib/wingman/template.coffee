@@ -8,9 +8,9 @@ module.exports = class Template
     @tree = Parser.parse source
   
   evaluate: (el, context) ->
-    for nodeData in @tree.children
-      NodeFactory.create nodeData, el, context
+    for options in @tree.children
+      HandlerFactory.create options, el, context
 
 Parser = require './template/parser'
-NodeFactory = require './template/node_factory'
+HandlerFactory = require './template/handler_factory'
 Fleck = require 'fleck'
