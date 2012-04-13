@@ -121,6 +121,11 @@ module.exports = class
       value = result.substr 1, result.length-4
       @currentScope.source = value
       @scanner.head -= 2
+    else
+      result = @scanner.scan /\{[a-zA-Z\.]+\}$/
+      if result
+        value = result.substr 1, result.length-2
+        @currentScope.source = value
     result
   
   scanForText: ->

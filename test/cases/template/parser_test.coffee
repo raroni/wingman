@@ -78,6 +78,11 @@ module.exports = class ParserTest extends Janitor.TestCase
       @assertEqual 'li', element.tag
       @assertEqual value, element.children[0].value
   
+  'test bare source': ->
+    tree = @parse '{name}'
+    @assertEqual 0, tree.children.length
+    @assertEqual 'name', tree.source
+  
   'test tag with source': ->
     tree = @parse '<div>{greeting}</div>'
     

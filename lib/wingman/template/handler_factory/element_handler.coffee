@@ -5,8 +5,7 @@ module.exports = class ElementHandler extends Module
   @include Elementary
   
   constructor: (@options, @context) ->
-    @domElement = Wingman.document.createElement @options.tag
-    @addToScope()
+    @setupDomElement()
     @setupStyles() if @options.styles
     @setupClasses() if @options.classes
     @setupAttributes() if @options.attributes
@@ -16,8 +15,13 @@ module.exports = class ElementHandler extends Module
     else if @options.children
       @setupChildren()
   
-  addToScope: ->
-    @options.scope.appendChild @domElement
+  setupDomElement: ->
+    @domElement = if @options.el
+      @options.el
+    else
+      element = Wingman.document.createElement @options.tag
+      @options.scope.appendChild element
+      element
   
   setupClasses: ->
     for klass in @options.classes

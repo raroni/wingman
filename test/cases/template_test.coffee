@@ -30,11 +30,27 @@ module.exports = class TemplateTest extends Janitor.TestCase
   'test template with nested tags': ->
     template = Wingman.Template.compile '<ol><li>hello</li></ol>'
     template @parent
-  
+    
     @assertEqual 1, @parent.childNodes.length
     olElm = @parent.childNodes[0]
     @assertEqual 1, olElm.childNodes.length
     @assertEqual 'hello', olElm.childNodes[0].innerHTML
+  
+  'test template with only dynamic value': ->
+    template = Wingman.Template.compile '{greeting}'
+    context = new WingmanObject
+    context.set greeting: 'hello'
+    template @parent, context
+    @assertEqual 1, @parent.childNodes.length
+    @assertEqual 'hello', @parent.innerHTML
+  
+  'test deferred context update with template with only dynamic value': ->
+    template = Wingman.Template.compile '{greeting}'
+    context = new WingmanObject
+    context.set greeting: 'hello'
+    template @parent, context
+    context.set greeting: 'good morning'
+    @assertEqual 'good morning', @parent.innerHTML
   
   'test basic template with dynamic content': ->
     template = Wingman.Template.compile '<div>{greeting}</div>'

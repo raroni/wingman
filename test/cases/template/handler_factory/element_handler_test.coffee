@@ -143,9 +143,9 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set color: 'red'
-    element = new ElementHandler options, context
+    handler = new ElementHandler options, context
     
-    @assertEqual 'red', element.domElement.style.color
+    @assertEqual 'red', handler.domElement.style.color
   
   'test deferred reset with element with single dynamic style': ->
     options = 
@@ -463,3 +463,13 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
     
     context.set selectedCls: undefined
     @assertEqual 'user', element.className
+  
+  'test passing element': ->
+    element = Wingman.document.createElement('div')
+    options =
+      el: element
+      children: []
+    
+    handler = new ElementHandler options
+    @assert handler.domElement
+    @assertEqual element, handler.domElement
