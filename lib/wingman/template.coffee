@@ -8,8 +8,10 @@ module.exports = class Template
     @tree = Parser.parse source
   
   evaluate: (el, context) ->
-    for options in @tree.children
-      HandlerFactory.create options, el, context
+    for child in @tree.children
+      options = { scope: el }
+      options[key] = value for key, value of child
+      HandlerFactory.create options, context
 
 Parser = require './template/parser'
 HandlerFactory = require './template/handler_factory'

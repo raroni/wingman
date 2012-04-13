@@ -3,7 +3,7 @@ Fleck = require 'fleck'
 HandlerFactory = require '../handler_factory'
 
 module.exports = class ForBlockHandler
-  constructor: (@options, @scope, @context) ->
+  constructor: (@options, @context) ->
     @handlers = {}
     @addAll() if @source()
     @context.observe @options.source, @rebuild
@@ -23,9 +23,13 @@ module.exports = class ForBlockHandler
     hash[key] = value
     newContext.set hash
     
-    for newoptions in @options.children
-      handler = HandlerFactory.create newoptions, @scope, newContext
-      @handlers[value].push handler
+    for child in @options.children
+      @handlers[value].push @createHandler(child, newContext)
+  
+  createHandler: (child, context) ->
+    options = { scope: @options.scope }
+    options[key] = value for key, value of child
+    HandlerFactory.create options, context
   
   remove: (value) =>
     while @handlers[value].length

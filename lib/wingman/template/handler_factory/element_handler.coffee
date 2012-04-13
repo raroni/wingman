@@ -4,7 +4,7 @@ Elementary = require '../../shared/elementary'
 module.exports = class ElementHandler extends Module
   @include Elementary
   
-  constructor: (@options, @scope, @context) ->
+  constructor: (@options, @context) ->
     @domElement = Wingman.document.createElement @options.tag
     @addToScope()
     @setupStyles() if @options.styles
@@ -17,7 +17,7 @@ module.exports = class ElementHandler extends Module
       @setupChildren()
   
   addToScope: ->
-    @scope.appendChild @domElement
+    @options.scope.appendChild @domElement
   
   setupClasses: ->
     for klass in @options.classes
@@ -62,7 +62,9 @@ module.exports = class ElementHandler extends Module
   
   setupChildren: ->
     for child in @options.children
-      HandlerFactory.create child, @domElement, @context
+      options = { scope: @domElement }
+      options[key] = value for key, value of child
+      HandlerFactory.create options, @context
 
 Wingman = require '../../../wingman'
 HandlerFactory = require '../handler_factory'

@@ -19,6 +19,9 @@ module.exports = class ViewTest extends Janitor.TestCase
     Wingman.document = document
     View.templateSources = {}
   
+  teardown: ->
+    delete View.templateSources
+  
   'test simple template': ->
     View.templateSources.main = '<div>hello</div>'
     class MainView extends View
@@ -385,6 +388,3 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     view = new NameView app: {}
     @assert !called
-  
-  teardown: ->
-    delete View.templateSources

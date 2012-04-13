@@ -14,6 +14,7 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
   
   'test simple conditional': ->
     options =
+      scope: @parent
       type: 'conditional'
       source: 'something'
       trueChildren: [
@@ -37,7 +38,7 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set something: true
-    new ConditionalHandler options, @parent, context
+    new ConditionalHandler options, context
     
     childNodes = @parent.childNodes
     @assertEqual 2, childNodes.length
@@ -50,6 +51,7 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
     options =
       type: 'conditional'
       source: 'early'
+      scope: @parent
       trueChildren: [
         {
           type: 'element'
@@ -79,7 +81,7 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
     
     context = new WingmanObject
     context.set early: true
-    new ConditionalHandler options, @parent, context
+    new ConditionalHandler options, context
     
     childNodes = @parent.childNodes
     @assertEqual 2, childNodes.length

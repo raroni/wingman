@@ -15,8 +15,9 @@ module.exports = class TextHandlerTest extends Janitor.TestCase
     textNode =
       type: 'text'
       value: 'hello'
+      scope: @parent
     
-    handler = new TextHandler textNode, @parent
+    handler = new TextHandler textNode
     textNode = handler.textNode
     @assert textNode
     @assertEqual 'hello', textNode.nodeValue
@@ -26,8 +27,9 @@ module.exports = class TextHandlerTest extends Janitor.TestCase
     textNode =
       type: 'text'
       value: 'hello'
+      scope: @parent
     
-    textNode = new TextHandler textNode, @parent
+    textNode = new TextHandler textNode
     @assert @parent.hasChildNodes()
     textNode.remove()
     @assert !@parent.hasChildNodes()

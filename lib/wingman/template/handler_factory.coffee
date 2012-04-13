@@ -11,10 +11,9 @@ MAP =
   element: ElementHandler
   text: TextHandler
 
-exports.create = (@options, @scope, @context) ->
+exports.create = (@options, @context) ->
   klass = MAP[@options.type]
   if klass
-    new klass @options, @scope, @context
+    new klass @options, @context
   else
     throw new Error "Cannot create unknown node type (#{@options.type})!"
-
