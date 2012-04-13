@@ -12,7 +12,6 @@ module.exports = class ParserTest extends Janitor.TestCase
     @assertEqual 'div', tree.children[0].tag
     @assertEqual 'element', tree.children[0].type
     @assertEqual 0, tree.children[0].children.length
-    @assert !tree.children[0].isDynamic
   
   'test empty tag with tag name containing numbers': ->
     tree = @parse '<h1></h1>'
@@ -30,7 +29,6 @@ module.exports = class ParserTest extends Janitor.TestCase
     
     @assertEqual 'text', textNode.type
     @assertEqual 'hi', textNode.value
-    @assert !textNode.isDynamic
   
   'test use of newlines and tabs': ->
     templateSource = """
@@ -43,10 +41,7 @@ module.exports = class ParserTest extends Janitor.TestCase
     
     @assertEqual 1, tree.children.length
     @assertEqual 'div', tree.children[0].tag
-    
-    textNode = tree.children[0].children[0]
-    @assertEqual 'Raz to the mouse!', textNode.value
-    @assert !textNode.isDynamic
+    @assertEqual 'Raz to the mouse!', tree.children[0].children[0]
   
   'test multiple tags': ->
     tree = @parse '<div>one</div><span>two</span>'
