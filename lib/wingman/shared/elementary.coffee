@@ -12,8 +12,8 @@ module.exports =
     @classCache()[className]++
     
     if @classCache()[className] == 1
-      @domElement.className = if @domElement.className
-       @domElement.className.split(' ').concat(className).join ' '
+      @el.className = if @el.className
+       @el.className.split(' ').concat(className).join ' '
       else
        className
   
@@ -22,17 +22,17 @@ module.exports =
     
     if @classCache()[className] == 0
       reg = new RegExp '(\\s|^)' + className + '(\\s|$)'
-      @domElement.className = @domElement.className.replace reg, ''
+      @el.className = @el.className.replace reg, ''
   
   setStyle: (key, value) ->
     keyCssNotation = @convertCssPropertyFromDomToCssNotation key
-    @domElement.style[keyCssNotation] = value
+    @el.style[keyCssNotation] = value
   
   setAttribute: (key, value) ->
-    @domElement.setAttribute key, value
+    @el.setAttribute key, value
   
   remove: ->
-    @domElement.parentNode.removeChild @domElement
+    @el.parentNode.removeChild @el
   
   # This method should probably not be an instance method. I could make it a private method,
   # but that would make it hard to test - so for now, it's just an instance method.

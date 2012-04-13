@@ -16,7 +16,7 @@ module.exports = class ElementHandler extends Module
       @setupChildren()
   
   setupDomElement: ->
-    @domElement = if @options.el
+    @el = if @options.el
       @options.el
     else
       element = Wingman.document.createElement @options.tag
@@ -60,13 +60,13 @@ module.exports = class ElementHandler extends Module
     @context.observe style.value, (newValue) => @setStyle key, newValue
   
   setupSource: ->
-    @domElement.innerHTML = @context.get @options.source
+    @el.innerHTML = @context.get @options.source
     @context.observe @options.source, (newValue) =>
-      @domElement.innerHTML = newValue
+      @el.innerHTML = newValue
   
   setupChildren: ->
     for child in @options.children
-      options = { scope: @domElement }
+      options = { scope: @el }
       options[key] = value for key, value of child
       HandlerFactory.create options, @context
 

@@ -6,7 +6,7 @@ Module = require '../../../lib/wingman/shared/module'
 DummyObject = class extends Module
   @include Elementary
   constructor: ->
-    @domElement = document.createElement 'div'
+    @el = document.createElement 'div'
 
 module.exports = class extends Janitor.TestCase
   setup: ->
@@ -19,12 +19,12 @@ module.exports = class extends Janitor.TestCase
   
   'test setting a style': ->
     @dummyObject.setStyle 'color', 'red'
-    @assertEqual 'red', @dummyObject.domElement.style.color
+    @assertEqual 'red', @dummyObject.el.style.color
   
   'test adding two identical classes': ->
     @dummyObject.addClass 'user' for [1..2]
-    @assertEqual 'user', @dummyObject.domElement.className
+    @assertEqual 'user', @dummyObject.el.className
   
   'test setting attribute': ->
     @dummyObject.setAttribute 'name', 'rasmus'
-    @assertEqual 'rasmus', @dummyObject.domElement.getAttribute('name')
+    @assertEqual 'rasmus', @dummyObject.el.getAttribute('name')
