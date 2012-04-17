@@ -11,6 +11,8 @@ STYLE_NAMES = [
   'right'
   'top'
   'bottom'
+  'width'
+  'height'
 ]
 
 module.exports = class extends WingmanObject
