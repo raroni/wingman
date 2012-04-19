@@ -168,6 +168,25 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     @assertEqual 'Rasmus', childElements[0].innerHTML
     @assertEqual 'Mario', childElements[1].innerHTML
   
+  'test child view': ->
+    options =
+      source: 'users'
+      scope: @parent
+      children: [
+        type: 'childView'
+        name: 'sub'
+      ]
+
+    class MainView extends Wingman.View
+    class MainView.SubView extends Wingman.View
+      templateSource: 'Hello'
+    
+    mainView = new MainView
+    mainView.set users: ['Luigi', 'Yoshi']
+    new ForBlockHandler options, mainView
+    @assertEqual 'Hello', @parent.childNodes[0].innerHTML
+    @assertEqual 'Hello', @parent.childNodes[1].innerHTML
+  
   'test child view where name equals singular of source': ->
     options =
       source: 'users'
