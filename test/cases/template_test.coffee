@@ -275,7 +275,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
     @assertEqual 'user', element.className
   
   'test child view': ->
-    template = Wingman.Template.compile '<div>Test</div>{view user}'
+    template = Wingman.Template.compile "<div>Test</div>{view 'user'}"
     
     class MainView extends Wingman.View
       templateSource: -> '<div>tester</div>'
@@ -309,7 +309,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test for block containing sub view': ->
     class MainView extends Wingman.View
-      templateSource: -> '<section>{for users}{view user}{end}</section>'
+      templateSource: -> "<section>{for users}{view 'user'}{end}</section>"
     
     class MainView.UserView extends Wingman.View
       templateSource: -> '<div>{user}</div>'

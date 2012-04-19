@@ -61,7 +61,7 @@ module.exports = class ElementHandler extends Module
   
   setupSource: ->
     @el.innerHTML = @context.get @options.source
-    @context.observe @options.source, (newValue) =>
+    @context.observe @options.source, (newValue, oldValue) =>
       @el.innerHTML = newValue
   
   setupChildren: ->

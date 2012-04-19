@@ -1,6 +1,8 @@
+Wingman = require '../../../wingman'
+
 module.exports = class ChildViewHandler
   constructor: (@options, @context) ->
-    @view = @context.createChild @options.name, @viewOptions()
+    @view = @context.createChild @viewName(), @viewOptions()
     @options.scope.appendChild @view.el
   
   viewOptions: ->
@@ -9,10 +11,19 @@ module.exports = class ChildViewHandler
     options
   
   viewProperties: ->
-    if @context.get @options.name
-      properties = {}
+    properties = {}
+    if @options.name && @context.get @options.name
       properties[@options.name] = @context.get @options.name
-      properties
+    if @options.properties
+      for key in @options.properties
+        properties[key] = @context.get key
+    properties
   
   remove: ->
     @view.remove()
+  
+  viewName: ->
+    if @options.name
+      @options.name
+    else
+      @context.get @options.path

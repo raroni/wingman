@@ -192,7 +192,7 @@ module.exports = class ViewTest extends Janitor.TestCase
   
   'test view with child view': ->
     class MainView extends Wingman.View
-      templateSource: '{view user}'
+      templateSource: "{view 'user'}"
     
     class MainView.UserView extends ViewWithTemplateSource
     

@@ -12,12 +12,7 @@ module.exports = class ForBlockHandler
   
   add: (value) =>
     @handlers[value] = []
-    
-    newContext = new WingmanObject
-    if @context.createChild
-      # The line below would be prettier, but Function#bind is not supported on iOS5.
-      # newContext.createChild = @context.createChild.bind @context
-      newContext.createChild = (args...) => @context.createChild.call @context, args...
+    newContext = Object.create @context
     key = Fleck.singularize @options.source.split('.').pop()
     hash = {}
     hash[key] = value

@@ -42,7 +42,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp.UserController extends Wingman.Controller
     
     class MyApp.RootView extends Wingman.View
-      templateSource: -> '{view user}'
+      templateSource: -> "{view 'user'}"
     
     class MyApp.UserView extends Wingman.View
       templateSource: -> '<div>stubbing the source</div>'
@@ -55,7 +55,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends Wingman.View
-      templateSource: -> "{view user}"
+      templateSource: -> "{view 'user'}"
     class MyApp.UserController extends Wingman.Controller
       ready: ->
         @get('app').set controllerGreeting: 'Controller says hello'
@@ -168,7 +168,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends Wingman.View
-      templateSource: -> '{view main}'
+      templateSource: -> "{view 'main'}"
     
     class MyApp.MainController extends Wingman.Controller
       ready: ->
@@ -189,10 +189,10 @@ module.exports = class ApplicationTest extends Janitor.TestCase
       ready: -> viewFromMainController = @view
     
     class MyApp.RootView extends Wingman.View
-      templateSource: -> '{view main}'
+      templateSource: -> "{view 'main'}"
     
     class MyApp.MainView extends Wingman.View
-      templateSource: -> '{view user}'
+      templateSource: -> "{view 'user'}"
     
     class MyApp.MainView.UserView extends ViewWithTemplateSource
     

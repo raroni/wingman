@@ -159,7 +159,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     
     context = new WingmanObject
     
-    new ForBlockHandler options, context, 'users'
+    new ForBlockHandler options, context
     childElements = @parent.childNodes
     
     @assertEqual 0, childElements.length
@@ -168,7 +168,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     @assertEqual 'Rasmus', childElements[0].innerHTML
     @assertEqual 'Mario', childElements[1].innerHTML
   
-  'test child view': ->
+  'test child view where name equals singular of source': ->
     options =
       source: 'users'
       scope: @parent
@@ -179,10 +179,61 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
-      templateSource: -> '<div>{user}</div>'
+      templateSource: '{user}'
     
     mainView = new MainView
     mainView.set users: ['Luigi', 'Yoshi']
     new ForBlockHandler options, mainView
-    @assertEqual '<div>Luigi</div>', @parent.childNodes[0].innerHTML
-    @assertEqual '<div>Yoshi</div>', @parent.childNodes[1].innerHTML
+    @assertEqual 'Luigi', @parent.childNodes[0].innerHTML
+    @assertEqual 'Yoshi', @parent.childNodes[1].innerHTML
+  
+  'test child view with path name pointing to property on parent view': ->
+    options =
+      source: 'users'
+      scope: @parent
+      children: [
+        type: 'childView'
+        path: 'mySubView'
+        properties: ['user']
+      ]
+    
+    class MainView extends Wingman.View
+      mySubView: -> 'user'
+    
+    class MainView.UserView extends Wingman.View
+      templateSource: '{user}'
+    
+    mainView = new MainView
+    mainView.set users: ['Luigi', 'Yoshi']
+    new ForBlockHandler options, mainView
+    @assertEqual 'Luigi', @parent.childNodes[0].innerHTML
+    @assertEqual 'Yoshi', @parent.childNodes[1].innerHTML
+
+  'test child view with path name pointing to property on iterated elements': ->
+    options =
+      source: 'users'
+      scope: @parent
+      children: [
+        type: 'childView'
+        path: 'user.myMethod'
+        properties: ['user']
+      ]
+    
+    class MainView extends Wingman.View
+      mySubView: -> 'user'
+    
+    class MainView.SecretView extends Wingman.View
+      templateSource: -> '{user.name}'
+    
+    class User extends Wingman.Model
+      myMethod: -> 'secret'
+    
+    user1 = new User name: 'Thelma'
+    user2 = new User name: 'Louise'
+    users = [user1, user2]
+    
+    mainView = new MainView
+    mainView.set { users }
+    new ForBlockHandler options, mainView
+    @assertEqual 'Thelma', @parent.childNodes[0].innerHTML
+    @assertEqual 'Louise', @parent.childNodes[1].innerHTML

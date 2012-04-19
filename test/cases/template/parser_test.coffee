@@ -214,6 +214,33 @@ module.exports = class ParserTest extends Janitor.TestCase
     @assertEqual 'element', input.type
     @assertEqual 'input', input.tag
   
+  'test child view with static identifier': ->
+    tree = @parse "{view 'user'}"
+    nodes = tree.children
+    @assertEqual 1, nodes.length
+    childViewNode = nodes[0]
+    @assertEqual 'childView', childViewNode.type
+    @assertEqual 'user', childViewNode.name
+  
+  'test child view with path identifier': ->
+    tree = @parse '{view user.name}'
+    nodes = tree.children
+    @assertEqual 1, nodes.length
+    childViewNode = nodes[0]
+    @assertEqual 'childView', childViewNode.type
+    @assertEqual 'user.name', childViewNode.path
+  
+  'test child view with properties': ->
+    tree = @parse "{view 'myView', properties: ['myProperty1', 'myProperty2']}"
+    nodes = tree.children
+    @assertEqual 1, nodes.length
+    childViewNode = nodes[0]
+    @assertEqual 'childView', childViewNode.type
+    @assertEqual 'myView', childViewNode.name
+    @assertEqual 2, childViewNode.properties?.length
+    @assertEqual 'myProperty1', childViewNode.properties?[0]
+    @assertEqual 'myProperty2', childViewNode.properties?[1]
+  
   'test tag combined with child view': ->
     tree = @parse '<h1>Some title</h1>{view user}'
     
@@ -223,7 +250,7 @@ module.exports = class ParserTest extends Janitor.TestCase
     childViewNode = nodes[1]
     
     @assertEqual 'childView', childViewNode.type
-    @assertEqual 'user', childViewNode.name
+    @assertEqual 'user', childViewNode.path
   
   'test regular attributes': ->
     tree = @parse '<input name="email" placeholder="Email...">'

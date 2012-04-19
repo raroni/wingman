@@ -28,25 +28,30 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     options =
       name: 'user'
       scope: @parent
+      properties: ['user', 'height']
     
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
-      templateSource: -> null
-      
-      left: ->
-        "#{@get('user.level')*10}px"
+      templateSource: null
     
     mainView = new MainView
-    user = { name: 'Rasmus' }
-    mainView.set { user }
+    mainView.set
+      user:
+        name: 'Rasmus'
+      width: 100
+      height: 200
+    
     handler = new ChildViewHandler options, mainView
     view = handler.view
     @assertEqual 'Rasmus', view.get('user.name')
+    @assertEqual 200, view.get('height')
+    @assert !view.get('width')
   
   'test using passed value in automatic styles': ->
     options =
       name: 'user'
       scope: @parent
+      passPropertyNames: ['user']
     
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
@@ -76,3 +81,18 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     
     handler.remove()
     @assertEqual 0, @parent.childNodes.length
+  
+  'test dynamic name': ->
+    options =
+      path: 'myViewName'
+      scope: @parent
+    
+    class MainView extends Wingman.View
+      myViewName: -> 'user'
+      
+    class MainView.UserView extends Wingman.View
+      templateSource: null
+    
+    mainView = new MainView
+    handler = new ChildViewHandler options, mainView
+    @assert handler.view instanceof MainView.UserView

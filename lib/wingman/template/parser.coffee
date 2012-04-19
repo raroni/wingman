@@ -80,15 +80,29 @@ module.exports = class
     result
     
   scanForViewToken: ->
-    result = @scanner.scan /\{view (.*?)\}/
+    result = @scanner.scan /\{view ([a-zA-Z\.']+)(,{1} {1}(.*?))?\}/
     if result
+      identifier = @scanner.getCapture(0)
+      options = @scanner.getCapture(2)
+      
       newNode =
-        name: @scanner.getCapture(0)
         parent: @currentScope
         type: 'childView'
+      
+      if options
+        optionRegex = /(\w+): \[(.*?)\]/g
+        while option = optionRegex.exec(options)
+          if option[1] == 'properties'
+            newNode.properties = option[2].replace(/\'| /g, '').split ','
+      
+      if identifier[0] == "'"
+        newNode.name = identifier.replace /\'/g, ''
+      else
+        newNode.path = identifier
+      
       @currentScope.children.push newNode
     result
-    
+  
   scanForIfToken: ->
     result = @scanner.scan /\{if (.*?)\}/
     if result
