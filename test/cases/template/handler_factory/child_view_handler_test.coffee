@@ -18,7 +18,7 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
-      templateSource: -> '<div>I am the user view</div>'
+      templateSource: '<div>I am the user view</div>'
     
     mainView = new MainView
     new ChildViewHandler options, mainView
@@ -55,7 +55,7 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
-      templateSource: -> null
+      templateSource: null
       
       left: ->
         "#{@get('user.level')*10}px"
@@ -72,7 +72,7 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
-      templateSource: -> '<div>I am the user view</div>'
+      templateSource: '<div>I am the user view</div>'
     
     mainView = new MainView
     handler = new ChildViewHandler options, mainView

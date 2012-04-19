@@ -4,7 +4,7 @@ WingmanObject = require '../../lib/wingman/shared/object'
 jsdom = require 'jsdom'
 
 class DummyView extends Wingman.View
-  templateSource: -> '<div>test</div>'
+  templateSource: '<div>test</div>'
 
 class ControllerWithView extends Wingman.Controller
   constructor: (options = {}) ->
@@ -25,7 +25,7 @@ module.exports = class ControllerTest extends Janitor.TestCase
         callbackFired = true
       
     DummyView = class extends Wingman.View
-      templateSource: -> '<div>test</div>'
+      templateSource: '<div>test</div>'
       
     dummyView = new DummyView parent: { el: Wingman.document.createElement('div') }
     dummyController = new DummyController view: dummyView

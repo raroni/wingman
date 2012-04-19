@@ -7,7 +7,7 @@ document = require('jsdom').jsdom(null, null, features: {
       })
 
 ViewWithTemplateSource = class extends View
-  templateSource: -> '<div>test</div>'
+  templateSource: '<div>test</div>'
 
 clickElement = (elm) ->
   event = document.createEvent "MouseEvents"
@@ -36,7 +36,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     
   'test setting dom class': ->
     class UserView extends View
-      templateSource: -> '<div>hello</div>'
+      templateSource: '<div>hello</div>'
   
     view = new UserView render: true
     @assertEqual 'user', view.el.className
@@ -109,7 +109,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       click: (event) ->
         didMaintainContext = @randomProperty
         eventFromCallback = event
-      templateSource: -> '<div><a>BOING</a></div>'
+      templateSource: '<div><a>BOING</a></div>'
     
     view = new MainView render: true
     clickElement view.el.childNodes[0].childNodes[0]

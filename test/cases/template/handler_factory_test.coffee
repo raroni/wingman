@@ -480,7 +480,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
     
     class MainView extends Wingman.View
     class MainView.UserView extends Wingman.View
-      templateSource: -> '<div>I am the user view</div>'
+      templateSource: '<div>I am the user view</div>'
     
     mainView = new MainView
     HandlerFactory.create options, mainView

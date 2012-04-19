@@ -223,7 +223,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
       mySubView: -> 'user'
     
     class MainView.SecretView extends Wingman.View
-      templateSource: -> '{user.name}'
+      templateSource: '{user.name}'
     
     class User extends Wingman.Model
       myMethod: -> 'secret'

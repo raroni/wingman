@@ -20,7 +20,7 @@ module.exports = class extends Janitor.TestCase
     
     class FunkySocks.RootController extends Wingman.Controller
     class FunkySocks.RootView extends Wingman.View
-      templateSource: -> '<div>test</div>'
+      templateSource: '<div>test</div>'
     
     new FunkySocks el: Wingman.document.createElement('div')
     

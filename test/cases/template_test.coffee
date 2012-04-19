@@ -278,10 +278,10 @@ module.exports = class TemplateTest extends Janitor.TestCase
     template = Wingman.Template.compile "<div>Test</div>{view 'user'}"
     
     class MainView extends Wingman.View
-      templateSource: -> '<div>tester</div>'
+      templateSource: '<div>tester</div>'
     
     class MainView.UserView extends Wingman.View
-      templateSource: -> '<div>tester</div>'
+      templateSource: '<div>tester</div>'
     
     context = new MainView
     template @parent, context
@@ -309,13 +309,13 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test for block containing sub view': ->
     class MainView extends Wingman.View
-      templateSource: -> "<section>{for users}{view 'user'}{end}</section>"
+      templateSource: "<section>{for users}{view 'user'}{end}</section>"
     
     class MainView.UserView extends Wingman.View
-      templateSource: -> '<div>{user}</div>'
+      templateSource: '<div>{user}</div>'
     
     mainView = new MainView
-    template = Wingman.Template.compile mainView.templateSource()
+    template = Wingman.Template.compile mainView.get('templateSource')
     template @parent, mainView
     mainView.set users: ['Rasmus', 'John']
     
