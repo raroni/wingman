@@ -388,3 +388,11 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     view = new NameView app: {}
     @assert !called
+  
+  'test sub context and descendantCreated event': ->
+    view = new Wingman.View
+    subContext = view.createSubContext()
+    callbackFired = true
+    view.bind 'descendantCreated', -> callbackFired = true
+    subContext.trigger 'descendantCreated'
+    @assert callbackFired

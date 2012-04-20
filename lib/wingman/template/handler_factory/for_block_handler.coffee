@@ -12,7 +12,7 @@ module.exports = class ForBlockHandler
   
   add: (value) =>
     @handlers[value] = []
-    newContext = Object.create @context
+    newContext = @context.createSubContext()
     key = Fleck.singularize @options.source.split('.').pop()
     hash = {}
     hash[key] = value

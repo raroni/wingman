@@ -187,6 +187,9 @@ WingmanObject = class WingmanObject extends Module
     (!(value instanceof WingmanObject)) &&
     !value?._ownerDocument? # need this to detect jsdom HTMLElement values - is there a better way?
   
+  createSubContext: ->
+    Object.create @
+  
   addTriggersToArray: (propertyName) ->
     parent = @
     array = @[propertyName]

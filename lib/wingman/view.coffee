@@ -15,7 +15,7 @@ STYLE_NAMES = [
   'height'
 ]
 
-module.exports = class extends WingmanObject
+module.exports = class View extends WingmanObject
   @include Elementary
   
   @parseEvents: (eventsHash) ->
@@ -138,3 +138,8 @@ module.exports = class extends WingmanObject
   setupStyle: (name) ->
     @setStyle name, @get(name)
     @observe name, (newValue) => @setStyle name, newValue
+  
+  createSubContext: ->
+    context = super()
+    context.bind 'descendantCreated', (child) => @trigger 'descendantCreated', child
+    context

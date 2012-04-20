@@ -187,6 +187,26 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     @assertEqual 'Hello', @parent.childNodes[0].innerHTML
     @assertEqual 'Hello', @parent.childNodes[1].innerHTML
   
+  'test child views descendantCreated event': ->
+    options =
+      source: 'users'
+      scope: @parent
+      children: [
+        type: 'childView'
+        name: 'sub'
+      ]
+    
+    class MainView extends Wingman.View
+    class MainView.SubView extends Wingman.View
+      templateSource: 'Hello'
+    
+    mainView = new MainView
+    mainView.set users: ['Luigi', 'Yoshi']
+    callbackFired = false
+    mainView.bind 'descendantCreated', -> callbackFired = true
+    new ForBlockHandler options, mainView
+    @assert callbackFired
+  
   'test child view where name equals singular of source': ->
     options =
       source: 'users'
