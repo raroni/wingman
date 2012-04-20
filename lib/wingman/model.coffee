@@ -1,19 +1,17 @@
 Wingman = require '../wingman'
 WingmanObject = require './shared/object'
 StorageAdapter = require './model/storage_adapter'
-Store = require './model/store'
-Scope = require './model/scope'
 HasManyAssociation = require './model/has_many_association'
 Fleck = require 'fleck'
 
 module.exports = class Model extends WingmanObject
   @extend StorageAdapter
   
-  @store: ->
-    @_store ||= new Store
+  @collection: ->
+    Wingman.store().collection @
   
   @count: ->
-    @store().count()
+    @collection().count()
   
   @load: (args...) ->
     if typeof(args[0]) == 'number'
@@ -38,17 +36,17 @@ module.exports = class Model extends WingmanObject
       callback models if callback
   
   @scoped: (params) ->
-    new Scope @store(), params
+    @collection().scoped params
   
   @find: (id) ->
-    @store().find id
+    @collection().find id
   
   constructor: (properties, options) ->
     @storageAdapter = @constructor.storageAdapter()
     @dirtyStaticPropertyNames = []
     @setupHasManyAssociations() if @constructor.hasManyNames
     @observeOnce 'id', =>
-      @constructor.store().add @
+      @constructor.collection().add @
     @set properties
   
   setupHasManyAssociations: ->

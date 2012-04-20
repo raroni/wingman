@@ -67,5 +67,15 @@ module.exports = class LocalStorageTest extends Janitor.TestCase
     
     @assertEqual 25, ageFromCallback
   
+  'test delete': ->
+    user = new User
+    user.set name: 'Rasmus', age: 25
+    storage = new LocalStorage namespace: 'users'
+    storage.create user
+    storage.delete user.get('id')
+    
+    data = Wingman.localStorage.getItem("users.#{user.get('id')}")
+    @assert !data
+  
   teardown: ->
     Wingman.localStorage.clear()

@@ -28,3 +28,6 @@ module.exports = class
   
   generateId: ->
     Math.round Math.random()*5000000
+  
+  delete: (id) ->
+    Wingman.localStorage.removeItem @key(id)

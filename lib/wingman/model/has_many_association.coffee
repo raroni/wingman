@@ -29,7 +29,7 @@ module.exports = class HasManyAssociation extends Module
       0
   
   buildOne: (hash) ->
-    foreignId = @model.get('id')
+    foreignId = @model.get 'id'
     throw new Error "Parent's ID must be set to use HasManyAssociation#build." unless foreignId
     hash[@foreignKey()] = foreignId
     new @associatedClass hash

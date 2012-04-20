@@ -1,5 +1,6 @@
 Module = require './../shared/module'
 Events = require './../shared/events'
+Scope = require './scope'
 
 module.exports = class Store extends Module
   @include Events
@@ -39,3 +40,9 @@ module.exports = class Store extends Module
   
   forEach: (callback) ->
     callback(value) for key, value of @models
+  
+  scoped: (params) ->
+    new Scope @, params
+  
+  clear: ->
+    @forEach (model) -> model.destroy()

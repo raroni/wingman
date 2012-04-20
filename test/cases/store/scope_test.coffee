@@ -1,27 +1,27 @@
 Janitor = require 'janitor'
 Wingman = require '../../../.'
-Scope = require '../../../lib/wingman/model/scope'
-Store = require '../../../lib/wingman/model/store'
+Scope = require '../../../lib/wingman/store/scope'
 
-module.exports = class StoreTest extends Janitor.TestCase
+module.exports = class ScopeTest extends Janitor.TestCase
   setup: ->
     class @Notification extends Wingman.Model
   
+  teardown: ->
+    delete Wingman.store().clear()
+  
   'test add': ->
-    scope = new Scope @Notification.store(), userId: 1
+    scope = new Scope @Notification.collection(), userId: 1
     
-    notifications = [
-      new @Notification id: 1, userId: 1, text: 'Goddag'
-      new @Notification id: 2, userId: 1, text: 'Bonsoir'
-      new @Notification id: 3, userId: 2, text: 'Goddag'
-    ]
+    new @Notification id: 1, userId: 1, text: 'Goddag'
+    new @Notification id: 2, userId: 1, text: 'Bonsoir'
+    new @Notification id: 3, userId: 2, text: 'Goddag'
     
     @assertEqual 2, scope.count()
     @assertEqual 'Goddag', scope.find(1).get('text')
     @assertEqual 'Bonsoir', scope.find(2).get('text')
   
   'test add event': ->
-    scope = new Scope @Notification.store(), userId: 1
+    scope = new Scope @Notification.collection(), userId: 1
     valuesFromCallback = []
     scope.bind 'add', (model) -> valuesFromCallback.push(model)
   
@@ -33,7 +33,7 @@ module.exports = class StoreTest extends Janitor.TestCase
     @assertEqual 'Bonsoir', valuesFromCallback[1].get('text')
   
   'test for each': ->
-    scope = new Scope @Notification.store(), userId: 1
+    scope = new Scope @Notification.collection(), userId: 1
 
     notifications = [
       new @Notification id: 1, userId: 1, text: 'Goddag'
@@ -47,7 +47,7 @@ module.exports = class StoreTest extends Janitor.TestCase
   
   'test remove': ->
     Wingman.request.realRequest = (options) ->
-    scope = new Scope @Notification.store(), userId: 1
+    scope = new Scope @Notification.collection(), userId: 1
     
     notification = new @Notification id: 1, userId: 1, text: 'Goddag'
     new @Notification id: 2, userId: 1, text: 'Bonsoir'
@@ -58,7 +58,7 @@ module.exports = class StoreTest extends Janitor.TestCase
   
   'test remove event': ->
     Wingman.request.realRequest = (options) ->
-    scope = new Scope @Notification.store(), userId: 1
+    scope = new Scope @Notification.collection(), userId: 1
     valueFromCallback = undefined
     scope.bind 'remove', (model) -> valueFromCallback = model
     
@@ -70,7 +70,7 @@ module.exports = class StoreTest extends Janitor.TestCase
     @assertEqual valueFromCallback, notification
 
   'test deferred change': ->
-    scope = new Scope @Notification.store(), userId: 1
+    scope = new Scope @Notification.collection(), userId: 1
     
     notification = new @Notification id: 1, userId: 1, text: 'Goddag'
     new @Notification id: 2, userId: 1, text: 'Bonsoir'
@@ -80,10 +80,10 @@ module.exports = class StoreTest extends Janitor.TestCase
     @assertEqual 1, scope.count()
     @assertThrows -> scope.find(1)
   
-  'test creating scope when theres already matches in the store': ->
+  'test creating scope when theres already matches in the collection': ->
     new @Notification id: 1, userId: 1, text: 'Goddag'
     new @Notification id: 2, userId: 2, text: 'Bonsoir'
     
-    scope = new Scope @Notification.store(), userId: 1
+    scope = new Scope @Notification.collection(), userId: 1
     @assertEqual 1, scope.count()
     @assertEqual 'Goddag', scope.find(1).get('text')

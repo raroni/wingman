@@ -10,6 +10,8 @@ module.exports = class ModelTest extends Janitor.TestCase
     Wingman.global = {}
   
   teardown: ->
+    Wingman.request.realRequest = ->
+    Wingman.store().clear()
     delete Wingman.global
     delete Wingman.request.realRequest
   
@@ -341,9 +343,9 @@ module.exports = class ModelTest extends Janitor.TestCase
   'test store add': ->
     class User extends Wingman.Model
     user = new User
-    @assertEqual 0, User.store().count()
+    @assertEqual 0, User.collection().count()
     user.set id: 1
-    @assertEqual 1, User.store().count()
+    @assertEqual 1, User.collection().count()
   
   'test find': ->
     class User extends Wingman.Model

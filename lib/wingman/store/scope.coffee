@@ -4,10 +4,11 @@ Events = require './../shared/events'
 module.exports = class Scope extends Module
   @include Events
   
-  constructor: (store, @params) ->
+  constructor: (collection, @params) ->
+
     @models = {}
-    store.forEach (model) => @check model
-    store.bind 'add', @listen
+    collection.forEach (model) => @check model
+    collection.bind 'add', @listen
   
   listen: (model) =>
     @check model
