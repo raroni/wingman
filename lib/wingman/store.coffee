@@ -11,5 +11,5 @@ module.exports = class Store
   createCollection: (klass) ->
     @collections[klass] = new @collectionClass klass
   
-  clear: ->
-    collection.clear() for klass, collection of @collections
+  flush: ->
+    collection.flush() for klass, collection of @collections

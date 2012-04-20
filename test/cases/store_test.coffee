@@ -8,7 +8,7 @@ class DummyCollection
   add: (value) ->
     @values.push value
   
-  clear: ->
+  flush: ->
     @values = []
   
   isEmpty: ->
@@ -25,7 +25,7 @@ module.exports = class StoreTest extends Janitor.TestCase
     class User
     @assertEqual @store.collection(User), @store.collection(User)
   
-  'test clear': ->
+  'test flush': ->
     class User
     class Notification
     
@@ -38,6 +38,6 @@ module.exports = class StoreTest extends Janitor.TestCase
     
     @assertEqual 2, usersCollection.count()
     @assertEqual 1, notificationsCollection.count()
-    @store.clear()
+    @store.flush()
     @assertEqual 0, usersCollection.count()
     @assertEqual 0, notificationsCollection.count()

@@ -8,8 +8,7 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     class @Notification extends Wingman.Model
   
   teardown: ->
-    Wingman.request.realRequest = ->
-    Wingman.store().clear()
+    Wingman.store().flush()
   
   'test count': ->
     user = new @User

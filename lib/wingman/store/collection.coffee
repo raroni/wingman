@@ -18,7 +18,7 @@ module.exports = class Store extends Module
   insert: (model) ->
     @models[model.get('id')] = model
     @trigger 'add', model
-    model.bind 'destroy', @remove
+    model.bind 'flush', @remove
   
   update: (model, model2) ->
     for key, value of model2.toJSON()
@@ -44,5 +44,5 @@ module.exports = class Store extends Module
   scoped: (params) ->
     new Scope @, params
   
-  clear: ->
-    @forEach (model) -> model.destroy()
+  flush: ->
+    @forEach (model) -> model.flush()

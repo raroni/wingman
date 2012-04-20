@@ -7,7 +7,7 @@ module.exports = class ScopeTest extends Janitor.TestCase
     class @Notification extends Wingman.Model
   
   teardown: ->
-    delete Wingman.store().clear()
+    Wingman.store().flush()
   
   'test add': ->
     scope = new Scope @Notification.collection(), userId: 1

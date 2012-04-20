@@ -73,6 +73,10 @@ module.exports = class Model extends WingmanObject
   destroy: ->
     @trigger 'destroy', @
     @storageAdapter.delete @get('id')
+    @flush()
+  
+  flush: ->
+    @trigger 'flush', @
   
   toParam: ->
     @get 'id'
@@ -106,3 +110,4 @@ module.exports = class Model extends WingmanObject
   
   isDirty: ->
     @dirtyStaticPropertyNames.length != 0
+  

@@ -10,8 +10,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     Wingman.global = {}
   
   teardown: ->
-    Wingman.request.realRequest = ->
-    Wingman.store().clear()
+    Wingman.store().flush()
     delete Wingman.global
     delete Wingman.request.realRequest
   
@@ -216,10 +215,15 @@ module.exports = class ModelTest extends Janitor.TestCase
       
     car = new Car id: 1, name: 'Toyota'
     
-    valueFromCallback = undefined
-    car.bind 'destroy', (model) -> valueFromCallback = model
+    callbackValues = []
+    car.bind 'destroy', (model) -> callbackValues.push model
+    car.bind 'flush', (model) -> callbackValues.push model
+    
     car.destroy()
-    @assertEqual 'Toyota', valueFromCallback.get('name')
+    
+    @assertEqual callbackValues.length, 2
+    @assertEqual 'Toyota', callbackValues[0].get('name')
+    @assertEqual callbackValues[0], callbackValues[1]
     @assert correctRequest
   
   'test scope with rest': ->
@@ -356,5 +360,13 @@ module.exports = class ModelTest extends Janitor.TestCase
     class User extends Wingman.Model
     user = new User id: 1
     @assertThrows -> user.set id: 2
+  
+  'test flush': ->
+    class User extends Wingman.Model
+    user = new User id: 1
+    callbackFired = false
+    user.bind 'flush', -> callbackFired = true
+    user.flush()
+    @assert callbackFired
 
 # TODO: LOAD AND DESTROY

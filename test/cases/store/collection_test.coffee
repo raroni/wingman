@@ -34,11 +34,11 @@ module.exports = class CollectionTest extends Janitor.TestCase
     @collection.add user
     @assertEqual user, valueFromCallback
   
-  'test remove': ->
+  'test flushing model': ->
     Wingman.request.realRequest = (options) ->
     user = new @User id: 1
     @collection.add user
-    user.destroy()
+    user.flush()
     @assertEqual 0, @collection.count()
   
   'test remove event': ->
@@ -68,12 +68,12 @@ module.exports = class CollectionTest extends Janitor.TestCase
     @collection.add user
     @assertEqual 'Ras', @collection.find(1).get('name')
   
-  'test clear': ->
+  'test flush': ->
     user1 = new @User id: 1
     user2 = new @User id: 2
     @collection.add user1
     @collection.add user2
     
     @assertEqual 2, @collection.count()
-    @collection.clear()
+    @collection.flush()
     @assertEqual 0, @collection.count()
