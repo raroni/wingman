@@ -1,6 +1,5 @@
 Janitor = require 'janitor'
-Wingman = require '../../.'
-WingmanObject = require '../../lib/wingman/shared/object'
+Store = require '../../lib/wingman/store'
 
 class DummyCollection
   constructor: -> @values = []
@@ -19,7 +18,7 @@ class DummyCollection
 
 module.exports = class StoreTest extends Janitor.TestCase
   setup: ->
-    @store = new Wingman.Store collectionClass: DummyCollection
+    @store = new Store collectionClass: DummyCollection
   
   'test collection caching': ->
     class User
