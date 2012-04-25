@@ -8,8 +8,8 @@ task 'build', 'Build dist file', ->
     __dirname + '/node_modules/fleck/public/javascripts'
   ]
 
-  package = stitch.createPackage {paths}
-  package.compile (err, source) ->
+  jsPackage = stitch.createPackage {paths}
+  jsPackage.compile (err, source) ->
     source = """
       (function(window) {
         #{source}
