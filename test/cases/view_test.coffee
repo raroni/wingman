@@ -1,9 +1,7 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
 View = Wingman.View
-document = require('jsdom').jsdom(null, null, features: {
-        QuerySelector : true
-      })
+document = require('jsdom').jsdom null, null, features: { QuerySelector : true }
 
 ViewWithTemplateSource = class extends View
   templateSource: '<div>test</div>'
