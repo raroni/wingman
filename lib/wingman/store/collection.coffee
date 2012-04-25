@@ -2,7 +2,7 @@ Module = require './../shared/module'
 Events = require './../shared/events'
 Scope = require './scope'
 
-module.exports = class Store extends Module
+module.exports = class Collection extends Module
   @include Events
   
   constructor: ->
