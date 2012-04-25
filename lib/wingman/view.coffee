@@ -1,5 +1,4 @@
 Wingman = require '../wingman'
-WingmanObject = require './shared/object'
 Elementary = require './shared/elementary'
 Fleck = require 'fleck'
 
@@ -15,7 +14,7 @@ STYLE_NAMES = [
   'height'
 ]
 
-module.exports = class View extends WingmanObject
+module.exports = class View extends Wingman.Object
   @include Elementary
   
   @parseEvents: (eventsHash) ->

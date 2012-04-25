@@ -1,10 +1,9 @@
 Wingman = require '../wingman'
-WingmanObject = require './shared/object'
 StorageAdapter = require './model/storage_adapter'
 HasManyAssociation = require './model/has_many_association'
 Fleck = require 'fleck'
 
-module.exports = class Model extends WingmanObject
+module.exports = class Model extends Wingman.Object
   @extend StorageAdapter
   
   @collection: ->

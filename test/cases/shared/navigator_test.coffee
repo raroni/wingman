@@ -1,5 +1,4 @@
 Janitor = require 'janitor'
-WingmanObject = require '../../../lib/wingman/shared/object'
 Module = require '../../../lib/wingman/shared/module'
 Navigator = require '../../../lib/wingman/shared/navigator'
 Wingman = require '../../../.'

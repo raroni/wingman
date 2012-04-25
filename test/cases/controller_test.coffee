@@ -1,6 +1,5 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
-WingmanObject = require '../../lib/wingman/shared/object'
 jsdom = require 'jsdom'
 
 class DummyView extends Wingman.View
@@ -43,7 +42,7 @@ module.exports = class ControllerTest extends Janitor.TestCase
       someMethod: ->
         callbackFired = true
     
-    app = new WingmanObject
+    app = new Wingman.Object
     view = new MainView { app }
     controller = new MainController view
     

@@ -1,10 +1,9 @@
 Janitor = require 'janitor'
 Wingman = require '../../../../.'
-WingmanObject = require '../../../../lib/wingman/shared/object'
 RestStorage = require '../../../../lib/wingman/model/storage_adapters/rest'
 sinon = require 'sinon'
 
-class DummyUser extends WingmanObject
+class DummyUser extends Wingman.Object
   get: (key) -> @[key]
   
   set: (hash) ->

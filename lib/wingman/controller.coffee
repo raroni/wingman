@@ -1,8 +1,7 @@
-WingmanObject = require './shared/object'
 Wingman = require '../wingman'
 Navigator = require './shared/navigator'
 
-module.exports = class extends WingmanObject
+module.exports = class extends Wingman.Object
   @include Navigator
   
   constructor: (view) ->

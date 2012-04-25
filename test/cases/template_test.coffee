@@ -1,6 +1,5 @@
 Janitor = require 'janitor'
 Wingman = require '../..'
-WingmanObject = require '../../lib/wingman/shared/object'
 jsdom = require 'jsdom'
 CustomAssertions = require '../custom_assertions'
 
@@ -38,7 +37,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test template with only dynamic value': ->
     template = Wingman.Template.compile '{greeting}'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set greeting: 'hello'
     template @parent, context
     @assertEqual 1, @parent.childNodes.length
@@ -46,7 +45,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test deferred context update with template with only dynamic value': ->
     template = Wingman.Template.compile '{greeting}'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set greeting: 'hello'
     template @parent, context
     context.set greeting: 'good morning'
@@ -54,7 +53,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test basic template with dynamic content': ->
     template = Wingman.Template.compile '<div>{greeting}</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set greeting: 'hello'
     template @parent, context
     @assertEqual 1, @parent.childNodes.length
@@ -62,7 +61,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test template with dynamic value after updating context': ->
     template = Wingman.Template.compile '<div>{greeting}</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set greeting: 'hello'
     template @parent, context
     context.set greeting: 'hi'
@@ -72,9 +71,9 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test template with nested dynamic value after updating context': ->
     template = Wingman.Template.compile '<div>{user.name}</div>'
-    user = new WingmanObject
+    user = new Wingman.Object
     user.set name: 'Rasmus'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set {user}
     template @parent, context
     
@@ -87,7 +86,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   'test for token': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
   
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     template @parent, context
   
@@ -101,7 +100,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   'test for token with deferred push': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
   
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     template @parent, context
   
@@ -115,7 +114,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   'test for token with deferred remove': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
   
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     template @parent, context
   
@@ -128,7 +127,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   'test for token with deferred reset': ->
     template = Wingman.Template.compile '<ol>{for users}<li>{user}</li>{end}</ol>'
   
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     template @parent, context
     olElm = @parent.childNodes[0]
@@ -144,7 +143,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test element with single dynamic style': ->
     template = Wingman.Template.compile '<div style="color:{color}">yo</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set color: 'red'
     elements = template @parent, context
   
@@ -152,7 +151,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test deferred reset for element with single dynamic style': ->
     template = Wingman.Template.compile '<div style="color:{myColor}">yo</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myColor: 'red'
     template @parent, context
     context.set myColor: 'blue'
@@ -160,7 +159,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test element with two static styles': ->
     template = Wingman.Template.compile '<div style="color:{myColor}; font-size: 15px">yo</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myColor: 'red'
     template @parent, context
   
@@ -169,7 +168,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test element with two dynamic styles': ->
     template = Wingman.Template.compile '<div style="color:{myColor}; font-size: {myFontSize}">yo</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myColor: 'red', myFontSize: '15px'
     template @parent, context
   
@@ -194,7 +193,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test element with single dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user'
   
     template @parent, context
@@ -202,7 +201,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test deferred reset with element with single dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user'
   
     template @parent, context
@@ -214,7 +213,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test deferred reset to falsy value with element with single dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass}">something</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user'
     
     template @parent, context
@@ -226,7 +225,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test element with two dynamic classes that evaluates to the same value': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass} {mySuperbClass}">something</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
   
     template @parent, context
@@ -234,7 +233,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test deferred reset of dynamic class that evaluates to the same value as another dynamic class': ->
     template = Wingman.Template.compile '<div class="{myAwesomeClass} {mySuperbClass}">something</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
     
     template @parent, context
@@ -246,7 +245,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test element with dynamic and static class': ->
     template = Wingman.Template.compile '<div class="user {selectedCls}">something</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set selectedCls: 'selected'
     
     template @parent, context
@@ -256,7 +255,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test deactivated dynamic class when also having static class': ->
     template = Wingman.Template.compile '<div class="user {selectedCls}">something</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set selectedCls: undefined
     
     template @parent, context
@@ -265,7 +264,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test deferred deactivation of dynamic class when also having static class': ->
     template = Wingman.Template.compile '<div class="user {selectedCls}">something</div>'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set selectedCls: 'selected'
     
     template @parent, context
@@ -297,7 +296,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test regular attributes with dynamic values': ->
     template = Wingman.Template.compile '<img src="{mySrc}">'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set mySrc: 'my_pic.png'
     
     template @parent, context
@@ -324,7 +323,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
     @assertEqual 'John', @parent.childNodes[0].childNodes[1].childNodes[0].innerHTML
   
   'test simple conditional': ->
-    context = new WingmanObject
+    context = new Wingman.Object
     template = Wingman.Template.compile '{if something}<div>hello</div>{end}'
     template @parent, context
     
@@ -335,7 +334,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
     @assertEqual 'hello', childNodes[0].innerHTML
     
   'test if else conditional': ->
-    context = new WingmanObject
+    context = new Wingman.Object
     template = Wingman.Template.compile '{if early}<div>good morning</div>{else}<div>good evening</div>{end}'
     template @parent, context
     
@@ -348,14 +347,14 @@ module.exports = class TemplateTest extends Janitor.TestCase
   
   'test element surrounded by text': ->
     
-    context = new WingmanObject
+    context = new Wingman.Object
     template = Wingman.Template.compile 'Hello <span>Rasmus</span>, how are you?'
     template @parent, context
     
     @assertEqual 'Hello <span>Rasmus</span>, how are you?', @parent.innerHTML
   
   'test element with source surrounded by text': ->
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set name: 'Rasmus'
     
     template = Wingman.Template.compile 'Hello <span>{name}</span>, how are you?'
@@ -364,7 +363,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
     @assertEqual 'Hello <span>Rasmus</span>, how are you?', @parent.innerHTML
   
   'test deferred context update with source element surrounded by text': ->
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set name: 'Rasmus'
     
     template = Wingman.Template.compile 'Hello <span>{name}</span>, how are you?'

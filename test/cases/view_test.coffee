@@ -1,6 +1,5 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
-WingmanObject = require '../../lib/wingman/shared/object'
 View = Wingman.View
 document = require('jsdom').jsdom(null, null, features: {
         QuerySelector : true
@@ -160,7 +159,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     class MainView.UserView extends ViewWithTemplateSource
     class MainView.UserView.NameView extends ViewWithTemplateSource
     
-    app = new WingmanObject
+    app = new Wingman.Object
     view = new MainView { app, render: true }
     @assertEqual app, view.createChild('user').createChild('name').get('app')
   

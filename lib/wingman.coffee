@@ -4,6 +4,7 @@ if window?
   exports.global = window
   exports.localStorage = localStorage
 
+exports.Object = require('./wingman/shared/object')
 exports.request = require('./wingman/request')
 exports.Template = require('./wingman/template')
 exports.View = require('./wingman/view')

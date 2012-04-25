@@ -1,10 +1,9 @@
 Wingman = require '../wingman'
 Events = require './shared/events'
-WingmanObject = require './shared/object'
 Navigator = require './shared/navigator'
 Fleck = require 'fleck'
 
-module.exports = class Application extends WingmanObject
+module.exports = class Application extends Wingman.Object
   @include Navigator
   @include Events
   

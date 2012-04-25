@@ -2,7 +2,6 @@ jsdom = require 'jsdom'
 Janitor = require 'janitor'
 ConditionalHandler = require '../../../../lib/wingman/template/handler_factory/conditional_handler'
 Wingman = require '../../../../.'
-WingmanObject = require '../../../../lib/wingman/shared/object'
 
 module.exports = class ConditionalHandlerTest extends Janitor.TestCase
   setup: ->
@@ -35,7 +34,7 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set something: true
     new ConditionalHandler options, context
     
@@ -77,7 +76,7 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
         ]
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set early: true
     new ConditionalHandler options, context
     

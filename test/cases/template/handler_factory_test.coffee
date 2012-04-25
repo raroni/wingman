@@ -1,6 +1,5 @@
 Janitor = require 'janitor'
 HandlerFactory = require '../../../lib/wingman/template/handler_factory'
-WingmanObject = require '../../../lib/wingman/shared/object'
 Wingman = require '../../..'
 CustomAssertions = require '../../custom_assertions'
 jsdom = require 'jsdom'
@@ -61,7 +60,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
       source: 'name'
       scope: @parent
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set name: 'Rasmus'
     HandlerFactory.create options, context
     
@@ -74,7 +73,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
       source: 'name'
       scope: @parent
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set name: 'John'
     HandlerFactory.create options, context
     element = @parent.childNodes[0]
@@ -90,9 +89,9 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
       source: 'user.name'
       scope: @parent
     
-    user = new WingmanObject
+    user = new Wingman.Object
     user.set name: 'John'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set {user}
     HandlerFactory.create options, context
     element = @parent.childNodes[0]
@@ -112,7 +111,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     
     HandlerFactory.create options, context
@@ -133,7 +132,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     
     HandlerFactory.create options, context
@@ -155,7 +154,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     
     HandlerFactory.create options, context
@@ -175,7 +174,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
   
     HandlerFactory.create options, context
@@ -217,7 +216,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
           value: 'color'
           isDynamic: true
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set color: 'red'
     
     HandlerFactory.create options, context
@@ -239,7 +238,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
           value: 'color'
           isDynamic: true
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set color: 'red'
     HandlerFactory.create options, context
     context.set color: 'blue'
@@ -286,7 +285,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
           value: 'myFontSize'
           isDynamic: true
     
-    context = new WingmanObject
+    context = new Wingman.Object
     
     context.set myColor: 'red', myFontSize: '15px'
     HandlerFactory.create options, context
@@ -317,7 +316,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
           value: 'myFontSize'
           isDynamic: true
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myColor: 'red', myFontSize: '15px'
     HandlerFactory.create options, context
     
@@ -374,7 +373,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         isDynamic: true
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user'
   
     HandlerFactory.create options, context
@@ -391,7 +390,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         isDynamic: true
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user'
   
     HandlerFactory.create options, context
@@ -411,7 +410,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         isDynamic: true
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user'
   
     HandlerFactory.create options, context
@@ -438,7 +437,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
     
     HandlerFactory.create options, context
@@ -462,7 +461,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
     
     HandlerFactory.create options, context
@@ -510,7 +509,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set something: true
     HandlerFactory.create options, context
     
@@ -553,7 +552,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         ]
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set early: true
     HandlerFactory.create options, context
     

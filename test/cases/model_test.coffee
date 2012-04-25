@@ -1,6 +1,5 @@
 Janitor = require 'janitor'
 Wingman = require '../../.'
-WingmanObject = require '../../lib/wingman/shared/object'
 HasManyAssociation = require '../../lib/wingman/model/has_many_association'
 sinon = require 'sinon'
 RestStorage = require '../../lib/wingman/model/storage_adapters/rest'
@@ -296,7 +295,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     class Wingman.global.Notification extends Wingman.Model
     
-    context = new WingmanObject
+    context = new Wingman.Object
     callbackValues = []
     context.observe 'user.notifications', 'add', (model) -> callbackValues.push model
     

@@ -1,7 +1,6 @@
 Janitor = require 'janitor'
 ElementHandler = require '../../../../lib/wingman/template/handler_factory/element_handler'
 Wingman = require '../../../../.'
-WingmanObject = require '../../../../lib/wingman/shared/object'
 CustomAssertions = require '../../../custom_assertions'
 jsdom = require 'jsdom'
 
@@ -66,7 +65,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
       source: 'name'
       scope: @parent
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set name: 'Rasmus'
     element = new ElementHandler options, context
   
@@ -78,7 +77,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
       source: 'name'
       scope: @parent
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set name: 'John'
     element = new ElementHandler options, context
     @assertEqual 'John', element.el.innerHTML
@@ -92,9 +91,9 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
       source: 'user.name'
       scope: @parent
     
-    user = new WingmanObject
+    user = new Wingman.Object
     user.set name: 'John'
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set {user}
     element = new ElementHandler options, context
     @assertEqual 'John', element.el.innerHTML
@@ -133,7 +132,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           value: 'color'
           isDynamic: true
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set color: 'red'
     handler = new ElementHandler options, context
     
@@ -153,7 +152,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           value: 'color'
           isDynamic: true
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set color: 'red'
     element = new ElementHandler options, context
     context.set color: 'blue'
@@ -194,7 +193,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           value: 'myFontSize'
           isDynamic: true
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myColor: 'red', myFontSize: '15px'
     element = new ElementHandler options, context
   
@@ -246,7 +245,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         isDynamic: true
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user'
   
     element = new ElementHandler options, context
@@ -262,7 +261,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         isDynamic: true
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user'
   
     element = new ElementHandler options, context
@@ -280,7 +279,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         isDynamic: true
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user'
     
     element = new ElementHandler options, context
@@ -305,7 +304,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
     
     element = new ElementHandler options, context
@@ -328,7 +327,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set myAwesomeClass: 'user', mySuperbClass: 'user'
     
     element = new ElementHandler options, context
@@ -363,7 +362,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           value: 'mySrc'
           isDynamic: true
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set mySrc: 'funny_pic.png'
     
     element = new ElementHandler(options, context).el
@@ -387,7 +386,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set selectedCls: 'selected'
     element = new ElementHandler(options, context).el
     
@@ -410,7 +409,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set selectedCls: undefined
     element = new ElementHandler(options, context).el
     
@@ -433,7 +432,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set selectedCls: 'selected'
     
     element = new ElementHandler(options, context).el

@@ -11,6 +11,7 @@ module.exports = class WingmanTest extends Janitor.TestCase
     @assert Wingman.Application
     @assert Wingman.Module
     @assert Wingman.Events
+    @assert Wingman.Object
     @assertEqual Wingman.store().constructor, Wingman.Store
   
   'test store singleton': ->

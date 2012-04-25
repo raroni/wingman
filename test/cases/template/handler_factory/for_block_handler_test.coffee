@@ -1,6 +1,5 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
-WingmanObject = require '../../../../lib/wingman/shared/object'
 ForBlockHandler = require '../../../../lib/wingman/template/handler_factory/for_block_handler'
 Wingman = require '../../../../.'
 
@@ -22,7 +21,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     
     new ForBlockHandler options, context
@@ -52,7 +51,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
   
     new ForBlockHandler options, context
@@ -74,8 +73,8 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
         source: 'notification'
       ]
   
-    context = new WingmanObject
-    user = new WingmanObject
+    context = new Wingman.Object
+    user = new Wingman.Object
     user.set notifications: ['Hello', 'Hi']
     context.set { user }
   
@@ -96,7 +95,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
     
     new ForBlockHandler options, context
@@ -117,7 +116,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
   
     new ForBlockHandler options, context, 'users'
@@ -137,7 +136,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     context.set users: ['Rasmus', 'John']
   
     new ForBlockHandler options, context
@@ -157,7 +156,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = new WingmanObject
+    context = new Wingman.Object
     
     new ForBlockHandler options, context
     childElements = @parent.childNodes
