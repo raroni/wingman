@@ -6,7 +6,7 @@ module.exports = class extends Wingman.Object
   
   constructor: (view) ->
     @set view: view
-    @set app: view.app
+    @set state: view.state
     @setupBindings()
     super()
     @ready?()

@@ -37,16 +37,16 @@ module.exports = class ControllerTest extends Janitor.TestCase
     class MainView extends Wingman.View
     class MainController extends Wingman.Controller
       @propertyDependencies
-        someMethod: 'app.test'
+        someMethod: 'state.test'
       
       someMethod: ->
         callbackFired = true
     
-    app = new Wingman.Object
-    view = new MainView { app }
+    state = new Wingman.Object
+    view = new MainView { state }
     controller = new MainController view
     
-    app.set test: 'something'
+    state.set test: 'something'
     
     @assert callbackFired
   

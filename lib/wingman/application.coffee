@@ -27,11 +27,17 @@ module.exports = class Application extends Wingman.Object
     @ready?()
   
   buildView: ->
-    view = new @constructor.RootView parent: @, el: @el, app: @, childClasses: @constructor.rootViewSiblings()
+    view = new @constructor.RootView parent: @, el: @el, state: @get('state'), childClasses: @constructor.rootViewSiblings()
     view.bind 'descendantCreated', (view) => @trigger 'viewCreated', view
     @trigger 'viewCreated', view
     view.render()
     view
+  
+  state: ->
+    @_state ||= @createState()
+  
+  createState: ->
+    new Wingman.Object
   
   buildController: (view) =>
     Controller = @controllerClassForView view

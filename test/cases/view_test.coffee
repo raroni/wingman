@@ -152,14 +152,14 @@ module.exports = class ViewTest extends Janitor.TestCase
     first = name.createChild 'first'
     @assertEqual 'user.name.first', first.path()
   
-  'test app instance sharing': ->
+  'test state sharing': ->
     class MainView extends ViewWithTemplateSource
     class MainView.UserView extends ViewWithTemplateSource
     class MainView.UserView.NameView extends ViewWithTemplateSource
     
-    app = new Wingman.Object
-    view = new MainView { app, render: true }
-    @assertEqual app, view.createChild('user').createChild('name').get('app')
+    state = new Wingman.Object
+    view = new MainView { state, render: true }
+    @assertEqual state, view.createChild('user').createChild('name').get('state')
   
   'test access to parent': ->
     class MainView extends ViewWithTemplateSource

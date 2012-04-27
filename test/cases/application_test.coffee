@@ -51,24 +51,24 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     app = new MyApp el: rootEl
     @assert rootEl.innerHTML.match('stubbing the source')
   
-  'test access to application instance': ->
+  'test access to state': ->
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends Wingman.View
       templateSource: "{view 'user'}"
     class MyApp.UserController extends Wingman.Controller
       ready: ->
-        @get('app').set controllerGreeting: 'Controller says hello'
+        @get('state').set controllerGreeting: 'Controller says hello'
     
     class MyApp.UserView extends ViewWithTemplateSource
       ready: ->
-        @get('app').set viewGreeting: 'View says hello'
+        @get('state').set viewGreeting: 'View says hello'
     
     rootEl = Wingman.document.createElement 'div'
     app = new MyApp el: rootEl
     
-    @assertEqual 'View says hello', app.get('viewGreeting')
-    @assertEqual 'Controller says hello', app.get('controllerGreeting')
+    @assertEqual 'View says hello', app.get('state.viewGreeting')
+    @assertEqual 'Controller says hello', app.get('state.controllerGreeting')
   
   'test singleton instance': ->
     class MyApp extends Wingman.Application
@@ -210,20 +210,20 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     @assert !rootViewSiblings.RootController
     @assert !rootViewSiblings.RootView
   
-  'test view depending on properties of shared': ->
+  'test view depending on properties of state': ->
     callbackFired = false
     
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
     class MyApp.RootView extends ViewWithTemplateSource
       @propertyDependencies
-        someMethod: 'app.test'
+        someMethod: 'state.test'
       
       someMethod: ->
         callbackFired = true
     
     app = new MyApp el: Wingman.document.createElement('div')
-    app.set test: 'something'
+    app.get('state').set test: 'something'
     @assert callbackFired
     
   'test controller depending on properties of shared': ->
@@ -232,7 +232,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp extends Wingman.Application
     class MyApp.RootController extends Wingman.Controller
       @propertyDependencies
-        someMethod: 'app.test'
+        someMethod: 'state.test'
       
       someMethod: ->
         callbackFired = true
@@ -240,7 +240,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     class MyApp.RootView extends ViewWithTemplateSource
     
     app = new MyApp el: Wingman.document.createElement('div')
-    app.set test: 'something'
+    app.get('state').set test: 'something'
     @assert callbackFired
   
   'test view without corresponding controller': ->
