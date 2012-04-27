@@ -28,20 +28,24 @@ module.exports = class ObjectTest extends Janitor.TestCase
     person.lastName = 'Nielsen'
     @assertEqual 'Rasmus Nielsen', person.fullName
   
-  #'test observe': ->
-  #  Person = class extends WingmanObject
-  #  person = new Person
-  #  person.set name: 'Roger'
-  #
-  #  newNameFromCallback = ''
-  #  oldNameFromCallback = ''
-  #  person.observe 'name', (newName, oldName) ->
-  #    newNameFromCallback = newName
-  #    oldNameFromCallback = oldName
-  #  person.set name: 'Rasmus'
-  #  @assertEqual newNameFromCallback, 'Rasmus'
-  #  @assertEqual oldNameFromCallback, 'Roger'
-  #
+  'test observe': ->
+    Person = WingmanObject.extend
+      name: null
+    
+    person = new Person
+    person.name = 'Roger'
+    
+    newNameFromCallback = null
+    oldNameFromCallback = null
+    
+    person.observe 'name', (newName, oldName) ->
+      newNameFromCallback = newName
+      oldNameFromCallback = oldName
+    
+    person.name = 'Rasmus'
+    @assertEqual newNameFromCallback, 'Rasmus'
+    @assertEqual oldNameFromCallback, 'Roger'
+  
   #'test observe of unset properties': ->
   #  Person = class extends WingmanObject
   #  person = new Person
