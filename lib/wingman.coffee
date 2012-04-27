@@ -5,6 +5,10 @@ if window?
   exports.localStorage = localStorage
 
 exports.Object = require('./wingman/shared/object')
+
+# temporary to avoid exceptions while working on Wingman.Object
+exports.Object = class extends require('./wingman/shared/module')
+  
 exports.request = require('./wingman/request')
 exports.Template = require('./wingman/template')
 exports.View = require('./wingman/view')
