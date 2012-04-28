@@ -106,6 +106,11 @@ addProperty = (key, value) ->
       get: createGetter(key, value)
       set: createSetter(key)
 
+instantiate = (object) ->
+  instance = Object.create object.prototype
+  instance.constructor = object
+  instance
+
 WingmanObject = ->
 WingmanObject.prototype = WingmanObjectPrototype
 WingmanObject.include = (hash) ->
@@ -119,10 +124,7 @@ WingmanObject.extend = (hash) ->
   object = ->
   object.prototype = Object.create this.prototype
   WingmanObject.include.call object, hash if hash
-  object.create = ->
-    instance = Object.create object.prototype
-    instance.constructor = object
-    instance
+  object.create = -> instantiate object
   object
 
 
