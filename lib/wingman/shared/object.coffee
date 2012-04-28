@@ -64,27 +64,53 @@ WingmanObjectPrototype =
     type = args.pop() || 'change'
     @unbind "#{type}:#{propertyName}", callback
 
+Properties =
+  data: []
+  instances: []
+  findOrCreate: (object) ->
+    @find(object) || @create(object)
+  
+  find: (object) ->
+    id = @instances.indexOf object
+    @data[id]
+  
+  create: (object) ->
+    hash = {}
+    @data.push hash
+    @instances.push object
+    hash
+
+createSetter = (key) ->
+  (value) ->
+    properties = Properties.findOrCreate @
+    properties[key] = value
+    @triggerPropertyChange key
+
+createGetter = (key, defaultValue) ->
+  ->
+    properties = Properties.find @
+    if properties && properties.hasOwnProperty key
+      properties[key]
+    else
+      defaultValue
+
+addProperty = (key, value) ->
+  match = key.match(/^get([A-Z]{1}.*)$/)
+  if match && typeof(value) == 'function'
+    propertyName = match[1].replace /.{1}/, (v) -> v.toLowerCase()
+    Object.defineProperty @, propertyName, { get: value }
+  else if typeof(value) == 'function'
+    @[key] = value
+  else
+    Object.defineProperty @, key,
+      get: createGetter(key, value)
+      set: createSetter(key)
+
 WingmanObject =
   prototype: WingmanObjectPrototype
   
   include: (hash) ->
-    properties = {}
-    for key, value of hash
-      do (key, value) =>
-        match = key.match(/^get([A-Z]{1}.*)$/)
-        if match && typeof(value) == 'function'
-          propertyName = match[1].replace /.{1}/, (v) -> v.toLowerCase()
-          Object.defineProperty @prototype, propertyName, { get: value }
-        else if typeof(value) == 'function'
-          @prototype[key] = value
-        else
-          properties[key] = value
-          Object.defineProperty @prototype, key,
-            get: ->
-              properties[key]
-            set: (value) ->
-              properties[key] = value
-              @triggerPropertyChange key
+    addProperty.call this.prototype, key, value for key, value of hash
   
   extend: (hash) ->
     object = ->

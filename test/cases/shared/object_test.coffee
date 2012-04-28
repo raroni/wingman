@@ -13,11 +13,13 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Viking = WingmanObject.extend
       healthPoints: 100
       takeDamage: (healthPoints) -> @healthPoints -= healthPoints
+      lives: 5
     
     thor = Viking.create()
     @assertEqual 100, thor.healthPoints
     thor.takeDamage 25
     @assertEqual 75, thor.healthPoints
+    @assertEqual 5, thor.lives
   
   'test getter': ->
     Person = WingmanObject.extend
@@ -46,64 +48,105 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual newNameFromCallback, 'Rasmus'
     @assertEqual oldNameFromCallback, 'Roger'
   
-  #'test observe of unset properties': ->
-  #  Person = class extends WingmanObject
-  #  person = new Person
-  #
-  #  newNameFromCallback = ''
-  #  oldNameFromCallback = ''
-  #  person.observe 'name', (newName, oldName) ->
-  #    newNameFromCallback = newName
-  #    oldNameFromCallback = oldName
-  #  person.set name: 'Rasmus'
-  #  @assertEqual newNameFromCallback, 'Rasmus'
-  #  @assertEqual oldNameFromCallback, undefined
-  #
-  #'test observe of nested unset properties': ->
-  #  Person = class extends WingmanObject
-  #  rasmus = new Person
-  #  john = new Person
-  #  john.set name: 'John'
-  #
-  #  newNameFromCallback = ''
-  #  oldNameFromCallback = ''
-  #  
-  #  rasmus.observe 'friend.name', (newName, oldName) ->
-  #    newNameFromCallback = newName
-  #    oldNameFromCallback = oldName
-  #  rasmus.set friend: john
-  #  
-  #  @assertEqual newNameFromCallback, 'John'
-  #  @assertEqual oldNameFromCallback, undefined
-  #
-  #'test observing on deeply nested properties that are later changed': ->
-  #  view = new WingmanObject
-  #  latestvalueFromCallback = undefined
-  #  view.observe 'user.car.kilometersDriven', (newValue) -> latestvalueFromCallback = newValue
-  #
-  #  user = new WingmanObject
-  #  view.set { user }
-  #  car1 = new WingmanObject
-  #  car1.set kilometersDriven: 200000
-  #  car2 = new WingmanObject
-  #  car2.set kilometersDriven: 10000
-  #  
-  #  user.set car: car1
-  #  user.set car: car2
-  #  
-  #  @assertEqual 10000, latestvalueFromCallback
-  #
-  #'test unobserve': ->
-  #  Person = class extends WingmanObject
-  #  person = new Person
-  #  callbackRun = false
-  #  callback = ->
-  #    callbackRun = true
-  #  person.observe 'name', callback
-  #  person.unobserve 'name', callback
-  #  person.set name: 'Rasmus'
-  #  @assert !callbackRun
-  #
+  'test observe of unset properties': ->
+    Person = WingmanObject.extend
+      name: null
+    
+    person = new Person
+    
+    newNameFromCallback = null
+    oldNameFromCallback = null
+    
+    person.observe 'name', (newName, oldName) ->
+      newNameFromCallback = newName
+      oldNameFromCallback = oldName
+    
+    person.name = 'Rasmus'
+    @assertEqual newNameFromCallback, 'Rasmus'
+    @assertEqual oldNameFromCallback, undefined
+  
+  'test observe of nested unset properties': ->
+    Person = WingmanObject.extend
+      name: null
+      friend: null
+    
+    rasmus = new Person
+    john = new Person
+    
+    john.name = 'John'
+    
+    newNameFromCallback = null
+    oldNameFromCallback = null
+    rasmus.observe 'friend.name', (newName, oldName) ->
+      newNameFromCallback = newName
+      oldNameFromCallback = oldName
+    
+    rasmus.friend = john
+    
+    @assertEqual newNameFromCallback, 'John'
+    @assertEqual oldNameFromCallback, undefined
+  
+  'test two instances of same object': ->
+    Car = WingmanObject.extend
+      speed: null
+    
+    car1 = Car.create()
+    car1.name = 'car1'
+    car1.speed = 100
+    
+    car2 = Car.create()
+    car2.speed = 150
+    
+    @assertEqual 100, car1.speed
+    @assertEqual 150, car2.speed
+  
+  'test observing on deeply nested properties that are later changed': ->
+    View = WingmanObject.extend
+      user: null
+    
+    User = WingmanObject.extend
+      car: null
+    
+    Car = WingmanObject.extend
+      speed: null
+    
+    view = View.create()
+    
+    callbackValues = []
+    
+    view.observe 'user.car.speed', (newValue) ->
+      callbackValues.push newValue
+    
+    user = User.create()
+    view.user = user
+    car1 = Car.create()
+    car1.speed = 200000
+    car2 = Car.create()
+    car2.speed = 10000
+    
+    user.car = car1
+    user.car = car2
+    
+    @assertEqual 3, callbackValues.length
+    @assertEqual undefined, callbackValues[0]
+    @assertEqual 200000, callbackValues[1]
+    @assertEqual 10000, callbackValues[2]
+  
+  'test unobserve': ->
+    Person = WingmanObject.extend
+      name: null
+    
+    person = new Person
+    callbackRan = false
+    callback = -> callbackRan = true
+    
+    person.observe 'name', callback
+    person.unobserve 'name', callback
+    
+    person.name = 'Rasmus'
+    
+    @assert !callbackRan
+  
   #'test getting non existing nested property': ->
   #  Person = class extends WingmanObject
   #  person = new Person
