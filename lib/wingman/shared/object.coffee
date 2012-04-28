@@ -106,18 +106,25 @@ addProperty = (key, value) ->
       get: createGetter(key, value)
       set: createSetter(key)
 
-WingmanObject =
-  prototype: WingmanObjectPrototype
+WingmanObject = ->
+WingmanObject.prototype = WingmanObjectPrototype
+WingmanObject.include = (hash) ->
+  addProperty.call this.prototype, key, value for key, value of hash
   
-  include: (hash) ->
-    addProperty.call this.prototype, key, value for key, value of hash
+WingmanObject.create = (hash) ->
+  object = this.extend hash
+  object.create()
   
-  extend: (hash) ->
-    object = ->
-    object.prototype = Object.create this.prototype
-    WingmanObject.include.call object, hash if hash
-    object.create = -> Object.create object.prototype
-    object
+WingmanObject.extend = (hash) ->
+  object = ->
+  object.prototype = Object.create this.prototype
+  WingmanObject.include.call object, hash if hash
+  object.create = ->
+    instance = Object.create object.prototype
+    instance.constructor = object
+    instance
+  object
+
 
 WingmanObject.include Events
 

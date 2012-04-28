@@ -4,11 +4,17 @@ WingmanObject = require '../../../lib/wingman/shared/object'
 module.exports = class ObjectTest extends Janitor.TestCase
   @solo: true
   
-  'test simplest object': ->
+  'test simplest extend': ->
     object = WingmanObject.extend()
     instance = object.create()
     @assert instance instanceof object
-    
+    @assertEqual instance.constructor, object
+    @assert instance instanceof WingmanObject
+  
+  'test simplest create': ->
+    instance = WingmanObject.create()
+    @assert instance instanceof WingmanObject
+  
   'test simple properties': ->
     Viking = WingmanObject.extend
       healthPoints: 100
@@ -20,6 +26,17 @@ module.exports = class ObjectTest extends Janitor.TestCase
     thor.takeDamage 25
     @assertEqual 75, thor.healthPoints
     @assertEqual 5, thor.lives
+  
+  'test create with simple properties': ->
+    viking = WingmanObject.create
+      healthPoints: 100
+      takeDamage: (healthPoints) -> @healthPoints -= healthPoints
+      lives: 5
+    
+    @assertEqual 100, viking.healthPoints
+    viking.takeDamage 25
+    @assertEqual 75, viking.healthPoints
+    @assertEqual 5, viking.lives
   
   'test getter': ->
     Person = WingmanObject.extend
