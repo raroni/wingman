@@ -10,7 +10,10 @@ module.exports =
         nestedProperty.get chain.join('.')
       else
         undefined
-
+  
+  set: (hash) ->
+    @[key] = value for key, value of hash
+  
   triggerPropertyChange: (propertyName) ->
     @previousProperties ||= {}
     newValue = @[propertyName]

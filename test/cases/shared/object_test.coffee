@@ -164,67 +164,98 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     @assert !callbackRan
   
-  #'test getting non existing nested property': ->
-  #  Person = class extends WingmanObject
-  #  person = new Person
-  #  @assertEqual undefined, person.get 'this.does.not.exist'
-  #
-  #'test nested get': ->
-  #  Car = class extends WingmanObject
-  #  CarType = class extends WingmanObject
-  #  
-  #  slowCar = new CarType
-  #  slowCar.set name: 'Toyota'
-  #  car = new Car()
-  #  car.set type: slowCar
-  #  @assertEqual 'Toyota', car.get('type.name')
-  #
-  #'test nested observe': ->
-  #  denmark = new WingmanObject
-  #  denmark.set name: 'Denmark'
-  #  england = new WingmanObject
-  #  england.set name: 'England'
-  #  sweden = new WingmanObject
-  #  sweden.set name: 'Sweden'
-  #  region1 = new WingmanObject
-  #  region1.set {country: denmark}
-  #  region2 = new WingmanObject
-  #  region2.set {country: sweden}
-  #  city = new WingmanObject
-  #  city.set {region: region1}
-  #
-  #  newNames = []
-  #  oldNames = []
-  #  city.observe 'region.country.name', (newName, oldName) ->
-  #    newNames.push newName
-  #    oldNames.push oldName
-  #
-  #  denmark.set name: 'Denmark test'
-  #  region1.set country: england
-  #  denmark.set name: 'Denmark test2'
-  #  city.set region: region2
-  #
-  #  @assertEqual 3, newNames.length
-  #  @assertEqual 'Denmark test', newNames[0]
-  #  @assertEqual 'England', newNames[1]
-  #  @assertEqual 'Sweden', newNames[2]
-  #
-  #  @assertEqual 3, oldNames.length
-  #  @assertEqual 'Denmark', oldNames[0]
-  #  @assertEqual 'Denmark test', oldNames[1]
-  #  @assertEqual 'England', oldNames[2]
-  #
+  'test getting non existing nested property': ->
+    person = WingmanObject.create()
+    @assertEqual undefined, person.get 'this.does.not.exist'
+  
+  'test nested get': ->
+    carType = WingmanObject.create
+      name: 'Toyota'
+    
+    car = WingmanObject.create
+      type: carType
+    
+    @assertEqual 'Toyota', car.type.name
+  
+  'test nested observe': ->
+    Country = WingmanObject.extend
+      name: null
+    
+    Region = WingmanObject.extend
+      country: null
+    
+    City = WingmanObject.extend
+      region: null
+    
+    denmark = Country.create()
+    denmark.name = 'Denmark'
+    england = Country.create()
+    england.name = 'England'
+    sweden = Country.create()
+    sweden.name = 'Sweden'
+    
+    region1 = Region.create()
+    region1.country = denmark
+    region2 = Region.create()
+    region2.country = sweden
+    
+    city = City.create()
+    city.region = region1
+  
+    newNames = []
+    oldNames = []
+    city.observe 'region.country.name', (newName, oldName) ->
+      newNames.push newName
+      oldNames.push oldName
+  
+    denmark.name = 'Denmark test'
+    region1.country = england
+    denmark.name = 'Denmark test2'
+    city.region = region2
+  
+    @assertEqual 3, newNames.length
+    @assertEqual 'Denmark test', newNames[0]
+    @assertEqual 'England', newNames[1]
+    @assertEqual 'Sweden', newNames[2]
+  
+    @assertEqual 3, oldNames.length
+    @assertEqual 'Denmark', oldNames[0]
+    @assertEqual 'Denmark test', oldNames[1]
+    @assertEqual 'England', oldNames[2]
+  
+  'test setting several properties at once': ->
+    person = WingmanObject.create
+      firstName: null
+      lastName: null
+    
+    person.set firstName: 'Rasmus', lastName: 'Nielsen'
+    
+    @assertEqual 'Rasmus', person.firstName
+    @assertEqual 'Nielsen', person.lastName
+  
+  'test observe while setting several properties at once': ->
+    person = WingmanObject.create
+      firstName: null
+      lastName: null
+    
+    callbackValue = null
+    person.observe 'firstName', (value) -> callbackValue = value
+    person.set firstName: 'Rasmus', lastName: 'Nielsen'
+    
+    @assertEqual 'Rasmus', callbackValue
+  
   #'test property dependencies': ->
-  #  Person = class extends WingmanObject
-  #    @propertyDependencies
+  #  Person = WingmanObject.extend
+  #    propertyDependencies:
   #      fullName: ['firstName', 'lastName']
   #    
   #    fullName: -> "#{@get('firstName')} #{@get('lastName')}"
   #  
-  #  person = new Person
+  #  person = Person.create()
   #  result = ''
   #  person.observe 'fullName', (newValue) -> result = newValue
-  #  person.set firstName: 'Rasmus', lastName: 'Nielsen'
+  #  person.firstName = 'Rasmus'
+  #  person.lastName = 'Nielsen'
   #  
   #  @assertEqual 'Rasmus Nielsen', result
   #
