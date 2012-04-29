@@ -38,7 +38,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 75, viking.healthPoints
     @assertEqual 5, viking.lives
   
-  'test inheritance': ->
+  'test basic inheritance': ->
     Person = WingmanObject.extend
       SEXES: ['male', 'female']
       getSex: -> @SEXES[@sexCode]
@@ -48,6 +48,9 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     woman = Woman.create()
     @assertEqual woman.sex, 'female'
+    @assert woman instanceof Woman
+    @assert woman instanceof Person
+    @assert woman instanceof WingmanObject
   
   'test getter': ->
     Person = WingmanObject.extend
