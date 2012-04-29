@@ -21,6 +21,7 @@ WingmanObject.extend = (hash) ->
   object.prototype = Object.create @prototype
   WingmanObject.include.call object, hash if hash
   object.create = -> instantiate object
+  object.extend = WingmanObject.extend
   object
 
 createSetter = (key) ->
