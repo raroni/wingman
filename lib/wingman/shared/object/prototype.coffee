@@ -64,3 +64,28 @@ module.exports =
     callback = args.pop()
     type = args.pop() || 'change'
     @unbind "#{type}:#{propertyName}", callback
+
+  initPropertyDependencies: ->
+    for dependentPropertyKey, dependingPropertiesKeys of @constructor.propertyDependencies()
+      dependingPropertiesKeys = [dependingPropertiesKeys] unless Array.isArray(dependingPropertiesKeys)
+      for dependingPropertyKey in dependingPropertiesKeys
+        @initPropertyDependency dependentPropertyKey, dependingPropertyKey
+  
+  initPropertyDependency: (dependentPropertyKey, dependingPropertyKey) ->
+    trigger = => @triggerPropertyChange dependentPropertyKey
+    
+    @observe dependingPropertyKey, (newValue, oldValue) =>
+      trigger()
+      
+      if !oldValue?.forEach && newValue?.forEach
+        observeArrayLike()
+      else if oldValue?.forEach
+        unobserveArrayLike()
+    
+    observeArrayLike = =>
+      @observe dependingPropertyKey, 'add', trigger
+      @observe dependingPropertyKey, 'remove', trigger
+    
+    unobserveArrayLike = =>
+      @unobserve dependingPropertyKey, 'add', trigger
+      @unobserve dependingPropertyKey, 'remove', trigger

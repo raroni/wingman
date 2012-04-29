@@ -244,21 +244,22 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     @assertEqual 'Rasmus', callbackValue
   
-  #'test property dependencies': ->
-  #  Person = WingmanObject.extend
-  #    propertyDependencies:
-  #      fullName: ['firstName', 'lastName']
-  #    
-  #    fullName: -> "#{@get('firstName')} #{@get('lastName')}"
-  #  
-  #  person = Person.create()
-  #  result = ''
-  #  person.observe 'fullName', (newValue) -> result = newValue
-  #  person.firstName = 'Rasmus'
-  #  person.lastName = 'Nielsen'
-  #  
-  #  @assertEqual 'Rasmus Nielsen', result
-  #
+  'test property dependencies': ->
+    Person = WingmanObject.extend
+      firstName: null
+      lastName: null
+      propertyDependencies:
+        fullName: ['firstName', 'lastName']
+      
+      getFullName: -> [@firstName, @lastName].join ' '
+    
+    person = Person.create()
+    result = null
+    person.observe 'fullName', (newValue) -> result = newValue
+    person.set firstName: 'Rasmus', lastName: 'Nielsen'
+    
+    @assertEqual 'Rasmus Nielsen', result
+  
   #'test observation of computed property that is reevaluated but not changed': ->
   #  Person = class extends WingmanObject
   #    @propertyDependencies

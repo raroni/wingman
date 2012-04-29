@@ -5,7 +5,12 @@ Prototype = require './object/prototype'
 WingmanObject = ->
 WingmanObject.prototype = Prototype
 WingmanObject.include = (hash) ->
-  addProperty.call this.prototype, key, value for key, value of hash
+  for key, value of hash
+    if key == 'propertyDependencies'
+      do (value) =>
+        this.propertyDependencies = -> value
+    else
+      addProperty.call this.prototype, key, value
   
 WingmanObject.create = (hash) ->
   object = this.extend hash
@@ -13,7 +18,7 @@ WingmanObject.create = (hash) ->
   
 WingmanObject.extend = (hash) ->
   object = ->
-  object.prototype = Object.create this.prototype
+  object.prototype = Object.create @prototype
   WingmanObject.include.call object, hash if hash
   object.create = -> instantiate object
   object
@@ -47,6 +52,7 @@ addProperty = (key, value) ->
 instantiate = (object) ->
   instance = Object.create object.prototype
   instance.constructor = object
+  instance.initPropertyDependencies() if object.propertyDependencies  
   instance
 
 WingmanObject.include Events
