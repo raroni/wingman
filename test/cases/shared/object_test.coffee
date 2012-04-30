@@ -78,7 +78,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
       color: 'white'
       
       giveBirth: ->
-        dog = @superMethod 'giveBirth'
+        dog = @callSuper 'giveBirth'
         dog.name = 'Snoopy Junior'
         dog
     

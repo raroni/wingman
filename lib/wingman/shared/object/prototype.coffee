@@ -119,7 +119,7 @@ module.exports =
     
     @observe chainAsString, observer
   
-  superMethod: (propertyName) ->
+  callSuper: (propertyName) ->
     Object.getPrototypeOf(Object.getPrototypeOf(@))[propertyName].call @
 
 isSerializable = (value) ->
