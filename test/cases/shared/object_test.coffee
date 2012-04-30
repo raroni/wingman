@@ -93,7 +93,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Person = WingmanObject.extend
       getFullName: -> [@firstName, @lastName].join ' '
     
-    person = new Person
+    person = Person.create()
     person.firstName = 'Rasmus'
     person.lastName = 'Nielsen'
     @assertEqual 'Rasmus Nielsen', person.fullName
