@@ -118,6 +118,9 @@ module.exports =
       @unobserve chainAsString, observer
     
     @observe chainAsString, observer
+  
+  superMethod: (propertyName) ->
+    Object.getPrototypeOf(Object.getPrototypeOf(@))[propertyName].bind(@)()
 
 isSerializable = (value) ->
   typeof(value) in ['number', 'string']
