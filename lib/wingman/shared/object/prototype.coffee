@@ -1,6 +1,10 @@
 Properties = require '../object/properties'
 
 module.exports =
+  initialize: ->
+    @initPropertyDependencies() if @constructor.propertyDependencies
+    @[key] = value for key, value of arguments[0]
+  
   get: (chainAsString) ->
     chain = chainAsString.split '.'
     if chain.length == 1
@@ -114,7 +118,6 @@ module.exports =
       @unobserve chainAsString, observer
     
     @observe chainAsString, observer
-
 
 isSerializable = (value) ->
   typeof(value) in ['number', 'string']

@@ -45,6 +45,14 @@ module.exports = class ObjectTest extends Janitor.TestCase
     person = Person.create name: 'Rasmus'
     @assertEqual 'Rasmus', person.name
   
+  'test constructor': ->
+    Person = WingmanObject.extend
+      name: null
+      initialize: (@name) ->
+    
+    dude = Person.create 'The Dude'
+    @assertEqual 'The Dude', dude.name
+  
   'test basic inheritance': ->
     Person = WingmanObject.extend
       SEXES: ['male', 'female']
