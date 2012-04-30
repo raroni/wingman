@@ -107,6 +107,14 @@ module.exports =
       )
       json[propertyName] = propertyValue if shouldBeIncluded
     json
+  
+  observeOnce: (chainAsString, callback) ->
+    observer = (args...) =>
+      callback args...
+      @unobserve chainAsString, observer
+    
+    @observe chainAsString, observer
+
 
 isSerializable = (value) ->
   typeof(value) in ['number', 'string']

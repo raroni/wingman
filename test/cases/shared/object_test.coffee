@@ -572,26 +572,26 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'eu', onlyCodeAndRegion.region
     @assertEqual 2, Object.keys(onlyCodeAndRegion).length
   
-  #'test observe once': ->
-  #  context = new WingmanObject
-  #  valuesFromCallback = []
-  #  context.observeOnce 'name', (value) -> valuesFromCallback.push(value)
-  #  
-  #  context.set name: 'Rasmus'
-  #  context.set name: 'Lou Bega'
-  #  context.set name: 'Hendrix'
-  #  
-  #  @assertEqual 1, valuesFromCallback.length
-  #  @assertEqual 'Rasmus', valuesFromCallback[0]
-  #
-  #'test observe once in combination with normal observe': ->
-  #  context = new WingmanObject
-  #  context.observeOnce 'name', -> 'test'
-  #  callbackFired = false
-  #  context.observe 'name', -> callbackFired = true
-  #  context.set name: 'Rasmus'
-  #  @assert callbackFired
-  #
+  'test observe once': ->
+    context = WingmanObject.create name: null
+    valuesFromCallback = []
+    context.observeOnce 'name', (value) -> valuesFromCallback.push(value)
+    
+    context.name = 'Rasmus'
+    context.name = 'Lou Bega'
+    context.name = 'Hendrix'
+    
+    @assertEqual 1, valuesFromCallback.length
+    @assertEqual 'Rasmus', valuesFromCallback[0]
+  
+  'test observe once in combination with normal observe': ->
+    context = WingmanObject.create name: null
+    context.observeOnce 'name', -> 'test'
+    callbackFired = false
+    context.observe 'name', -> callbackFired = true
+    context.name = 'Rasmus'
+    @assert callbackFired
+  
   #'test intelligent properties and json export': ->
   #  class Thingamabob
   #  thingamabob = new Thingamabob
