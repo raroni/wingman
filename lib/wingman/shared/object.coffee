@@ -4,39 +4,29 @@ Prototype = require './object/prototype'
 
 WingmanObject = ->
 WingmanObject.prototype = Prototype
+
 WingmanObject.include = (hash) ->
-  for key, value of hash
-    if key == 'propertyDependencies'
-      do (value) =>
-        this.propertyDependencies = -> value
-    else
-      addProperty.call this.prototype, key, value
+  if hash.propertyDependencies
+    setupPropertyDependencies.call @, hash.propertyDependencies
+    delete hash.propertyDependencies
   
+  addProperties.call @prototype, hash
+
 WingmanObject.create = (hash) ->
   object = this.extend hash
   object.create()
-  
+
 WingmanObject.extend = (hash) ->
   object = ->
   object.prototype = Object.create @prototype
   WingmanObject.include.call object, hash if hash
-  object.create = -> instantiate object
+  object.prototype.constructor = object
+  object.create = (hash) -> instantiate object, hash
   object.extend = WingmanObject.extend
   object
 
-createSetter = (key) ->
-  (value) ->
-    properties = Properties.findOrCreate @
-    properties[key] = value
-    @triggerPropertyChange key
-
-createGetter = (key, defaultValue) ->
-  ->
-    properties = Properties.find @
-    if properties && properties.hasOwnProperty key
-      properties[key]
-    else
-      defaultValue
+addProperties = (hash) ->
+  addProperty.call @, key, value for key, value of hash
 
 addProperty = (key, value) ->
   match = key.match(/^get([A-Z]{1}.*)$/)
@@ -50,10 +40,49 @@ addProperty = (key, value) ->
       get: createGetter(key, value)
       set: createSetter(key)
 
-instantiate = (object) ->
+setupPropertyDependencies = (value) ->
+  @propertyDependencies = =>
+    total = {}
+    parent = Object.getPrototypeOf(@prototype).constructor
+    if parent && parent.propertyDependencies
+      total[k] = v for k, v of parent.propertyDependencies()
+    total[k] = v for k, v of value
+    total
+
+convertIfNecessary = (value) ->
+  if Array.isArray(value)
+    addProperties.call value, Events
+    
+    value.push = ->
+      Array.prototype.push.apply @, arguments
+      @trigger 'add', arguments['0']
+    
+    value.remove = (value) ->
+      index = @indexOf value
+      if index != -1
+        @splice index, 1
+        @trigger 'remove', value
+  
+  value
+
+createSetter = (key) ->
+  (value) ->
+    properties = Properties.findOrCreate @
+    properties[key] = convertIfNecessary value
+    @triggerPropertyChange key
+
+createGetter = (key, defaultValue) ->
+  ->
+    properties = Properties.find @
+    if properties && properties.hasOwnProperty key
+      properties[key]
+    else
+      defaultValue
+
+instantiate = (object, hash) ->
   instance = Object.create object.prototype
-  instance.constructor = object
-  instance.initPropertyDependencies() if object.propertyDependencies  
+  instance.initPropertyDependencies() if object.propertyDependencies
+  instance[key] = value for key, value of hash
   instance
 
 WingmanObject.include Events

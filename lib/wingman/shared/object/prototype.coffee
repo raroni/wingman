@@ -25,46 +25,54 @@ module.exports =
     # Beware, all ye who enter, for here be dragons!
     callback = args.pop()
     type = args.pop() || 'change'
-  
+    
     chain = chainAsString.split '.'
     chainExceptFirst = chain.slice 1, chain.length
     chainExceptFirstAsString = chainExceptFirst.join '.'
     nested = chainExceptFirst.length != 0
-  
-    getAndSendToCallback = (newValue, oldValue) =>
-      if type == 'change'
-        callback newValue, oldValue
-      else
-        callback newValue
-  
+    
     property = @[chain[0]]
-  
-    observeOnNested = (p) =>
+    
+    observeNested = (p) =>
       p.observe chainExceptFirstAsString, type, (newValue, oldValue) ->
-        getAndSendToCallback newValue, oldValue
-
-    observeOnNested(property) if nested && property
-
-    observeType = if nested then 'change' else type
-    @observeProperty chain[0], observeType, (newValue, oldValue) ->
+        callback newValue, oldValue
+    
+    observeEnumerable = (property) ->
+      property.bind type, callback
+    
+    checkProperty = (property) ->
       if nested
-        if newValue
-          ov = if oldValue then oldValue.get(chainExceptFirst.join('.')) else undefined
-          getAndSendToCallback newValue.get(chainExceptFirst.join('.')), ov if type == 'change'
-          observeOnNested newValue
-        if oldValue
-          oldValue.unobserve chainExceptFirstAsString, type, getAndSendToCallback
-      else
-        getAndSendToCallback newValue, oldValue
-
+        observeNested property
+      else if type != 'change'
+        observeEnumerable property
+    
+    checkProperty property if property
+    
+    @observeProperty chain[0], 'change', (newValue, oldValue) ->
+      checkProperty newValue
+      
+      callbackValues = { new: newValue, old: oldValue }
+      
+      if nested && newValue
+        callbackValues.new = newValue.get chainExceptFirstAsString
+        callbackValues.old = if oldValue then oldValue.get(chainExceptFirstAsString) else undefined
+      
+      if oldValue
+        if nested
+          oldValue.unobserve chainExceptFirstAsString, type, callback
+        else if type != 'change'
+          oldValue.unbind type, callback
+      
+      callback callbackValues.new, callbackValues.old if type == 'change'
+  
   observeProperty: (propertyName, type, callback) ->
     @bind "#{type}:#{propertyName}", callback
-
+  
   unobserve: (propertyName, args...) ->
     callback = args.pop()
     type = args.pop() || 'change'
     @unbind "#{type}:#{propertyName}", callback
-
+  
   initPropertyDependencies: ->
     for dependentPropertyKey, dependingPropertiesKeys of @constructor.propertyDependencies()
       dependingPropertiesKeys = [dependingPropertiesKeys] unless Array.isArray(dependingPropertiesKeys)
@@ -72,20 +80,15 @@ module.exports =
         @initPropertyDependency dependentPropertyKey, dependingPropertyKey
   
   initPropertyDependency: (dependentPropertyKey, dependingPropertyKey) ->
-    trigger = => @triggerPropertyChange dependentPropertyKey
+    trigger = =>
+      @triggerPropertyChange dependentPropertyKey
     
     @observe dependingPropertyKey, (newValue, oldValue) =>
       trigger()
       
       if !oldValue?.forEach && newValue?.forEach
-        observeArrayLike()
+        newValue.bind 'add', trigger
+        newValue.bind 'remove', trigger
       else if oldValue?.forEach
-        unobserveArrayLike()
-    
-    observeArrayLike = =>
-      @observe dependingPropertyKey, 'add', trigger
-      @observe dependingPropertyKey, 'remove', trigger
-    
-    unobserveArrayLike = =>
-      @unobserve dependingPropertyKey, 'add', trigger
-      @unobserve dependingPropertyKey, 'remove', trigger
+        oldValue.unbind 'add', trigger
+        oldValue.unbind 'remove', trigger

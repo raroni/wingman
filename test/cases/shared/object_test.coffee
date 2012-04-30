@@ -38,6 +38,13 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 75, viking.healthPoints
     @assertEqual 5, viking.lives
   
+  'test instantiation with hash': ->
+    Person = WingmanObject.extend
+      name: null
+    
+    person = Person.create name: 'Rasmus'
+    @assertEqual 'Rasmus', person.name
+  
   'test basic inheritance': ->
     Person = WingmanObject.extend
       SEXES: ['male', 'female']
@@ -258,6 +265,93 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     @assertEqual 'Rasmus', callbackValue
   
+  'test observe array property add': ->
+    app = WingmanObject.extend
+      users: null
+    
+    instance = app.create
+      users: []
+    
+    added = []
+    instance.users.bind 'add', (newValue) -> added.push(newValue)
+    instance.users.push 'Rasmus'
+    instance.users.push 'John'
+    instance.users = []
+    instance.users.push 'Jack'
+    
+    @assertEqual 2, added.length
+    @assertEqual 'Rasmus', added[0]
+    @assertEqual 'John', added[1]
+    @assertEqual 1, instance.users.length
+  
+  'test observe nested array property': ->
+    country = WingmanObject.create cities: null
+    country.cities = ['London', 'Manchester']
+    user = WingmanObject.create { country }
+    
+    result = undefined
+    user.observe 'country.cities', 'add', (newValue) -> result = newValue
+    country.cities.push 'Liverpool'
+    
+    @assertEqual 'Liverpool', result
+  
+  'test nested observe of array add of yet to be set properties': ->
+    added = []
+    
+    context = WingmanObject.create user: null
+    context.observe 'user.notifications', 'add', (newValue) -> added.push(newValue)
+    
+    user = WingmanObject.create notifications: null
+    user.notifications = []
+    
+    context.user = user
+    context.user.notifications.push 'Hello'
+    
+    @assertEqual 'Hello', added[0]
+  
+  'test nested observe of enumerable that is being reset': ->
+    added = []
+    
+    context = WingmanObject.create user: null
+    context.observe 'user.notifications', 'add', (newValue) -> added.push(newValue)
+    
+    user = WingmanObject.create notifications: null
+    user.notifications = []
+    
+    context.user = user
+    
+    user.notifications = []
+    context.user.notifications.push 'Hello'
+    
+    @assertEqual 'Hello', added[0]
+  
+  'test deeply nested observe of array add of yet to be set properties': ->
+    context = WingmanObject.create shared: null
+    shared = WingmanObject.create currentUser: null
+    
+    added = []
+    context.observe 'shared.currentUser.notifications', 'add', (newValue) -> added.push(newValue)
+    
+    context.shared = shared
+    
+    currentUser = WingmanObject.create notifications: null
+    currentUser.notifications = []
+    shared.currentUser = currentUser
+    
+    context.shared.currentUser.notifications.push 'Hello'
+    @assertEqual 'Hello', added[0]
+    
+  'test observe array property remove': ->
+    country = WingmanObject.create cities: null
+    country.cities = ['London', 'Manchester']
+    removedValueFromCallback = ''
+    country.observe 'cities', 'remove', (removedValue) -> removedValueFromCallback = removedValue
+    country.cities.remove 'London'
+    
+    @assertEqual 'London', removedValueFromCallback
+    @assertEqual 'Manchester', country.cities[0]
+    @assertEqual 1, country.cities.length  
+    
   'test property dependencies': ->
     Person = WingmanObject.extend
       firstName: null
@@ -268,252 +362,180 @@ module.exports = class ObjectTest extends Janitor.TestCase
       getFullName: -> [@firstName, @lastName].join ' '
     
     person = Person.create()
-    result = null
-    person.observe 'fullName', (newValue) -> result = newValue
+    callbackValues = []
+    person.observe 'fullName', (newValue) -> callbackValues.push newValue
     person.set firstName: 'Rasmus', lastName: 'Nielsen'
     
-    @assertEqual 'Rasmus Nielsen', result
+    @assertEqual 'Rasmus Nielsen', callbackValues[callbackValues.length-1]
+    
+    # TODO:
+    #@assertEqual 1, callbackValues.length
+    #@assertEqual 'Rasmus Nielsen', callbackValues[0]
   
-  #'test observation of computed property that is reevaluated but not changed': ->
-  #  Person = class extends WingmanObject
-  #    @propertyDependencies
-  #      isHappy: 'car'
-  #  
-  #    isHappy: -> @get('car') == 'Batmobile'
-  #  
-  #  person = new Person
-  #  callbackValues = []
-  #  person.observe 'isHappy', (value) -> callbackValues.push value
-  #  person.set car: 'Lada'
-  #  person.set car: 'Toyota'
-  #  person.set car: 'Batmobile'
-  #  person.set car: 'Volkswagen'
-  #  
-  #  @assertEqual 3, callbackValues.length
-  #  @assertEqual false, callbackValues[0]
-  #  @assertEqual true, callbackValues[1]
-  #  @assertEqual false, callbackValues[2]
-  #
-  #'test property dependencies with single depending property': ->
-  #  Country = class extends WingmanObject
-  #    @NAMES: { dk: 'Denmark', se: 'Sweden' }
-  #    
-  #    @propertyDependencies
-  #      countryName: 'countryCode'
-  #    
-  #    countryName: -> @constructor.NAMES[@get('countryCode')]
-  #  
-  #  country = new Country
-  #  result = undefined
-  #  country.observe 'countryName', (newValue) -> result = newValue
-  #  country.set countryCode: 'dk'
-  #
-  #  @assertEqual 'Denmark', result
-  #
-  #'test nested property dependencies': ->
-  #  session = new WingmanObject
-  #  View = class extends WingmanObject
-  #    @propertyDependencies
-  #      isHappy: 'session.cake'
-  #    
-  #    isHappy: ->
-  #      !!@get('session.cake')
-  #  
-  #  view = new View
-  #  callbackValue = undefined
-  #  view.observe 'isHappy', (value) -> callbackValue = value
-  #  view.set { session }
-  #  session.set cake: 'strawberry'
-  #  @assert callbackValue
-  #
-  #'test several nested property dependencies': ->
-  #  session = new WingmanObject
-  #  session.set userId: 1
-  #  
-  #  View = class extends WingmanObject
-  #    @propertyDependencies
-  #      isActive: 'session.userId'
-  #      canTrain: 'training.createdOn'
-  #    
-  #    canTrain: ->
-  #      @get('training.createdOn') != '2012-01-26'
-  #    
-  #    isActive: ->
-  #      !!@get('session.userId')
-  #  
-  #  view = new View
-  #  isActiveCallbackFired = false
-  #  canTrainCallbackFired = false
-  #  view.observe 'isActive', -> isActiveCallbackFired = true
-  #  view.observe 'canTrain', -> canTrainCallbackFired = true
-  #  view.set { session }
-  #  view.set training: { createdOn: 'test' }
-  #  
-  #  @assert isActiveCallbackFired
-  #  @assert canTrainCallbackFired
-  #
-  #'test nested observe combined with property dependencies': ->
-  #  Country = class extends WingmanObject
-  #    @CODES = 
-  #      DK: 'Denmark'
-  #      UK: 'England'
-  #      SE: 'Sweden'
-  #
-  #    @propertyDependencies
-  #      name: ['code']
-  #
-  #    name: ->
-  #      @constructor.CODES[@get('code')]
-  #
-  #  denmark = new Country
-  #  denmark.set code: 'DK'
-  #  england = new Country
-  #  england.set code: 'UK'
-  #  sweden = new Country
-  #  sweden.set code: 'SE'
-  #  region1 = new WingmanObject
-  #  region1.set {country: denmark}
-  #  region2 = new WingmanObject
-  #  region2.set {country: sweden}
-  #  city = new WingmanObject
-  #  city.set {region: region1}
-  #
-  #  names = []
-  #  city.observe 'region.country.name', (newName) -> names.push(newName)
-  #  denmark.set code: 'SE'
-  #  region1.set country: england
-  #  denmark.set code: 'UK'
-  #  city.set region: region2
-  #
-  #  @assertEqual 3, names.length
-  #  @assertEqual 'Sweden', names[0]
-  #  @assertEqual 'England', names[1]
-  #  @assertEqual 'Sweden', names[2]
-  #
-  #'test property dependency for array-like property': ->
-  #  Person = class extends WingmanObject
-  #    @propertyDependencies
-  #      fullName: 'names'
-  #    
-  #    fullName: ->
-  #      @get('names').join(' ') if @get('names')
-  #  
-  #  person = new Person
-  #  callbackValues = []
-  #  person.observe 'fullName', (value) -> callbackValues.push value
-  #  person.set names: []
-  #  person.get('names').push 'Rasmus'
-  #  person.get('names').push 'Nielsen'
-  #  
-  #  @assertEqual '', callbackValues[0]
-  #  @assertEqual 'Rasmus', callbackValues[1]
-  #  @assertEqual 'Rasmus Nielsen', callbackValues[2]
-  #
-  #'test property dependency inheritance': ->
-  #  class Parent extends WingmanObject
-  #    @propertyDependencies
-  #      loggedIn: 'currentUser'
-  #    
-  #    loggedIn: ->
-  #      !!@get('currentUser')
-  #  
-  #  class Child extends Parent
-  #    @propertyDependencies
-  #      something: 'loggedIn'
-  #    
-  #    something: ->
-  #  
-  #  child = new Child
-  #  callbackFired = false
-  #  child.observe 'something', -> callbackFired = true
-  #  child.set currentUser: 'yogi'
-  #  @assert callbackFired
-  #
-  #'test childrens property dependencies doesnt affect parents': ->
-  #  class Parent extends WingmanObject
-  #    @propertyDependencies
-  #      loggedIn: 'currentUser'
-  #    
-  #    loggedIn: ->
-  #      !!@get('currentUser')
-  #  
-  #  class Child extends Parent
-  #    @propertyDependencies
-  #      something: 'loggedIn'
-  #    
-  #    something: ->
-  #  
-  #  parent = new Parent
-  #  parentCallbackFired = false
-  #  parent.observe 'something', -> parentCallbackFired = true
-  #  parent.set currentUser: 'bobo'
-  #  @assert !parentCallbackFired
-  #
-  #'test observe array property add': ->
-  #  instance = new WingmanObject
-  #  added = []
-  #  instance.observe 'users', 'add', (newValue) -> added.push(newValue)
-  #  instance.set users: []
-  #  instance.get('users').push 'Rasmus'
-  #  instance.get('users').push 'John'
-  #  instance.set users: []
-  #  instance.get('users').push 'Jack'
-  #
-  #  @assertEqual 'Rasmus', added[0]
-  #  @assertEqual 'John', added[1]
-  #  @assertEqual 'Jack', added[2]
-  #  @assertEqual 1, instance.get('users').length
-  #
-  #'test nested observe of array add of yet to be set properties': ->
-  #  context = new WingmanObject
-  #  added = []
-  #  context.observe 'user.notifications', 'add', (newValue) -> added.push(newValue)
-  #  
-  #  user = new WingmanObject
-  #  context.set { user }
-  #  user.set notifications: []
-  #  context.get('user.notifications').push 'Hello'
-  #  
-  #  @assertEqual 'Hello', added[0]
-  #
-  #'test deeply nested observe of array add of yet to be set properties': ->
-  #  context = new WingmanObject
-  #  shared = new WingmanObject
-  #  added = []
-  #  context.observe 'shared.currentUser.notifications', 'add', (newValue) -> added.push(newValue)
-  #
-  #  context.set { shared }
-  #  
-  #  currentUser = new WingmanObject
-  #  currentUser.set notifications: []
-  #  shared.set { currentUser }
-  #  
-  #  context.get('shared.currentUser.notifications').push 'Hello'
-  #  @assertEqual 'Hello', added[0]
-  #  
-  #'test observe array property remove': ->
-  #  country = new WingmanObject
-  #  country.set cities: ['London', 'Manchester']
-  #  removedValueFromCallback = ''
-  #  country.observe 'cities', 'remove', (removedValue) -> removedValueFromCallback = removedValue
-  #  country.get('cities').remove 'London'
-  #
-  #  @assertEqual 'London', removedValueFromCallback
-  #  @assertEqual 'Manchester', country.get('cities')[0]
-  #  @assertEqual 1, country.get('cities').length
-  #
-  #'test observe nested array property': ->
-  #  country = new WingmanObject
-  #  country.set cities: ['London', 'Manchester']
-  #  user = new WingmanObject
-  #  user.set {country}
-  #
-  #  result = ''
-  #  user.observe 'country.cities', 'add', (newValue) -> result = newValue
-  #  country.get('cities').push 'Liverpool'
-  #
-  #  @assertEqual 'Liverpool', result
-  #
+  'test property dependencies with single depending property': ->
+    Country = WingmanObject.extend
+      countryCode: null
+      
+      NAMES:
+        dk: 'Denmark'
+        se: 'Sweden'
+      propertyDependencies:
+        countryName: 'countryCode'
+      
+      getCountryName: -> @NAMES[@countryCode]
+    
+    country = Country.create()
+    result = undefined
+    country.observe 'countryName', (newValue) -> result = newValue
+    country.countryCode = 'dk'
+    
+    @assertEqual 'Denmark', result
+  
+  'test observation of computed property that is reevaluated but not changed': ->
+    Person = WingmanObject.extend
+      car: null
+      propertyDependencies:
+        isHappy: 'car'
+    
+      getIsHappy: -> @car == 'Batmobile'
+    
+    person = Person.create()
+    callbackValues = []
+    person.observe 'isHappy', (value) -> callbackValues.push value
+    person.car = 'Lada'
+    person.car = 'Toyota'
+    person.car = 'Batmobile'
+    person.car = 'Volkswagen'
+    
+    @assertEqual 3, callbackValues.length
+    @assertEqual false, callbackValues[0]
+    @assertEqual true, callbackValues[1]
+    @assertEqual false, callbackValues[2]
+  
+  'test nested property dependencies': ->
+    session = WingmanObject.create
+      cake: null
+    
+    View = WingmanObject.extend
+      session: null
+      propertyDependencies:
+        isHappy: 'session.cake'
+      
+      getIsHappy: -> !!@get('session.cake')
+    
+    view = View.create()
+    callbackValue = undefined
+    view.observe 'isHappy', (value) -> callbackValue = value
+    view.session = session
+    session.cake = 'strawberry'
+    @assert callbackValue
+  
+  'test nested observe combined with property dependencies': ->
+    Country = WingmanObject.extend
+      CODES:
+        DK: 'Denmark'
+        UK: 'England'
+        SE: 'Sweden'
+      
+      propertyDependencies:
+        name: ['code']
+      
+      code: null
+      
+      getName: ->
+        @CODES[@get('code')]
+    
+    Region = WingmanObject.extend
+      country: null
+    
+    City = WingmanObject.extend
+      region: null
+    
+    denmark = Country.create code: 'DK'
+    england = Country.create code: 'UK'
+    sweden = Country.create code: 'SE'
+    
+    region1 = Region.create country: denmark
+    region2 = WingmanObject.create country: sweden
+    
+    city = City.create region: region1
+    
+    names = []
+    city.observe 'region.country.name', (newName) -> names.push(newName)
+    denmark.code = 'SE'
+    region1.country = england
+    denmark.code = 'UK'
+    city.region = region2
+  
+    @assertEqual 3, names.length
+    @assertEqual 'Sweden', names[0]
+    @assertEqual 'England', names[1]
+    @assertEqual 'Sweden', names[2]
+  
+  'test property depending on enumerable': ->
+    Person = WingmanObject.extend
+      propertyDependencies:
+        fullName: 'names'
+      
+      names: null
+      
+      getFullName: ->
+        @names.join ' ' if @names
+    
+    person = Person.create names: []
+    
+    callbackValues = []
+    person.observe 'fullName', (value) -> callbackValues.push value
+    person.names.push 'Rasmus'
+    person.names.push 'Nielsen'
+    
+    @assertEqual 'Rasmus', callbackValues[0]
+    @assertEqual 'Rasmus Nielsen', callbackValues[1]
+  
+  'test property dependency inheritance': ->
+    Parent = WingmanObject.extend
+      currentUser: null
+      
+      propertyDependencies:
+        loggedIn: 'currentUser'
+      
+      getLoggedIn: ->
+        !!@get('currentUser')
+    
+    Child = Parent.extend
+      propertyDependencies:
+        something: 'loggedIn'
+      
+      getSomething: ->
+    
+    child = Child.create()
+    callbackFired = false
+    child.observe 'something', -> callbackFired = true
+    child.currentUser = 'yogi'
+    @assert callbackFired
+  
+  'test childrens property dependencies doesnt affect parents': ->
+    Parent = WingmanObject.extend
+      propertyDependencies:
+        loggedIn: 'currentUser'
+      
+      currentUser: null
+      
+      loggedIn: ->
+        !!@currentUser
+    
+    Child = Parent.extend
+      propertyDependencies:
+        something: 'loggedIn'
+      
+      something: ->
+    
+    parent = Parent.create()
+    parentCallbackFired = false
+    parent.observe 'something', -> parentCallbackFired = true
+    parent.currentUser = 'bobo'
+    @assert !parentCallbackFired
+  
   #'test export to JSON': ->
   #  Country = class extends WingmanObject
   #    name: -> 'method properties should not be a part of toJSON'
