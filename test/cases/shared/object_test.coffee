@@ -536,38 +536,42 @@ module.exports = class ObjectTest extends Janitor.TestCase
     parent.currentUser = 'bobo'
     @assert !parentCallbackFired
   
-  #'test export to JSON': ->
-  #  Country = class extends WingmanObject
-  #    name: -> 'method properties should not be a part of toJSON'
-  #    otherProperty: => 'not even if you bind them like this'
-  #      
-  #  country = new Country
-  #  country.set code: 'dk', region: 'eu'
-  #  
-  #  @assertEqual 'dk', country.toJSON().code
-  #  @assertEqual 'eu', country.toJSON().region
-  #  @assertEqual 2, Object.keys(country.toJSON()).length
-  #
-  #'test export to JSON with object with no set attributes': ->
-  #  obj = new WingmanObject
-  #  json = obj.toJSON()
-  #  @assertEqual 0, Object.keys(json).length
-  #
-  #'test export to JSON with only options': ->
-  #  country = new WingmanObject
-  #  country.set code: 'dk', region: 'eu', population: 5000000
-  #
-  #  onlyCode = country.toJSON(only: 'code')
-  #
-  #  @assertEqual 'dk', onlyCode.code
-  #  @assertEqual 1, Object.keys(onlyCode).length
-  #  
-  #  onlyCodeAndRegion = country.toJSON(only: ['code', 'region'])
-  #
-  #  @assertEqual 'dk', onlyCodeAndRegion.code
-  #  @assertEqual 'eu', onlyCodeAndRegion.region
-  #  @assertEqual 2, Object.keys(onlyCodeAndRegion).length
-  #
+  'test export to JSON': ->
+    Country = WingmanObject.extend
+      code: null
+      region: null
+      name: -> 'method properties should not be a part of toJSON'
+      otherProperty: => 'not even if you bind them like this'
+        
+    country = Country.create code: 'dk', region: 'eu'
+    
+    json = country.toJSON()
+    @assertEqual 'dk', json.code
+    @assertEqual 'eu', json.region
+    @assertEqual 2, Object.keys(json).length
+  
+  'test export with no properties': ->
+    Country = WingmanObject.extend()
+    country = Country.create()
+    json = country.toJSON()
+    @assertEqual 0, Object.keys(json).length
+  
+  'test export to JSON with only options': ->
+    Country = WingmanObject.extend
+      code: null
+      region: null
+    
+    country = Country.create code: 'dk', region: 'eu', population: 5000
+    onlyCode = country.toJSON only: 'code'
+    @assertEqual 'dk', onlyCode.code
+    @assertEqual 1, Object.keys(onlyCode).length
+    
+    onlyCodeAndRegion = country.toJSON only: ['code', 'region']
+    
+    @assertEqual 'dk', onlyCodeAndRegion.code
+    @assertEqual 'eu', onlyCodeAndRegion.region
+    @assertEqual 2, Object.keys(onlyCodeAndRegion).length
+  
   #'test nested set': ->
   #  context = new WingmanObject
   #  context.set

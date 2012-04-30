@@ -1,3 +1,5 @@
+Properties = require '../object/properties'
+
 module.exports =
   get: (chainAsString) ->
     chain = chainAsString.split '.'
@@ -92,3 +94,20 @@ module.exports =
       else if oldValue?.forEach
         oldValue.unbind 'add', trigger
         oldValue.unbind 'remove', trigger
+  
+  toJSON: (options = {}) ->
+    json = {}
+    properties = Properties.find @
+    options.only = [options.only] if options.only && !Array.isArray options.only
+    
+    for propertyName, propertyValue of properties
+      shouldBeIncluded = (
+        (!options.only || (propertyName in options.only)) &&
+        isSerializable(propertyValue)
+      )
+      json[propertyName] = propertyValue if shouldBeIncluded
+    json
+
+isSerializable = (value) ->
+  typeof(value) in ['number', 'string']
+
