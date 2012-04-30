@@ -70,20 +70,24 @@ module.exports = class ObjectTest extends Janitor.TestCase
   'test super': ->
     Dog = WingmanObject.extend
       color: null
+      name: null
       giveBirth: ->
-        Dog.create()
+        Dog.create color: @color
     
-    BrownDog = Dog.extend
+    Snoopy = Dog.extend
+      color: 'white'
+      
       giveBirth: ->
         dog = @superMethod 'giveBirth'
-        dog.color = 'brown'
+        dog.name = 'Snoopy Junior'
         dog
     
-    brownDog = BrownDog.create()
-    puppy = brownDog.giveBirth()
+    snoopy = Snoopy.create()
+    puppy = snoopy.giveBirth()
     
     @assert puppy instanceof Dog
-    @assertEqual 'brown', puppy.color
+    @assertEqual 'white', puppy.color
+    @assertEqual 'Snoopy Junior', puppy.name
   
   'test getter': ->
     Person = WingmanObject.extend
