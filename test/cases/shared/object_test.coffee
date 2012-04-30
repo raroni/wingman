@@ -412,6 +412,26 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual true, callbackValues[1]
     @assertEqual false, callbackValues[2]
   
+  'test observe once': ->
+    context = WingmanObject.create name: null
+    valuesFromCallback = []
+    context.observeOnce 'name', (value) -> valuesFromCallback.push(value)
+    
+    context.name = 'Rasmus'
+    context.name = 'Lou Bega'
+    context.name = 'Hendrix'
+    
+    @assertEqual 1, valuesFromCallback.length
+    @assertEqual 'Rasmus', valuesFromCallback[0]
+  
+  'test observe once in combination with normal observe': ->
+    context = WingmanObject.create name: null
+    context.observeOnce 'name', -> 'test'
+    callbackFired = false
+    context.observe 'name', -> callbackFired = true
+    context.name = 'Rasmus'
+    @assert callbackFired
+  
   'test nested property dependencies': ->
     session = WingmanObject.create
       cake: null
@@ -572,38 +592,17 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'eu', onlyCodeAndRegion.region
     @assertEqual 2, Object.keys(onlyCodeAndRegion).length
   
-  'test observe once': ->
-    context = WingmanObject.create name: null
-    valuesFromCallback = []
-    context.observeOnce 'name', (value) -> valuesFromCallback.push(value)
+  'test intelligent properties and json export': ->
+    thingamabob = WingmanObject.create()
     
-    context.name = 'Rasmus'
-    context.name = 'Lou Bega'
-    context.name = 'Hendrix'
+    Context = WingmanObject.extend name: null, age: null, engine: null
+    context = Context.create
+      name: 'Guybrush'
+      age: 25
+      engine: thingamabob
     
-    @assertEqual 1, valuesFromCallback.length
-    @assertEqual 'Rasmus', valuesFromCallback[0]
-  
-  'test observe once in combination with normal observe': ->
-    context = WingmanObject.create name: null
-    context.observeOnce 'name', -> 'test'
-    callbackFired = false
-    context.observe 'name', -> callbackFired = true
-    context.name = 'Rasmus'
-    @assert callbackFired
-  
-  #'test intelligent properties and json export': ->
-  #  class Thingamabob
-  #  thingamabob = new Thingamabob
-  #
-  #  context = new WingmanObject
-  #  context.set
-  #    name: 'Guybrush'
-  #    age: 25
-  #    engine: thingamabob
-  #  
-  #  json = context.toJSON()
-  #  
-  #  @assertEqual 2, Object.keys(json).length
-  #  @assertEqual 'Guybrush', json.name
-  #  @assertEqual 25, json.age
+    json = context.toJSON()
+    
+    @assertEqual 2, Object.keys(json).length
+    @assertEqual 'Guybrush', json.name
+    @assertEqual 25, json.age
