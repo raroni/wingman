@@ -36,7 +36,9 @@ addProperty = (key, value) ->
   match = key.match(/^get([A-Z]{1}.*)$/)
   if match && typeof(value) == 'function'
     propertyName = match[1].replace /.{1}/, (v) -> v.toLowerCase()
-    Object.defineProperty @, propertyName, { get: value }
+    Object.defineProperty @, propertyName,
+      get: value
+      set: (value) -> Object.defineProperty @, propertyName, { value }
   else if typeof(value) == 'function'
     klass = @
     @[key] = ->

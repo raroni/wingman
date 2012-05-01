@@ -2,6 +2,8 @@ Janitor = require 'janitor'
 WingmanObject = require '../../../lib/wingman/shared/object'
 
 module.exports = class ObjectTest extends Janitor.TestCase
+  @solo: true
+  
   'test simplest extend': ->
     object = WingmanObject.extend()
     instance = object.create()
@@ -691,3 +693,16 @@ module.exports = class ObjectTest extends Janitor.TestCase
     inner.name = 'Inner'
     @assertEqual 'Inner', inner.name
     @assertEqual 'Outer', outer.name
+  
+  'test overwriting a getter with normal propery': ->
+    Parent = WingmanObject.extend
+      getName: -> 'I am a method!'
+    
+    Child = Parent.extend
+      name: 'A string will do'
+    
+    child = Child.create()
+    @assertEqual 'A string will do', child.name
+    
+    parent = Parent.create()
+    @assertEqual 'I am a method!', parent.name
