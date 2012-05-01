@@ -1,10 +1,10 @@
-Module = require '../../shared/module'
+WingmanObject = require '../../shared/object'
 Elementary = require '../../shared/elementary'
 
-module.exports = class ElementHandler extends Module
-  @include Elementary
+module.exports = WingmanObject.extend
+  include: Elementary
   
-  constructor: (@options, @context) ->
+  initialize: ->
     @setupDomElement()
     @setupStyles() if @options.styles
     @setupClasses() if @options.classes
@@ -27,7 +27,7 @@ module.exports = class ElementHandler extends Module
     for klass in @options.classes
       if klass.isDynamic
         @observeClass klass
-        @addClass klassValue if klassValue = @context.get(klass.value)
+        @addClass klassValue if klassValue = @context[klass.value]
       else
         @addClass klass.value
   
@@ -35,7 +35,7 @@ module.exports = class ElementHandler extends Module
     for key, attribute of @options.attributes
       if attribute.isDynamic
         @observeAttribute key, attribute
-        @setAttribute key, @context.get(attribute.value)
+        @setAttribute key, @context[attribute.value]
       else
         @setAttribute key, attribute.value
   
@@ -52,7 +52,7 @@ module.exports = class ElementHandler extends Module
     for key, style of @options.styles
       if style.isDynamic
         @observeStyle key, style
-        @setStyle key, @context.get(style.value)
+        @setStyle key, @context[style.value]
       else
         @setStyle key, style.value
   
@@ -61,7 +61,7 @@ module.exports = class ElementHandler extends Module
   
   setupSource: ->
     @el.innerHTML = @context.get @options.source
-    @context.observe @options.source, (newValue, oldValue) =>
+    @context.observe @options.source, (newValue) =>
       @el.innerHTML = newValue
   
   setupChildren: ->
