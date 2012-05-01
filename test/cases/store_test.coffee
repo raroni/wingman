@@ -1,32 +1,27 @@
+WingmanObject = require '../../lib/wingman/shared/object'
 Janitor = require 'janitor'
 Store = require '../../lib/wingman/store'
 
-class DummyCollection
-  constructor: -> @values = []
-  
-  add: (value) ->
-    @values.push value
-  
-  flush: ->
-    @values = []
-  
-  isEmpty: ->
-    @count() == 0
-  
-  count: ->
-    @values.length
+DummyCollection = WingmanObject.extend
+  initialize: -> @values = []
+  add: (value) -> @values.push value
+  flush: -> @values = []
+  isEmpty: -> @count() == 0
+  count: -> @values.length
 
 module.exports = class StoreTest extends Janitor.TestCase
+  @solo: true
+  
   setup: ->
-    @store = new Store collectionClass: DummyCollection
+    @store = Store.create collectionClass: DummyCollection
   
   'test collection caching': ->
-    class User
+    User = WingmanObject.extend()
     @assertEqual @store.collection(User), @store.collection(User)
   
   'test flush': ->
-    class User
-    class Notification
+    User = WingmanObject.extend()
+    Notification = WingmanObject.extend()
     
     usersCollection = @store.collection User
     usersCollection.add 1

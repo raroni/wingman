@@ -1,15 +1,25 @@
 Collection = require './store/collection'
+WingmanObject = require './shared/object'
 
-module.exports = class Store
-  constructor: (@options) ->
+module.exports = WingmanObject.extend
+  initialize: ->
     @collections = {}
-    @collectionClass = @options?.collectionClass || Collection
+    @collectionClass ||= Collection
+    @classes = []
   
   collection: (klass) ->
-    @collections[klass] || @createCollection klass
-  
-  createCollection: (klass) ->
-    @collections[klass] = new @collectionClass klass
+    @collections[@classId(klass)] ||= @collectionClass.create(klass)
   
   flush: ->
     collection.flush() for klass, collection of @collections
+  
+  classId: (klass) ->
+    id = @classes.indexOf klass
+    if id == -1
+      @createClassId klass
+    else
+      id
+  
+  createClassId: (klass) ->
+    @classes.push klass
+    @classes.length-1
