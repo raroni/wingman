@@ -1,7 +1,7 @@
 Wingman = require '../../../wingman'
 
-module.exports = class TextHandler
-  constructor: (@options, @context) ->
+module.exports = Wingman.Object.extend
+  initialize: ->
     @textNode = Wingman.document.createTextNode @options.value
     @options.scope.appendChild @textNode
   

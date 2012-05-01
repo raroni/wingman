@@ -12,22 +12,22 @@ module.exports = class TextHandlerTest extends Janitor.TestCase
     delete Wingman.document
   
   'test simple text node': ->
-    textNode =
+    options =
       value: 'hello'
       scope: @parent
     
-    handler = new TextHandler textNode
+    handler = TextHandler.create { options }
     textNode = handler.textNode
     @assert textNode
     @assertEqual 'hello', textNode.nodeValue
     @assertEqual @parent, textNode.parentNode
   
   'test remove': ->
-    textNode =
+    options =
       value: 'hello'
       scope: @parent
     
-    textNode = new TextHandler textNode
+    textNode = TextHandler.create { options }
     @assert @parent.hasChildNodes()
     textNode.remove()
     @assert !@parent.hasChildNodes()

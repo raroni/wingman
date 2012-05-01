@@ -4,8 +4,6 @@ ConditionalHandler = require '../../../../lib/wingman/template/handler_factory/c
 Wingman = require '../../../../.'
 
 module.exports = class ConditionalHandlerTest extends Janitor.TestCase
-  @solo: true
-  
   setup: ->
     Wingman.document = jsdom.jsdom()
     @parent = Wingman.document.createElement 'div'
