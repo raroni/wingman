@@ -3,8 +3,6 @@ WingmanObject = require '../../../lib/wingman/shared/object'
 Events = require '../../../lib/wingman/shared/events'
 
 module.exports = class extends Janitor.TestCase
-  @solo: true
-  
   'test trigger': ->
     klass = WingmanObject.extend include: Events
     instance = klass.create()

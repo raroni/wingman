@@ -1,16 +1,16 @@
 document = require('jsdom').jsdom()
 Janitor = require 'janitor'
 Elementary = require '../../../lib/wingman/shared/elementary'
-Module = require '../../../lib/wingman/shared/module'
+WingmanObject = require '../../../lib/wingman/shared/object'
 
-DummyObject = class extends Module
-  @include Elementary
-  constructor: ->
+DummyObject = WingmanObject.extend
+  include: Elementary
+  initialize: ->
     @el = document.createElement 'div'
 
 module.exports = class extends Janitor.TestCase
   setup: ->
-    @dummyObject = new DummyObject
+    @dummyObject = DummyObject.create()
   
   'test css property name convertion from dom to css notation': ->
     @assertEqual 'fontSize', Elementary.convertCssPropertyFromDomToCssNotation 'font-size'
