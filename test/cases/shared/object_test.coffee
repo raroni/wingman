@@ -90,16 +90,14 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Dog = WingmanObject.extend
       color: null
       name: null
-      giveBirth: ->
-        Dog.create color: @color
+      giveBirth: (name) ->
+        Dog.create { color: @color, name }
     
     Snoopy = Dog.extend
       color: 'white'
       
       giveBirth: ->
-        dog = @callSuper 'giveBirth'
-        dog.name = 'Snoopy Junior'
-        dog
+        @_super 'Snoopy Junior'
     
     snoopy = Snoopy.create()
     

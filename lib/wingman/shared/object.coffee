@@ -38,7 +38,12 @@ addProperty = (key, value) ->
     propertyName = match[1].replace /.{1}/, (v) -> v.toLowerCase()
     Object.defineProperty @, propertyName, { get: value }
   else if typeof(value) == 'function'
-    @[key] = value
+    klass = @
+    @[key] = ->
+      @_super = Object.getPrototypeOf(klass)[key]
+      result = value.apply @, arguments
+      delete @_super
+      result
   else if key of @
     @[key] = value
   else
