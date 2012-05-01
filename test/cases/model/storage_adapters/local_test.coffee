@@ -9,8 +9,6 @@ User = Wingman.Object.extend
   age: null
 
 module.exports = class LocalStorageTest extends Janitor.TestCase
-  @solo: true
-  
   'test create': ->
     user = User.create name: 'Rasmus', age: 25
     storage = LocalStorage.create namespace: 'users'

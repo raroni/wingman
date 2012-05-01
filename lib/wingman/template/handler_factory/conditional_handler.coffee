@@ -1,10 +1,11 @@
+WingmanObject = require '../../shared/object'
 HandlerFactory = require '../handler_factory'
 
-module.exports = class ConditionalHandler
-  constructor: (@options, @context) ->
+module.exports = WingmanObject.extend
+  initialize: ->
     @handlers = []
-    @context.observe @options.source, @update
-    @update @context.get(@options.source)
+    @context.observe @options.source, @update.bind(@)
+    @update @context[@options.source]
   
   add: (currentValue) ->
     children = (currentValue && @options.trueChildren) || @options.falseChildren
@@ -19,6 +20,6 @@ module.exports = class ConditionalHandler
   remove: ->
     handler.remove() while handler = @handlers.shift()
   
-  update: (currentValue) =>
+  update: (currentValue) ->
     @remove()
     @add currentValue

@@ -4,6 +4,8 @@ ConditionalHandler = require '../../../../lib/wingman/template/handler_factory/c
 Wingman = require '../../../../.'
 
 module.exports = class ConditionalHandlerTest extends Janitor.TestCase
+  @solo: true
+  
   setup: ->
     Wingman.document = jsdom.jsdom()
     @parent = Wingman.document.createElement 'div'
@@ -34,15 +36,14 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = new Wingman.Object
-    context.set something: true
-    new ConditionalHandler options, context
+    context = Wingman.Object.create something: true
+    ConditionalHandler.create { options, context }
     
     childNodes = @parent.childNodes
     @assertEqual 2, childNodes.length
     @assertEqual 'user', childNodes[0].innerHTML
     @assertEqual 'user2', childNodes[1].innerHTML
-    context.set something: false
+    context.something = false
     @assertEqual 0, childNodes.length
   
   'test if else conditonal': ->
@@ -76,14 +77,13 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
         ]
       ]
     
-    context = new Wingman.Object
-    context.set early: true
-    new ConditionalHandler options, context
+    context = Wingman.Object.create early: true
+    ConditionalHandler.create { options, context }
     
     childNodes = @parent.childNodes
     @assertEqual 2, childNodes.length
     @assertEqual 'good morning', childNodes[0].innerHTML
     @assertEqual 'good morning again', childNodes[1].innerHTML
-    context.set early: false
+    context.early = false
     @assertEqual 1, childNodes.length
     @assertEqual 'good evening', childNodes[0].innerHTML
