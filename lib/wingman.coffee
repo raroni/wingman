@@ -6,8 +6,7 @@ if window?
 
 exports.Object = require('./wingman/shared/object')
 
-# temporary to avoid exceptions while working on Wingman.Object
-exports.Object = class extends require('./wingman/shared/module')
+exports.Object = class extends require('./wingman/shared/object')
   
 exports.request = require('./wingman/request')
 exports.Template = require('./wingman/template')

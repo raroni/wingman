@@ -2,8 +2,6 @@ Janitor = require 'janitor'
 WingmanObject = require '../../../lib/wingman/shared/object'
 
 module.exports = class ObjectTest extends Janitor.TestCase
-  @solo: true
-  
   'test simplest extend': ->
     object = WingmanObject.extend()
     instance = object.create()
