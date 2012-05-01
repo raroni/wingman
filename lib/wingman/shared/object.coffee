@@ -10,6 +10,10 @@ WingmanObject.include = (hash) ->
   if hash.propertyDependencies
     setupPropertyDependencies.call @, hash.propertyDependencies
     delete hash.propertyDependencies
+  else if hash.include
+    modules = if Array.isArray hash.include then hash.include else [hash.include]
+    addProperties.call @prototype, module for module in modules
+    delete hash.include
   
   addProperties.call @prototype, hash
 

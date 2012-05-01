@@ -10,8 +10,6 @@ DummyCollection = WingmanObject.extend
   count: -> @values.length
 
 module.exports = class StoreTest extends Janitor.TestCase
-  @solo: true
-  
   setup: ->
     @store = Store.create collectionClass: DummyCollection
   

@@ -2,6 +2,8 @@ Janitor = require 'janitor'
 WingmanObject = require '../../../lib/wingman/shared/object'
 
 module.exports = class ObjectTest extends Janitor.TestCase
+  @solo: true
+  
   'test simplest extend': ->
     object = WingmanObject.extend()
     instance = object.create()
@@ -109,6 +111,33 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'white', puppy.color
     @assertEqual 'Snoopy Junior', puppy.name
   
+  'test include': ->
+    Walker =
+      position: 0
+      walk: -> @position += 2
+      getLegs: -> '||'
+    
+    Person = WingmanObject.extend
+      include: Walker
+    
+    person = Person.create()
+    person.walk()
+    
+    @assertEqual 2, person.position
+    @assertEqual '||', person.legs
+    @refute person.include
+  
+  'test including two modules': ->
+    Walker = { walk: -> true }
+    Seer = { see: -> true }
+    
+    Person = WingmanObject.extend
+      include: [Walker, Seer]
+    
+    person = Person.create()
+    @assert person.walk()
+    @assert person.see()
+    
   'test getter': ->
     Person = WingmanObject.extend
       getFullName: -> [@firstName, @lastName].join ' '
