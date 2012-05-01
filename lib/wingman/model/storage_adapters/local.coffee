@@ -1,21 +1,19 @@
 Wingman = require '../../../wingman'
 
-module.exports = class
+module.exports = Wingman.Object.extend
   autoSave: true
   
-  constructor: (@options) ->
-  
   create: (model, options) ->
-    model.set id: @generateId()
-    Wingman.localStorage.setItem @key(model.get('id')), JSON.stringify(model.toJSON())
+    model.id = @generateId()
+    Wingman.localStorage.setItem @key(model.id), JSON.stringify(model.toJSON())
     options?.success?()
     
   update: (model, options) ->
-    @load model.get('id'), success: (existingProperties) =>
+    @load model.id, success: (existingProperties) =>
       newProperties = model.toJSON()
       for key, value of existingProperties
         newProperties[key] = value unless newProperties[key]?
-      Wingman.localStorage.setItem @key(model.get('id')), JSON.stringify(newProperties)
+      Wingman.localStorage.setItem @key(model.id), JSON.stringify(newProperties)
       options?.success?()
   
   load: (id, options) ->
@@ -24,7 +22,7 @@ module.exports = class
     options.success itemAsJson
   
   key: (id) ->
-    [@options.namespace, id].join '.'
+    [@namespace, id].join '.'
   
   generateId: ->
     Math.round Math.random()*5000000
