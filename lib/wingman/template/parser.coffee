@@ -1,3 +1,4 @@
+WingmanObject = require '../shared/object'
 {StringScanner} = require "strscan"
 
 selfClosingTags = ['input', 'img', 'br', 'hr']
@@ -16,21 +17,9 @@ buildText = (value) ->
     isDynamic
   }
 
-module.exports = class
-  @parse: (source) ->
-    parser = new @ source
-    parser.execute()
-    parser.tree
-  
-  @trimSource: (source) ->
-    lines = []
-    for line in source.split "\n"
-      lines.push line.replace(/^ +/, '')
-    lines.join('').replace /[\n\r\t]/g, ''
-  
-  constructor: (source) ->
-    @scanner = new StringScanner @constructor.trimSource(source)
-    
+Parser = WingmanObject.extend
+  initialize: ->
+    @scanner = new StringScanner trimSource(@source)
     @tree = { children: [] }
     @currentScope = @tree
   
@@ -190,3 +179,16 @@ module.exports = class
       node.attributes = {}
       for key, value of attributes
         node.attributes[key] = buildText value
+
+Parser.parse = (source) ->
+  parser = @create { source }
+  parser.execute()
+  parser.tree
+
+trimSource = (source) ->
+  lines = []
+  for line in source.split "\n"
+    lines.push line.replace(/^ +/, '')
+  lines.join('').replace /[\n\r\t]/g, ''
+
+module.exports = Parser
