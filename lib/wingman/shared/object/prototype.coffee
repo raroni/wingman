@@ -125,6 +125,9 @@ module.exports =
   
   callSuper: (propertyName) ->
     Object.getPrototypeOf(Object.getPrototypeOf(@))[propertyName].call @
+  
+  createSubContext: ->
+    Object.create @
 
 isSerializable = (value) ->
   typeof(value) in ['number', 'string']

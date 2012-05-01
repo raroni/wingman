@@ -683,3 +683,13 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 2, Object.keys(json).length
     @assertEqual 'Guybrush', json.name
     @assertEqual 25, json.age
+  
+  'test sub context': ->
+    outer = WingmanObject.create name: 'Outer'
+    inner = outer.createSubContext()
+    
+    @assertEqual 'Outer', inner.name
+    
+    inner.name = 'Inner'
+    @assertEqual 'Inner', inner.name
+    @assertEqual 'Outer', outer.name
