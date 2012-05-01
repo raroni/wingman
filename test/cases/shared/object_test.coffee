@@ -14,6 +14,28 @@ module.exports = class ObjectTest extends Janitor.TestCase
   'test simplest create': ->
     instance = WingmanObject.create()
     @assert instance instanceof WingmanObject
+    @assertEqual instance.constructor, WingmanObject
+    @assertEqual WingmanObject.prototype, Object.getPrototypeOf(instance)
+  
+  'test reusing defined properties': ->
+    Person = WingmanObject.extend
+      name: null
+    
+    person = Person.create name: 'Rasmus'
+    @assert Person.prototype.hasOwnProperty('name')
+    @refute person.hasOwnProperty('name')
+  
+  'test reusing defined properties': ->
+    Dog = WingmanObject.extend
+      name: null
+    
+    Snoopy = Dog.extend
+      name: 'Snoopy'
+    
+    snoopy = Snoopy.create()
+    snoopy.namE = 'snoopy'
+    
+    @assertEqual 'Snoopy', snoopy.name
   
   'test simple properties': ->
     Viking = WingmanObject.extend
@@ -38,19 +60,18 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 75, viking.healthPoints
     @assertEqual 5, viking.lives
   
-  'test instantiation with hash': ->
-    Person = WingmanObject.extend
-      name: null
-    
-    person = Person.create name: 'Rasmus'
+  'test create with hash': ->
+    person = WingmanObject.create name: 'Rasmus'
     @assertEqual 'Rasmus', person.name
   
   'test constructor': ->
     Person = WingmanObject.extend
       name: null
-      initialize: (@name) ->
+      
+      initialize: ->
+        @name = 'The Dude'
     
-    dude = Person.create 'The Dude'
+    dude = Person.create()
     @assertEqual 'The Dude', dude.name
   
   'test basic inheritance': ->
@@ -83,6 +104,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
         dog
     
     snoopy = Snoopy.create()
+    
     puppy = snoopy.giveBirth()
     
     @assert puppy instanceof Dog
@@ -96,6 +118,14 @@ module.exports = class ObjectTest extends Janitor.TestCase
     person = Person.create()
     person.firstName = 'Rasmus'
     person.lastName = 'Nielsen'
+    @assertEqual 'Rasmus Nielsen', person.fullName
+  
+  'test getter with create': ->
+    person = WingmanObject.create
+      firstName: 'Rasmus'
+      lastName: 'Nielsen'
+      getFullName: -> [@firstName, @lastName].join ' '
+    
     @assertEqual 'Rasmus Nielsen', person.fullName
   
   'test observe': ->
@@ -117,10 +147,8 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual oldNameFromCallback, 'Roger'
   
   'test observe of unset properties': ->
-    Person = WingmanObject.extend
-      name: null
-    
-    person = new Person
+    Person = WingmanObject.extend name: null
+    person = Person.create()
     
     newNameFromCallback = null
     oldNameFromCallback = null
@@ -131,7 +159,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     person.name = 'Rasmus'
     @assertEqual newNameFromCallback, 'Rasmus'
-    @assertEqual oldNameFromCallback, undefined
+    @assertEqual oldNameFromCallback, null
   
   'test observe of nested unset properties': ->
     Person = WingmanObject.extend
@@ -229,29 +257,18 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'Toyota', car.type.name
   
   'test nested observe': ->
-    Country = WingmanObject.extend
-      name: null
+    Country = WingmanObject.extend name: null
+    Region = WingmanObject.extend country: null
+    City = WingmanObject.extend region: null
     
-    Region = WingmanObject.extend
-      country: null
+    denmark = Country.create name: 'Denmark'
+    england = Country.create name: 'England'
+    sweden = Country.create name: 'Sweden'
     
-    City = WingmanObject.extend
-      region: null
+    region1 = Region.create country: denmark
+    region2 = Region.create country: sweden
     
-    denmark = Country.create()
-    denmark.name = 'Denmark'
-    england = Country.create()
-    england.name = 'England'
-    sweden = Country.create()
-    sweden.name = 'Sweden'
-    
-    region1 = Region.create()
-    region1.country = denmark
-    region2 = Region.create()
-    region2.country = sweden
-    
-    city = City.create()
-    city.region = region1
+    city = City.create region: region1
   
     newNames = []
     oldNames = []
@@ -296,23 +313,19 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'Rasmus', callbackValue
   
   'test observe array property add': ->
-    app = WingmanObject.extend
-      users: null
-    
-    instance = app.create
-      users: []
+    app = WingmanObject.create users: []
     
     added = []
-    instance.users.bind 'add', (newValue) -> added.push(newValue)
-    instance.users.push 'Rasmus'
-    instance.users.push 'John'
-    instance.users = []
-    instance.users.push 'Jack'
+    app.users.bind 'add', (newValue) -> added.push(newValue)
+    app.users.push 'Rasmus'
+    app.users.push 'John'
+    app.users = []
+    app.users.push 'Jack'
     
     @assertEqual 2, added.length
     @assertEqual 'Rasmus', added[0]
     @assertEqual 'John', added[1]
-    @assertEqual 1, instance.users.length
+    @assertEqual 1, app.users.length
   
   'test observe nested array property': ->
     country = WingmanObject.create cities: null
@@ -512,11 +525,12 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     names = []
     city.observe 'region.country.name', (newName) -> names.push(newName)
+    
     denmark.code = 'SE'
     region1.country = england
     denmark.code = 'UK'
     city.region = region2
-  
+    
     @assertEqual 3, names.length
     @assertEqual 'Sweden', names[0]
     @assertEqual 'England', names[1]
@@ -535,12 +549,20 @@ module.exports = class ObjectTest extends Janitor.TestCase
     person = Person.create names: []
     
     callbackValues = []
-    person.observe 'fullName', (value) -> callbackValues.push value
+    person.observe 'fullName', (value) ->
+      callbackValues.push value
+    
     person.names.push 'Rasmus'
     person.names.push 'Nielsen'
     
+    person.names.remove 'Rasmus'
+    
+    person.names = ['Johnny']
+    
     @assertEqual 'Rasmus', callbackValues[0]
     @assertEqual 'Rasmus Nielsen', callbackValues[1]
+    @assertEqual 'Nielsen', callbackValues[2]
+    @assertEqual 'Johnny', callbackValues[3]
   
   'test property dependency inheritance': ->
     Parent = WingmanObject.extend

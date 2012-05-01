@@ -3,7 +3,6 @@ Properties = require '../object/properties'
 module.exports =
   initialize: ->
     @initPropertyDependencies() if @constructor.propertyDependencies
-    @[key] = value for key, value of arguments[0]
   
   get: (chainAsString) ->
     chain = chainAsString.split '.'
@@ -20,11 +19,11 @@ module.exports =
   set: (hash) ->
     @[key] = value for key, value of hash
   
-  triggerPropertyChange: (propertyName) ->
-    @previousProperties ||= {}
+  triggerPropertyChange: (propertyName, oldValue) ->
     newValue = @[propertyName]
+    @previousProperties = {} unless @hasOwnProperty 'previousProperties'
     if !@previousProperties.hasOwnProperty(propertyName) || @previousProperties[propertyName] != newValue
-      @trigger "change:#{propertyName}", newValue, @previousProperties[propertyName]
+      @trigger "change:#{propertyName}", newValue, oldValue
       @previousProperties[propertyName] = newValue
 
   observe: (chainAsString, args...) ->
@@ -86,15 +85,20 @@ module.exports =
         @initPropertyDependency dependentPropertyKey, dependingPropertyKey
   
   initPropertyDependency: (dependentPropertyKey, dependingPropertyKey) ->
-    trigger = =>
-      @triggerPropertyChange dependentPropertyKey
+    trigger = => @triggerPropertyChange dependentPropertyKey
+    
+    observeEnumerable = (enumerable) ->
+      enumerable.bind 'add', trigger
+      enumerable.bind 'remove', trigger
+    
+    value = @[dependingPropertyKey]
+    observeEnumerable value if value && value.forEach
     
     @observe dependingPropertyKey, (newValue, oldValue) =>
       trigger()
       
       if !oldValue?.forEach && newValue?.forEach
-        newValue.bind 'add', trigger
-        newValue.bind 'remove', trigger
+        observeEnumerable newValue
       else if oldValue?.forEach
         oldValue.unbind 'add', trigger
         oldValue.unbind 'remove', trigger
@@ -124,4 +128,3 @@ module.exports =
 
 isSerializable = (value) ->
   typeof(value) in ['number', 'string']
-

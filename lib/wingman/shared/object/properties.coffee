@@ -9,7 +9,8 @@ find = (object) ->
   data[id]
 
 create = (object) ->
-  hash = {}
+  prototype = if object then findOrCreate(Object.getPrototypeOf(object)) else null
+  hash = Object.create prototype
   data.push hash
   instances.push object
   hash

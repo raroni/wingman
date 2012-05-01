@@ -4,6 +4,7 @@ Prototype = require './object/prototype'
 
 WingmanObject = ->
 WingmanObject.prototype = Prototype
+WingmanObject.prototype.constructor = WingmanObject
 
 WingmanObject.include = (hash) ->
   if hash.propertyDependencies
@@ -13,15 +14,14 @@ WingmanObject.include = (hash) ->
   addProperties.call @prototype, hash
 
 WingmanObject.create = (hash) ->
-  object = this.extend hash
-  object.create()
+  instantiate this, hash
 
 WingmanObject.extend = (hash) ->
   object = ->
   object.prototype = Object.create @prototype
   WingmanObject.include.call object, hash if hash
   object.prototype.constructor = object
-  object.create = -> instantiate object, arguments
+  object.create = WingmanObject.create
   object.extend = WingmanObject.extend
   object
 
@@ -35,10 +35,13 @@ addProperty = (key, value) ->
     Object.defineProperty @, propertyName, { get: value }
   else if typeof(value) == 'function'
     @[key] = value
+  else if key of @
+    @[key] = value
   else
     Object.defineProperty @, key,
       get: createGetter(key, value)
       set: createSetter(key)
+    @[key] = value
 
 setupPropertyDependencies = (value) ->
   @propertyDependencies = =>
@@ -68,20 +71,19 @@ convertIfNecessary = (value) ->
 createSetter = (key) ->
   (value) ->
     properties = Properties.findOrCreate @
+    oldValue = properties[key]
     properties[key] = convertIfNecessary value
-    @triggerPropertyChange key
+    @triggerPropertyChange key, oldValue
 
 createGetter = (key, defaultValue) ->
   ->
-    properties = Properties.find @
-    if properties && properties.hasOwnProperty key
-      properties[key]
-    else
-      defaultValue
+    properties = Properties.findOrCreate @
+    properties[key]
 
-instantiate = (object, arguments) ->
+instantiate = (object, hash) ->
   instance = Object.create object.prototype
-  instance.initialize.apply instance, arguments if instance.initialize
+  addProperties.call instance, hash if hash
+  instance.initialize() if instance.initialize
   instance
 
 WingmanObject.include Events
