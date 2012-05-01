@@ -8,8 +8,6 @@ jsdom = require 'jsdom'
 DummyController = Wingman.Object.extend include: Navigator
 
 module.exports = class NavigatorTest extends Janitor.TestCase
-  @solo: true
-  
   setup: ->
     Wingman.document = jsdom.jsdom()
     Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
