@@ -117,6 +117,22 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'white', puppy.color
     @assertEqual 'Snoopy Junior', puppy.name
   
+  'test preserving correct super across several methods': ->
+    Animal = WingmanObject.extend
+      identify: -> "I am a #{@name}"
+    
+    Dog = Animal.extend
+      name: 'dog'
+      
+      identify: ->
+        @someOtherMethod()
+        @_super()
+      
+      someOtherMethod: ->
+        'just testing'
+    
+    @assertEqual 'I am a dog', Dog.create().identify()
+  
   'test include': ->
     Walker =
       position: 0
