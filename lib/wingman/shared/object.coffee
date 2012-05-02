@@ -39,6 +39,7 @@ addProperty = (key, value) ->
     Object.defineProperty @, propertyName,
       get: value
       set: (value) -> Object.defineProperty @, propertyName, { value }
+      enumerable: true
   else if typeof(value) == 'function'
     klass = @
     @[key] = ->
@@ -52,6 +53,7 @@ addProperty = (key, value) ->
     Object.defineProperty @, key,
       get: createGetter(key, value)
       set: createSetter(key)
+      enumerable: true
     @[key] = value
 
 setupPropertyDependencies = (value) ->

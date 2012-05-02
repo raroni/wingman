@@ -2,8 +2,6 @@ Janitor = require 'janitor'
 WingmanObject = require '../../../lib/wingman/shared/object'
 
 module.exports = class ObjectTest extends Janitor.TestCase
-  @solo: true
-  
   'test simplest extend': ->
     object = WingmanObject.extend()
     instance = object.create()
@@ -25,7 +23,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assert Person.prototype.hasOwnProperty('name')
     @refute person.hasOwnProperty('name')
   
-  'test reusing defined properties': ->
+  'test reusing defined properties across inheritance': ->
     Dog = WingmanObject.extend
       name: null
     
@@ -33,9 +31,11 @@ module.exports = class ObjectTest extends Janitor.TestCase
       name: 'Snoopy'
     
     snoopy = Snoopy.create()
-    snoopy.namE = 'snoopy'
     
     @assertEqual 'Snoopy', snoopy.name
+    @refute Snoopy.prototype.hasOwnProperty('name')
+    @refute snoopy.hasOwnProperty('name')
+    @assert Dog.prototype.hasOwnProperty('name')
   
   'test simple properties': ->
     Viking = WingmanObject.extend
@@ -48,6 +48,14 @@ module.exports = class ObjectTest extends Janitor.TestCase
     thor.takeDamage 25
     @assertEqual 75, thor.healthPoints
     @assertEqual 5, thor.lives
+  
+  'test property enumerating': ->
+    obj = WingmanObject.create name: 'Rasmus', age: 26
+    result = {}
+    result[key] = value for key, value of obj
+    
+    @assertEqual 'Rasmus', result.name
+    @assertEqual 26, result.age
   
   'test create with simple properties': ->
     viking = WingmanObject.create
@@ -144,6 +152,17 @@ module.exports = class ObjectTest extends Janitor.TestCase
     person.firstName = 'Rasmus'
     person.lastName = 'Nielsen'
     @assertEqual 'Rasmus Nielsen', person.fullName
+  
+  'test getters and enumeration': ->
+    obj = WingmanObject.create
+      getName: -> 'Rasmus'
+      getAge: -> 26
+    
+    result = {}
+    result[key] = value for key, value of obj
+    
+    @assertEqual 'Rasmus', result.name
+    @assertEqual 26, result.age
   
   'test getter with create': ->
     person = WingmanObject.create
