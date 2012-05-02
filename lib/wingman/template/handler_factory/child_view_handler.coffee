@@ -1,7 +1,7 @@
-Wingman = require '../../../wingman'
+WingmanObject = require '../../shared/object'
 
-module.exports = class ChildViewHandler
-  constructor: (@options, @context) ->
+module.exports = WingmanObject.extend
+  initialize: ->
     @view = @context.createChild @viewName(), @viewOptions()
     @options.scope.appendChild @view.el
   

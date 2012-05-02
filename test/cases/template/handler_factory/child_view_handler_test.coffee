@@ -16,12 +16,12 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       name: 'user'
       scope: @parent
     
-    class MainView extends Wingman.View
-    class MainView.UserView extends Wingman.View
+    MainView = Wingman.View.extend()
+    MainView.UserView = Wingman.View.extend
       templateSource: '<div>I am the user view</div>'
     
-    mainView = new MainView
-    new ChildViewHandler options, mainView
+    mainView = MainView.create()
+    ChildViewHandler.create { options, context: mainView }
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
   'test passing value from context': ->
@@ -30,22 +30,22 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       scope: @parent
       properties: ['user', 'height']
     
-    class MainView extends Wingman.View
-    class MainView.UserView extends Wingman.View
+    MainView = Wingman.View.extend()
+    MainView.UserView = Wingman.View.extend
       templateSource: null
     
-    mainView = new MainView
+    mainView = MainView.create()
     mainView.set
       user:
         name: 'Rasmus'
       width: 100
       height: 200
     
-    handler = new ChildViewHandler options, mainView
+    handler = ChildViewHandler.create { options, context: mainView }
     view = handler.view
-    @assertEqual 'Rasmus', view.get('user.name')
-    @assertEqual 200, view.get('height')
-    @assert !view.get('width')
+    @assertEqual 'Rasmus', view.user.name
+    @assertEqual 200, view.height
+    @assert !view.width
   
   'test using passed value in automatic styles': ->
     options =
@@ -53,16 +53,16 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       scope: @parent
       passPropertyNames: ['user']
     
-    class MainView extends Wingman.View
-    class MainView.UserView extends Wingman.View
+    MainView = Wingman.View.extend()
+    MainView.UserView = Wingman.View.extend
       templateSource: null
       
-      left: ->
-        "#{@get('user.level')*10}px"
+      getLeft: ->
+        "#{@user.level*10}px"
     
-    mainView = new MainView
-    mainView.set user: { level: 3 }
-    new ChildViewHandler options, mainView
+    mainView = MainView.create()
+    mainView.user = { level: 3 }
+    ChildViewHandler.create { options, context: mainView }
     @assertEqual '30px', @parent.childNodes[0].style.left
   
   'test remove': ->
@@ -70,12 +70,12 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       name: 'user'
       scope: @parent
     
-    class MainView extends Wingman.View
-    class MainView.UserView extends Wingman.View
+    MainView = Wingman.View.extend()
+    MainView.UserView = Wingman.View.extend
       templateSource: '<div>I am the user view</div>'
     
-    mainView = new MainView
-    handler = new ChildViewHandler options, mainView
+    mainView = MainView.create()
+    handler = ChildViewHandler.create { options, context: mainView }
     
     @assertEqual 1, @parent.childNodes.length
     
@@ -87,12 +87,12 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       path: 'myViewName'
       scope: @parent
     
-    class MainView extends Wingman.View
-      myViewName: -> 'user'
+    MainView = Wingman.View.extend
+      getMyViewName: -> 'user'
       
-    class MainView.UserView extends Wingman.View
+    MainView.UserView = Wingman.View.extend
       templateSource: null
     
-    mainView = new MainView
-    handler = new ChildViewHandler options, mainView
+    mainView = MainView.create()
+    handler = ChildViewHandler.create { options, context: mainView }
     @assert handler.view instanceof MainView.UserView

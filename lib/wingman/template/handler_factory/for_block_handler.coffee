@@ -2,15 +2,15 @@ WingmanObject = require '../../shared/object'
 Fleck = require 'fleck'
 HandlerFactory = require '../handler_factory'
 
-module.exports = class ForBlockHandler
-  constructor: (@options, @context) ->
+module.exports = WingmanObject.extend
+  initialize: ->
     @handlers = {}
     @addAll() if @source()
-    @context.observe @options.source, @rebuild
-    @context.observe @options.source, 'add', @add
-    @context.observe @options.source, 'remove', @remove
+    @context.observe @options.source, @rebuild.bind(@)
+    @context.observe @options.source, 'add', @add.bind(@)
+    @context.observe @options.source, 'remove', @remove.bind(@)
   
-  add: (value) =>
+  add: (value) ->
     @handlers[value] = []
     newContext = @context.createSubContext()
     key = Fleck.singularize @options.source.split('.').pop()
@@ -26,7 +26,7 @@ module.exports = class ForBlockHandler
     options[key] = value for key, value of child
     HandlerFactory.create options, context
   
-  remove: (value) =>
+  remove: (value) ->
     while @handlers[value].length
       handler = @handlers[value].pop()
       handler.remove()
@@ -41,6 +41,6 @@ module.exports = class ForBlockHandler
   removeAll: ->
     @remove value for value, element of @handlers
   
-  rebuild: =>
+  rebuild: ->
     @removeAll()
     @addAll() if @source()

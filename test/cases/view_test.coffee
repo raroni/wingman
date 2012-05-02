@@ -3,7 +3,7 @@ Wingman = require '../../.'
 View = Wingman.View
 document = require('jsdom').jsdom null, null, features: { QuerySelector : true }
 
-ViewWithTemplateSource = class extends View
+ViewWithTemplateSource = View.extend
   templateSource: '<div>test</div>'
 
 clickElement = (elm) ->
@@ -21,33 +21,31 @@ module.exports = class ViewTest extends Janitor.TestCase
   
   'test simple template': ->
     View.templateSources.main = '<div>hello</div>'
-    class MainView extends View
+    MainView = View.extend templateName: 'main'
     
-    dummyApp =
-      pathKeys: -> []
-      el: document.createElement('div')
-    
-    view = new MainView parent: dummyApp, render: true
+    view = MainView.create()
+    view.render()
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'hello', view.el.childNodes[0].innerHTML
-    
-  'test setting dom class': ->
-    class UserView extends View
-      templateSource: '<div>hello</div>'
   
-    view = new UserView render: true
-    @assertEqual 'user', view.el.className
+  # feature temporary disabled while converting to new Wingman.Object
+  #'test setting dom class': ->
+  #  class UserView extends View
+  #    templateSource: '<div>hello</div>'
+  #
+  #  view = UserView.create()
+  #  view.render()
+  #  @assertEqual 'user', view.el.className
   
   'test simple template with dynamic values': ->
     View.templateSources['simple_with_dynamic_values'] = '<div>{myName}</div>'
-    class SimpleWithDynamicValuesView extends View
+    SimpleWithDynamicValuesView = View.extend
+      templateName: 'simple_with_dynamic_values'
+      myName: null
     
-    dummyApp =
-      pathKeys: -> []
-      el: document.createElement('div')
-    
-    view = new SimpleWithDynamicValuesView parent: dummyApp, render: true
-    view.set myName: 'Razda'
+    view = SimpleWithDynamicValuesView.create()
+    view.render()
+    view.myName = 'Razda'
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'Razda', view.el.childNodes[0].innerHTML
   
@@ -55,7 +53,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     eventsHash =
       'click .user': 'userClicked'
       'hover button.some_class': 'buttonHovered'
-      
+    
     events = View.parseEvents(eventsHash).sort (e1, e2) -> e1.type > e2.type
     
     @assertEqual 'click', events[0].type
@@ -68,31 +66,28 @@ module.exports = class ViewTest extends Janitor.TestCase
   
   'test simple event': ->
     View.templateSources.main = '<div><div class="user">Johnny</div></div>'
-    class MainView extends View
-      @_name: 'test'
+    MainView = View.extend
+      templateName: 'main'
       events:
         'click .user': 'userClicked'
     
-    dummyApp =
-      pathKeys: -> []
-      el: document.createElement('div')
-    
-    view = new MainView parent: dummyApp, render: true
+    view = MainView.create()
+    view.render()
     clicked = false
-    view.bind 'userClicked', ->
-      clicked = true
+    view.bind 'userClicked', -> clicked = true
     
     clickElement view.el.childNodes[0].childNodes[0]
     @assert clicked
     
   'test event bubbling': ->
     View.templateSources.main = '<div class="outer"><div class="user">Johnny</div></div>'
-    class MainView extends View
-      @_name: 'test'
+    MainView = View.extend
+      templateName: 'main'
       events:
         'click .outer': 'outerClicked'
     
-    view = new MainView render: true
+    view = MainView.create()
+    view.render()
     clicked = false
     view.bind 'outerClicked', -> clicked = true
     clickElement view.el.childNodes[0].childNodes[0]
@@ -101,14 +96,17 @@ module.exports = class ViewTest extends Janitor.TestCase
   'test click on views mother element': ->
     eventFromCallback = undefined
     didMaintainContext = false
-    class MainView extends View
+    
+    MainView = View.extend
       randomProperty: true
       click: (event) ->
         didMaintainContext = @randomProperty
         eventFromCallback = event
       templateSource: '<div><a>BOING</a></div>'
     
-    view = new MainView render: true
+    view = MainView.create()
+    view.render()
+    
     clickElement view.el.childNodes[0].childNodes[0]
     @assert eventFromCallback
     @assertEqual 'A', eventFromCallback.target.tagName
@@ -116,21 +114,17 @@ module.exports = class ViewTest extends Janitor.TestCase
   
   'test trigger arguments': ->
     View.templateSources.main = '<div>Something</div>'
-    class MainView extends View
-      @_name: 'test'
+    MainView = View.extend
+      templateName: 'main'
       events:
         'click div': 'somethingHappened'
       
       somethingHappenedArguments: ->
         ['a', 'b']
     
-    dummyApp =
-      pathKeys: -> []
-      el: document.createElement('div')
-    
-    view = new MainView parent: dummyApp, render: true
-    a = null
-    b = null
+    view = MainView.create()
+    view.render()
+    a = b = null
     view.bind 'somethingHappened', (x,y) ->
       a = x
       b = y
@@ -140,87 +134,83 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assertEqual 'b', b
   
   'test path of deeply nested view': ->
-    class MainView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend
       isRoot: -> true
-    class MainView.UserView extends ViewWithTemplateSource
-    class MainView.UserView.NameView extends ViewWithTemplateSource
-    class MainView.UserView.NameView.FirstView extends ViewWithTemplateSource
     
-    main = new MainView parent: { el: document.createElement('div') }, render: true
+    MainView.UserView = ViewWithTemplateSource.extend()
+    MainView.UserView.NameView = ViewWithTemplateSource.extend()
+    MainView.UserView.NameView.FirstView = ViewWithTemplateSource.extend()
+    
+    main = MainView.create()
     user = main.createChild 'user'
     name = user.createChild 'name'
     first = name.createChild 'first'
-    @assertEqual 'user.name.first', first.path()
+    
+    path = first.path()
+    @assertEqual 3, path.length
+    @assertEqual MainView.UserView, path[0]
+    @assertEqual MainView.UserView.NameView, path[1]
+    @assertEqual MainView.UserView.NameView.FirstView, path[2]
   
   'test state sharing': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
-    class MainView.UserView.NameView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserView = ViewWithTemplateSource.extend()
+    MainView.UserView.NameView = ViewWithTemplateSource.extend()
     
-    state = new Wingman.Object
-    view = new MainView { state, render: true }
-    @assertEqual state, view.createChild('user').createChild('name').get('state')
+    state = Wingman.Object.create()
+    view = MainView.create { state }
+    @assertEqual state, view.createChild('user').createChild('name').state
   
   'test access to parent': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
-    class MainView.UserView.NameView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserView = ViewWithTemplateSource.extend()
+    MainView.UserView.NameView = ViewWithTemplateSource.extend()
     
-    view = new MainView render: true
-    @assert view.createChild('user').createChild('name').get('parent.parent') instanceof MainView
-    
+    view = MainView.create()
+    @assert view.createChild('user').createChild('name').parent.parent instanceof MainView
+  
   'test ready callback': ->
     callbackFired = false
-    class MainView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend
       ready: -> callbackFired = true
     
-    view = new MainView render: true
+    view = MainView.create()
+    view.render()
     @assert callbackFired
   
-  'test single word name': ->
-    class MainView extends ViewWithTemplateSource
-    view = new MainView
-    @assertEqual 'main', view.get('name')
-  
-  'test double word name': ->
-    class UserNameView extends ViewWithTemplateSource
-    view = new UserNameView
-    @assertEqual 'userName', view.get('name')
-  
   'test view with child view': ->
-    class MainView extends Wingman.View
-      templateSource: "{view 'user'}"
+    MainView = Wingman.View.extend templateSource: "{view 'user'}"
+    MainView.UserView = ViewWithTemplateSource.extend()
     
-    class MainView.UserView extends ViewWithTemplateSource
-    
-    view = new MainView render: true
-    childView = view.get('children')[0]
+    view = MainView.create()
+    view.render()
+    childView = view.children[0]
     @assert childView instanceof MainView.UserView
     @assert view, childView.parent
   
   'test manual creation of child view': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserView = ViewWithTemplateSource.extend()
     
-    view = new MainView
+    view = MainView.create()
     childView = view.createChild 'user'
     @assert childView instanceof MainView.UserView
     @assert view, childView.parent
   
   'test manual creation of child view with properties': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserView = ViewWithTemplateSource.extend()
     
-    view = new MainView
+    view = MainView.create()
     childView = view.createChild 'user', properties: { user: 'Rasmus' }
     @assertEqual 'Rasmus', childView.get('user')
   
   'test children list' :->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
-    class MainView.StatusView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserView = ViewWithTemplateSource.extend()
+    MainView.StatusView = ViewWithTemplateSource.extend()
     
-    view = new MainView
+    view = MainView.create()
     @assertEqual 0, view.get('children').length
     
     userView = view.createChild 'user'
@@ -236,36 +226,38 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assertEqual 0, view.get('children').length
   
   'test manualle created child views are not rendered by default': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserView = ViewWithTemplateSource.extend()
     
-    view = new MainView render: true
+    view = MainView.create()
+    view.render()
     childView = view.createChild 'user'
     @assert !childView.el.innerHTML
   
   'test immediate render when manually creating child view': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserView = ViewWithTemplateSource.extend()
     
-    view = new MainView render: true
+    view = MainView.create()
+    view.render()
     childView = view.createChild 'user', render: true
     @assert childView.el.innerHTML
     
   'test manual creation of child view with two word name': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserNameView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserNameView = ViewWithTemplateSource.extend()
     
-    view = new MainView render: true
+    view = MainView.create()
     childView = view.createChild 'userName'
     @assert childView instanceof MainView.UserNameView
     @assert view, childView.parent
   
   'test descendant view event': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
-    class MainView.UserView.NameView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserView = ViewWithTemplateSource.extend()
+    MainView.UserView.NameView = ViewWithTemplateSource.extend()
     
-    main = new MainView
+    main = MainView.create()
     callbackValues = []
     main.bind 'descendantCreated', (view) -> callbackValues.push view
     user = main.createChild 'user'
@@ -276,10 +268,10 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assertEqual name, callbackValues[1]
   
   'test properties with descendant view event': ->
-    class MainView extends ViewWithTemplateSource
-    class MainView.UserView extends ViewWithTemplateSource
+    MainView = ViewWithTemplateSource.extend()
+    MainView.UserView = ViewWithTemplateSource.extend()
     
-    main = new MainView
+    main = MainView.create()
     callbackValue = undefined
     main.bind 'descendantCreated', (view) -> callbackValue = view.get('user')
     user = main.createChild 'user', properties: { user: 'Ras' }
@@ -287,107 +279,117 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assertEqual 'Ras', callbackValue
   
   'test custom tag': ->
-    class MainView extends ViewWithTemplateSource
-      tag: 'tr'
-    
-    mainView = new MainView render: true
+    MainView = ViewWithTemplateSource.extend tag: 'tr'
+    mainView = MainView.create()
     @assertEqual 'TR', mainView.el.tagName
   
   'test custom template name': ->
     View.templateSources =
       'my_custom_name': '<div>hi</div>'
     
-    class MainView extends Wingman.View
+    MainView = Wingman.View.extend
       templateName: 'my_custom_name'
     
-    mainView = new MainView render: true
+    mainView = MainView.create()
+    mainView.render()
     @assertEqual 'hi', mainView.el.childNodes[0].innerHTML
   
   'test template source as a string': ->
-    class MainView extends Wingman.View
+    MainView = Wingman.View.extend
       templateSource: '<div>hello</div>'
     
-    mainView = new MainView render: true
+    mainView = MainView.create()
+    mainView.render()
     @assertEqual 'hello', mainView.el.childNodes[0].innerHTML
   
   'test disabling template': ->
-    class MainView extends Wingman.View
+    MainView = Wingman.View.extend
       templateSource: null
     
-    mainView = new MainView render: true
+    mainView = MainView.create()
+    mainView.render()
     @assertEqual 0, mainView.el.childNodes.length
     
   'test appending view': ->
-    class MainView extends Wingman.View
+    MainView = Wingman.View.extend
       templateSource: null
-      
-    class SubView extends Wingman.View
-      templateSource: '<div>hello</div>'
     
-    mainView = new MainView render: true
-    subView = new SubView render: true
+    SubView = Wingman.View.extend
+      tag: 'span'
+      templateSource: 'hello there'
+    
+    mainView = MainView.create()
+    mainView.render()
+    
+    subView = SubView.create()
+    subView.render()
+    
     mainView.append subView
     
-    @assertEqual '<div class="sub"><div>hello</div></div>', mainView.el.innerHTML
+    @assertEqual '<span>hello there</span>', mainView.el.innerHTML
   
   'test style property': ->
-    class MainView extends Wingman.View
+    MainView = Wingman.View.extend
       templateSource: null
       left: '10px'
     
-    view = new MainView render: true
+    view = MainView.create()
+    view.render()
     @assertEqual "10px", view.el.style.left
   
   'test computed style property': ->
-    class MainView extends Wingman.View
+    MainView = Wingman.View.extend
       templateSource: null
       
-      backgroundImage: ->
+      getBackgroundImage: ->
         "url('/something.jpg')"
     
-    view = new MainView render: true
+    view = MainView.create()
+    view.render()
     @assertEqual "url('/something.jpg')", view.el.style.backgroundImage
   
   'test computed style property with dependency': ->
-    class MainView extends Wingman.View
+    MainView = Wingman.View.extend
       myCode: 1
       templateSource: null
-      @propertyDependencies
+      propertyDependencies:
         backgroundImage: 'myCode'
       
-      backgroundImage: ->
+      getBackgroundImage: ->
         "url('/#{@get('myCode')}.jpg')"
     
-    view = new MainView render: true
+    view = MainView.create()
+    view.render()
     @assertEqual "url('/1.jpg')", view.el.style.backgroundImage
-    view.set myCode: 2
+    view.myCode = 2
     @assertEqual "url('/2.jpg')", view.el.style.backgroundImage
   
   'test child views object': ->
-    class MainView extends Wingman.View
+    MainView = Wingman.View.extend
       templateSource: null
     
     MyViews = {}
-    class MyViews.NameView extends Wingman.View
+    MyViews.NameView = Wingman.View.extend
       templateSource: null
     
-    view = new MainView childClasses: MyViews
-    view.createChild 'name'
+    view = MainView.create childClasses: MyViews
+    nameView = view.createChild 'name'
+    @assert nameView instanceof MyViews.NameView
   
   'test computed properties depending on app property not being called upon initialization': ->
     called = false
-    class NameView extends Wingman.View
+    NameView = Wingman.View.extend
       templateSource: null
-      @propertyDependencies
+      propertyDependencies:
         something: 'app.loggedIn'
       
       something: -> called = true
     
-    view = new NameView app: {}
+    view = NameView.create app: Wingman.Object.create()
     @assert !called
   
   'test sub context and descendantCreated event': ->
-    view = new Wingman.View
+    view = Wingman.View.create()
     subContext = view.createSubContext()
     callbackFired = true
     view.bind 'descendantCreated', -> callbackFired = true

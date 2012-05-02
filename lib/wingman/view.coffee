@@ -14,56 +14,40 @@ STYLE_NAMES = [
   'height'
 ]
 
-module.exports = class View extends Wingman.Object
-  @include Elementary
+View = Wingman.Object.extend
+  include: Elementary
+  children: null
   
-  @parseEvents: (eventsHash) ->
-    (@parseEvent(key, trigger) for key, trigger of eventsHash)
-  
-  @parseEvent: (key, trigger) ->
-    type = key.split(' ')[0]
-    {
-      selector: key.substring(type.length + 1)
-      type
-      trigger
-    }
-  
-  constructor: (options) ->
-    @set parent: options.parent if options?.parent?
-    @set state: options.state if options?.state?
-    @set childClasses: options.childClasses if options?.childClasses?
-    @el = options?.el || Wingman.document.createElement(@tag || 'div')
-    @set children: []
-    super()
-    @render() if options?.render
+  initialize: ->
+    @el ||= Wingman.document.createElement(@tag || 'div')
+    @children = []
+    @_super()
   
   name: ->
     withoutView = @constructor.name.replace ///View$///, ''
     Fleck.camelize Fleck.underscore(withoutView)
   
   render: ->
-    templateSource = @get 'templateSource'
-    if templateSource
-      template = Wingman.Template.compile templateSource
+    if @templateSource
+      template = Wingman.Template.compile @templateSource
       template @el, @
     
-    @addClass @pathName()
     @setupListeners()
     @setupStyles()
     @ready?()
   
-  childClasses: ->
+  getChildClasses: ->
     @constructor
   
   createChild: (name, options) ->
     className = Fleck.camelize(Fleck.underscore(name), true) + 'View'
     klass = @get('childClasses')[className]
     
-    child = new klass parent: @, state: @get('state')
+    child = klass.create parent: @, state: @get('state')
     child.set options.properties if options?.properties
     
     @get('children').push child
-    child.bind 'remove', => @get('children').remove child
+    child.bind 'remove', => @children.remove child
     
     child.bind 'descendantCreated', (child) => @trigger 'descendantCreated', child
     @trigger 'descendantCreated', child
@@ -71,21 +55,17 @@ module.exports = class View extends Wingman.Object
     child.render() if options?.render
     child
   
-  templateSource: ->
-    name = @get 'templateName'
-    templateSource = @constructor.templateSources[name]
-    throw new Error "Template '#{name}' not found." unless templateSource
+  getTemplateSource: ->
+    templateSource = View.templateSources[@templateName]
+    throw new Error "Template '#{@templateName}' not found." unless templateSource
     templateSource
-  
-  templateName: ->
-    @path()
   
   setupListeners: ->
     @el.addEventListener 'click', (e) => @click(e) if @click
     @setupEvents() if @events
   
   setupEvents: ->
-    @setupEvent event for event in @constructor.parseEvents(@events)
+    @setupEvent event for event in View.parseEvents(@events)
   
   triggerWithCustomArguments: (trigger) ->
     args = [trigger]
@@ -105,26 +85,15 @@ module.exports = class View extends Wingman.Object
           @triggerWithCustomArguments event.trigger
           e.preventDefault()
   
-  pathName: ->
-    Fleck.underscore @constructor.name.replace(/([A-Z])/g, ' $1').substring(1).split(' ').slice(0, -1).join('')
-  
   append: (view) ->
     @el.appendChild view.el
   
-  pathKeys: ->
-    return [] if @isRoot()
-    pathKeys = [@pathName()]
-    pathKeys = @get('parent').pathKeys().concat pathKeys if @get('parent')?.pathKeys?
-    pathKeys
-  
-  isRoot: ->
+  getIsRoot: ->
     @get('parent') instanceof Wingman.Application
   
   path: ->
-    if @get('parent') instanceof Wingman.Application
-      'root'
-    else
-      @pathKeys().join '.'
+    return [] if @isRoot
+    @parent.path().concat @constructor
   
   remove: ->
     Elementary.remove.call @ if @el.parentNode
@@ -139,6 +108,19 @@ module.exports = class View extends Wingman.Object
     @observe name, (newValue) => @setStyle name, newValue
   
   createSubContext: ->
-    context = super()
+    context = @_super()
     context.bind 'descendantCreated', (child) => @trigger 'descendantCreated', child
     context
+
+View.parseEvents = (eventsHash) ->
+  (@parseEvent(key, trigger) for key, trigger of eventsHash)
+
+View.parseEvent = (key, trigger) ->
+  type = key.split(' ')[0]
+  {
+    selector: key.substring(type.length + 1)
+    type
+    trigger
+  }
+
+module.exports = View
