@@ -1,8 +1,8 @@
+WingmanObject = module.exports = ->
+
 Events = require './events'
-Properties = require './object/properties'
 Prototype = require './object/prototype'
 
-WingmanObject = ->
 WingmanObject.prototype = Prototype
 WingmanObject.prototype.constructor = WingmanObject
 
@@ -12,10 +12,10 @@ WingmanObject.include = (hash) ->
     delete hash.propertyDependencies
   else if hash.include
     modules = if Array.isArray hash.include then hash.include else [hash.include]
-    addProperties.call @prototype, module for module in modules
+    WingmanObject.addProperties.call @prototype, module for module in modules
     delete hash.include
   
-  addProperties.call @prototype, hash
+  WingmanObject.addProperties.call @prototype, hash
 
 WingmanObject.create = (hash) ->
   instantiate this, hash
@@ -29,7 +29,7 @@ WingmanObject.extend = (hash) ->
   object.extend = WingmanObject.extend
   object
 
-addProperties = (hash) ->
+WingmanObject.addProperties = (hash) ->
   addProperty.call @, key, value for key, value of hash
 
 addProperty = (key, value) ->
@@ -56,8 +56,8 @@ addProperty = (key, value) ->
     @[key] = value
   else
     Object.defineProperty @, key,
-      get: createGetter(key, value)
-      set: createSetter(key)
+      get: -> @getProperty key
+      set: (value) -> @setProperty key, value
       enumerable: true
     @[key] = value
 
@@ -70,40 +70,10 @@ setupPropertyDependencies = (value) ->
     total[k] = v for k, v of value
     total
 
-convertIfNecessary = (value) ->
-  if Array.isArray(value)
-    addProperties.call value, Events
-    
-    value.push = ->
-      Array.prototype.push.apply @, arguments
-      @trigger 'add', arguments['0']
-    
-    value.remove = (value) ->
-      index = @indexOf value
-      if index != -1
-        @splice index, 1
-        @trigger 'remove', value
-  
-  value
-
-createSetter = (key) ->
-  (value) ->
-    properties = Properties.findOrCreate @
-    oldValue = properties[key]
-    properties[key] = convertIfNecessary value
-    @triggerPropertyChange key, oldValue
-
-createGetter = (key, defaultValue) ->
-  ->
-    properties = Properties.findOrCreate @
-    properties[key]
-
 instantiate = (object, hash) ->
   instance = Object.create object.prototype
-  addProperties.call instance, hash if hash
+  WingmanObject.addProperties.call instance, hash if hash
   instance.initialize() if instance.initialize
   instance
 
 WingmanObject.include Events
-
-module.exports = WingmanObject

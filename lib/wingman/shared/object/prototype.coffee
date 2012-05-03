@@ -1,4 +1,6 @@
+WingmanObject = require '../object'
 Properties = require '../object/properties'
+Events = require '../events'
 
 module.exports =
   initialize: ->
@@ -18,6 +20,16 @@ module.exports =
   
   set: (hash) ->
     @[key] = value for key, value of hash
+  
+  setProperty: (key, value) ->
+    properties = Properties.findOrCreate @
+    oldValue = properties[key]
+    properties[key] = convertIfNecessary value
+    @triggerPropertyChange key, oldValue
+  
+  getProperty: (key) ->
+    properties = Properties.findOrCreate @
+    properties[key]
   
   triggerPropertyChange: (propertyName, oldValue) ->
     newValue = @[propertyName]
@@ -131,3 +143,19 @@ module.exports =
 
 isSerializable = (value) ->
   typeof(value) in ['number', 'string']
+
+convertIfNecessary = (value) ->
+  if Array.isArray(value)
+    WingmanObject.addProperties.call value, Events
+    
+    value.push = ->
+      Array.prototype.push.apply @, arguments
+      @trigger 'add', arguments['0']
+    
+    value.remove = (value) ->
+      index = @indexOf value
+      if index != -1
+        @splice index, 1
+        @trigger 'remove', value
+  
+  value

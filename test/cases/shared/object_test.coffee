@@ -741,3 +741,11 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     parent = Parent.create()
     @assertEqual 'I am a method!', parent.name
+  
+  'test overriding setProperty': ->
+    Model = WingmanObject.extend
+      setProperty: (key, value) ->
+        @_super key, "#{value} set by Model"
+    
+    model = Model.create name: 'Yoshi'
+    @assertEqual 'Yoshi set by Model', model.name
