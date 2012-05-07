@@ -4,8 +4,6 @@ jsdom = require 'jsdom'
 CustomAssertions = require '../custom_assertions'
 
 module.exports = class TemplateTest extends Janitor.TestCase
-  @solo: true
-  
   setup: ->
     Wingman.document = jsdom.jsdom()
     @parent = Wingman.document.createElement 'div'
