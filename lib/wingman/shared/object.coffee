@@ -20,13 +20,15 @@ WingmanObject.include = (hash) ->
 WingmanObject.create = (hash) ->
   instantiate this, hash
 
-WingmanObject.extend = (hash) ->
+WingmanObject.extend = (prototype, classProperties) ->
   object = ->
+  merge object, @
+  merge object, classProperties
+  
   object.prototype = Object.create @prototype
-  WingmanObject.include.call object, hash if hash
+  WingmanObject.include.call object, prototype if prototype
   object.prototype.constructor = object
-  object.create = WingmanObject.create
-  object.extend = WingmanObject.extend
+  
   object
 
 WingmanObject.addProperties = (hash) ->
@@ -42,7 +44,7 @@ addProperty = (key, value) ->
         Object.defineProperty @, propertyName, { value }
       enumerable: true
   else if typeof(value) == 'function'
-    klass = @
+    klass = @ # rename to prototype?
     @[key] = ->
       oldSuper = @_super
       @_super = Object.getPrototypeOf(klass)[key]
@@ -61,13 +63,15 @@ addProperty = (key, value) ->
       enumerable: true
     @[key] = value
 
-setupPropertyDependencies = (value) ->
+merge = (obj, obj2) ->
+  obj[key] = value for key, value of obj2
+
+setupPropertyDependencies = (propertyDependencyConfig) ->
+  existing = @propertyDependencies?()
   @propertyDependencies = =>
     total = {}
-    parent = Object.getPrototypeOf(@prototype).constructor
-    if parent && parent.propertyDependencies
-      total[k] = v for k, v of parent.propertyDependencies()
-    total[k] = v for k, v of value
+    merge total, existing
+    merge total, propertyDependencyConfig
     total
 
 instantiate = (object, hash) ->

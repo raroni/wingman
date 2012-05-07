@@ -23,20 +23,6 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assert Person.prototype.hasOwnProperty('name')
     @refute person.hasOwnProperty('name')
   
-  'test reusing defined properties across inheritance': ->
-    Dog = WingmanObject.extend
-      name: null
-    
-    Snoopy = Dog.extend
-      name: 'Snoopy'
-    
-    snoopy = Snoopy.create()
-    
-    @assertEqual 'Snoopy', snoopy.name
-    @refute Snoopy.prototype.hasOwnProperty('name')
-    @refute snoopy.hasOwnProperty('name')
-    @assert Dog.prototype.hasOwnProperty('name')
-  
   'test simple properties': ->
     Viking = WingmanObject.extend
       healthPoints: 100
@@ -72,7 +58,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     person = WingmanObject.create name: 'Rasmus'
     @assertEqual 'Rasmus', person.name
   
-  'test constructor': ->
+  'test initialize': ->
     Person = WingmanObject.extend
       name: null
       
@@ -95,6 +81,28 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assert woman instanceof Woman
     @assert woman instanceof Person
     @assert woman instanceof WingmanObject
+  
+  'test reusing defined properties across inheritance': ->
+    Dog = WingmanObject.extend
+      name: null
+    
+    Snoopy = Dog.extend
+      name: 'Snoopy'
+    
+    snoopy = Snoopy.create()
+    
+    @assertEqual 'Snoopy', snoopy.name
+    @refute Snoopy.prototype.hasOwnProperty('name')
+    @refute snoopy.hasOwnProperty('name')
+    @assert Dog.prototype.hasOwnProperty('name')
+  
+  'test inheriting class properties': ->
+    Prototype = {}
+    ClassProperties = doSomething: 'test'
+    Animal = WingmanObject.extend Prototype, ClassProperties
+    Dog = Animal.extend()
+    
+    @assertEqual 'test', Dog.doSomething
   
   'test super': ->
     Dog = WingmanObject.extend
@@ -641,6 +649,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
       getSomething: ->
     
     child = Child.create()
+    
     callbackFired = false
     child.observe 'something', -> callbackFired = true
     child.currentUser = 'yogi'
