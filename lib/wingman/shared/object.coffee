@@ -35,10 +35,9 @@ addProperty = (key, value) ->
 merge = (obj, obj2) ->
   obj[key] = value for key, value of obj2
 
-instantiate = (object, hash) ->
+instantiate = (object, args) ->
   instance = Object.create object.prototype
-  addProperties.call instance, hash if hash
-  instance.initialize() if instance.initialize
+  instance.initialize.apply instance, args if instance.initialize
   instance
 
 convertIfNecessary = (value) ->
@@ -64,8 +63,8 @@ WingmanObject.include = (args...) ->
   addProperties.call @, module for module in args
 
 WingmanObject.include
-  create: (hash) ->
-    instantiate this, hash
+  create: (args...) ->
+    instantiate this, args
 
   extend: (prototype, classProperties) ->
     object = ->

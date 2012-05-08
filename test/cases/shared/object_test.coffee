@@ -2,6 +2,8 @@ Janitor = require 'janitor'
 WingmanObject = require '../../../lib/wingman/shared/object'
 
 module.exports = class ObjectTest extends Janitor.TestCase
+  @solo: true
+  
   'test simplest extend': ->
     object = WingmanObject.extend()
     instance = object.create()
@@ -19,7 +21,8 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Person = WingmanObject.extend
       name: null
     
-    person = Person.create name: 'Rasmus'
+    person = Person.create()
+    person.name = 'Rasmus'
     @assert Person.prototype.hasOwnProperty('name')
     @refute person.hasOwnProperty('name')
   
@@ -36,7 +39,10 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 5, thor.lives
   
   'test property enumerating': ->
-    obj = WingmanObject.create name: 'Rasmus', age: 26
+    obj = WingmanObject.extend name: null, age: null
+    obj = WingmanObject.create()
+    obj.name = 'Rasmus'
+    obj.age = 26
     result = {}
     result[key] = value for key, value of obj
     
@@ -44,29 +50,25 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 26, result.age
   
   'test create with simple properties': ->
-    viking = WingmanObject.create
+    Viking = WingmanObject.extend
       healthPoints: 100
       takeDamage: (healthPoints) -> @healthPoints -= healthPoints
       lives: 5
+    
+    viking = Viking.create()
     
     @assertEqual 100, viking.healthPoints
     viking.takeDamage 25
     @assertEqual 75, viking.healthPoints
     @assertEqual 5, viking.lives
   
-  'test create with hash': ->
-    person = WingmanObject.create name: 'Rasmus'
-    @assertEqual 'Rasmus', person.name
-  
   'test initialize': ->
     Person = WingmanObject.extend
-      name: null
-      
-      initialize: ->
-        @name = 'The Dude'
+      initialize: (@name, @age) ->
     
-    dude = Person.create()
+    dude = Person.create 'The Dude', 25
     @assertEqual 'The Dude', dude.name
+    @assertEqual 25, dude.age
   
   'test basic inheritance': ->
     Person = WingmanObject.extend
@@ -108,6 +110,10 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Dog = WingmanObject.extend
       color: null
       name: null
+      
+      initialize: (hash) ->
+        @[key] = value for key, value of hash
+      
       giveBirth: (name) ->
         Dog.create { color: @color, name }
     
@@ -197,21 +203,25 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'Rasmus Nielsen', person.fullName
   
   'test getters and enumeration': ->
-    obj = WingmanObject.create
+    constructor = WingmanObject.extend
       getName: -> 'Rasmus'
       getAge: -> 26
     
+    instance = constructor.create()
+    
     result = {}
-    result[key] = value for key, value of obj
+    result[key] = value for key, value of instance
     
     @assertEqual 'Rasmus', result.name
     @assertEqual 26, result.age
   
   'test getter with create': ->
-    person = WingmanObject.create
+    Person = WingmanObject.extend
       firstName: 'Rasmus'
       lastName: 'Nielsen'
       getFullName: -> [@firstName, @lastName].join ' '
+    
+    person = Person.create()
     
     @assertEqual 'Rasmus Nielsen', person.fullName
   
@@ -316,7 +326,8 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 10000, callbackValues[2]
   
   'test unobserve': ->
-    person = WingmanObject.create name: null
+    Person = WingmanObject.extend name: null
+    person = Person.create()
     
     callbackValues = []
     callback1 = -> callbackValues.push 'a'
@@ -336,27 +347,27 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual undefined, person.get 'this.does.not.exist'
   
   'test nested get': ->
-    carType = WingmanObject.create
-      name: 'Toyota'
+    CarType = WingmanObject.extend initialize: (@name) ->
+    carType = CarType.create 'Toyota'
     
-    car = WingmanObject.create
-      type: carType
+    Car = WingmanObject.extend initialize: (@type) ->
+    car = Car.create carType
     
     @assertEqual 'Toyota', car.type.name
   
   'test nested observe': ->
-    Country = WingmanObject.extend name: null
-    Region = WingmanObject.extend country: null
-    City = WingmanObject.extend region: null
+    Country = WingmanObject.extend name: null, initialize: (@name) ->
+    Region = WingmanObject.extend country: null, initialize: (@country) ->
+    City = WingmanObject.extend region: null, initialize: (@region) ->
     
-    denmark = Country.create name: 'Denmark'
-    england = Country.create name: 'England'
-    sweden = Country.create name: 'Sweden'
+    denmark = Country.create 'Denmark'
+    england = Country.create 'England'
+    sweden = Country.create 'Sweden'
     
-    region1 = Region.create country: denmark
-    region2 = Region.create country: sweden
+    region1 = Region.create denmark
+    region2 = Region.create sweden
     
-    city = City.create region: region1
+    city = City.create region1
     
     newNames = []
     oldNames = []
@@ -390,9 +401,11 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'Nielsen', person.lastName
   
   'test observe while setting several properties at once': ->
-    person = WingmanObject.create
+    Person = WingmanObject.extend
       firstName: null
       lastName: null
+    
+    person = Person.create()
     
     callbackValue = null
     person.observe 'firstName', (value) -> callbackValue = value
@@ -401,7 +414,8 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'Rasmus', callbackValue
   
   'test observe array property add': ->
-    app = WingmanObject.create users: []
+    App = WingmanObject.extend users: null, initialize: -> @users = []
+    app = App.create()
     
     added = []
     app.users.bind 'add', (newValue) -> added.push(newValue)
@@ -416,9 +430,12 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 1, app.users.length
   
   'test observe nested array property': ->
-    country = WingmanObject.create cities: null
+    Country = WingmanObject.extend cities: null
+    country = Country.create()
     country.cities = ['London', 'Manchester']
-    user = WingmanObject.create { country }
+    User = WingmanObject.extend country: null
+    user = User.create()
+    user.country = country
     
     result = undefined
     user.observe 'country.cities', 'add', (newValue) -> result = newValue
@@ -429,10 +446,12 @@ module.exports = class ObjectTest extends Janitor.TestCase
   'test nested observe of array add of yet to be set properties': ->
     added = []
     
-    context = WingmanObject.create user: null
+    Context = WingmanObject.extend user: null
+    context = Context.create()
     context.observe 'user.notifications', 'add', (newValue) -> added.push(newValue)
     
-    user = WingmanObject.create notifications: null
+    User = WingmanObject.extend notifications: null
+    user = User.create()
     user.notifications = []
     
     context.user = user
@@ -443,10 +462,12 @@ module.exports = class ObjectTest extends Janitor.TestCase
   'test nested observe of enumerable that is being reset': ->
     added = []
     
-    context = WingmanObject.create user: null
+    Context = WingmanObject.extend user: null
+    context = Context.create()
     context.observe 'user.notifications', 'add', (newValue) -> added.push(newValue)
     
-    user = WingmanObject.create notifications: null
+    User = WingmanObject.extend notifications: null
+    user = User.create()
     user.notifications = []
     
     context.user = user
@@ -457,15 +478,15 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'Hello', added[0]
   
   'test deeply nested observe of array add of yet to be set properties': ->
-    context = WingmanObject.create shared: null
-    shared = WingmanObject.create currentUser: null
+    context = WingmanObject.extend(shared: null).create()
+    shared = WingmanObject.extend(currentUser: null).create()
     
     added = []
     context.observe 'shared.currentUser.notifications', 'add', (newValue) -> added.push(newValue)
     
     context.shared = shared
     
-    currentUser = WingmanObject.create notifications: null
+    currentUser = WingmanObject.extend(notifications: null).create()
     currentUser.notifications = []
     shared.currentUser = currentUser
     
@@ -473,7 +494,8 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'Hello', added[0]
   
   'test observe array property remove': ->
-    country = WingmanObject.create cities: null
+    Country = WingmanObject.extend cities: null
+    country = Country.create()
     country.cities = ['London', 'Manchester']
     removedValueFromCallback = ''
     country.observe 'cities', 'remove', (removedValue) -> removedValueFromCallback = removedValue
@@ -484,7 +506,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 1, country.cities.length  
   
   'test observe once': ->
-    context = WingmanObject.create name: null
+    context = WingmanObject.extend(name: null).create()
     valuesFromCallback = []
     context.observeOnce 'name', (value) -> valuesFromCallback.push(value)
     
@@ -496,7 +518,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'Rasmus', valuesFromCallback[0]
   
   'test observe once in combination with normal observe': ->
-    context = WingmanObject.create name: null
+    context = WingmanObject.extend(name: null).create()
     context.observeOnce 'name', -> 'test'
     callbackFired = false
     context.observe 'name', -> callbackFired = true
@@ -565,8 +587,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual false, callbackValues[2]
   
   'test nested property dependencies': ->
-    session = WingmanObject.create
-      cake: null
+    session = WingmanObject.extend(cake: null).create()
     
     View = WingmanObject.extend
       session: null
@@ -591,6 +612,9 @@ module.exports = class ObjectTest extends Janitor.TestCase
       
       code: null
       
+      initialize: (@code) ->
+        @_super()
+      
       getName: ->
         @CODES[@get('code')]
     
@@ -598,18 +622,20 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     Region = WingmanObject.extend
       country: null
+      initialize: (@country) ->
     
     City = WingmanObject.extend
       region: null
+      initialize: (@region) ->
     
-    denmark = Country.create code: 'DK'
-    england = Country.create code: 'UK'
-    sweden = Country.create code: 'SE'
+    denmark = Country.create 'DK'
+    england = Country.create 'UK'
+    sweden = Country.create 'SE'
     
-    region1 = Region.create country: denmark
-    region2 = WingmanObject.create country: sweden
+    region1 = Region.create denmark
+    region2 = Region.create sweden
     
-    city = City.create region: region1
+    city = City.create region1
     
     names = []
     city.observe 'region.country.name', (newName) -> names.push(newName)
@@ -627,12 +653,17 @@ module.exports = class ObjectTest extends Janitor.TestCase
   'test property depending on enumerable': ->
     Person = WingmanObject.extend
       names: null
+      
+      initialize: ->
+        @names = []
+        @_super()
+      
       getFullName: ->
         @names.join ' ' if @names
     
     Person.addPropertyDependencies fullName: 'names'
     
-    person = Person.create names: []
+    person = Person.create()
     
     callbackValues = []
     person.observe 'fullName', (value) ->
@@ -692,12 +723,14 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Country = WingmanObject.extend
       code: null
       region: null
+      initialize: (@code, @region) ->
       name: -> 'method properties should not be a part of toJSON'
       otherProperty: => 'not even if you bind them like this'
         
-    country = Country.create code: 'dk', region: 'eu'
+    country = Country.create 'dk', 'eu'
     
     json = country.toJSON()
+    
     @assertEqual 'dk', json.code
     @assertEqual 'eu', json.region
     @assertEqual 2, Object.keys(json).length
@@ -712,6 +745,8 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Country = WingmanObject.extend
       code: null
       region: null
+      initialize: (hash) ->
+        @[key] = value for key, value of hash
     
     country = Country.create code: 'dk', region: 'eu', population: 5000
     onlyCode = country.toJSON only: 'code'
@@ -727,7 +762,14 @@ module.exports = class ObjectTest extends Janitor.TestCase
   'test intelligent properties and json export': ->
     thingamabob = WingmanObject.create()
     
-    Context = WingmanObject.extend name: null, age: null, engine: null
+    Context = WingmanObject.extend
+      name: null
+      age: null
+      engine: null
+      
+      initialize: (hash) ->
+        @[key] = value for key, value of hash
+    
     context = Context.create
       name: 'Guybrush'
       age: 25
@@ -740,7 +782,8 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 25, json.age
   
   'test sub context': ->
-    outer = WingmanObject.create name: 'Outer'
+    outer = WingmanObject.create()
+    outer.name = 'Outer'
     inner = outer.createSubContext()
     
     @assertEqual 'Outer', inner.name
@@ -764,8 +807,11 @@ module.exports = class ObjectTest extends Janitor.TestCase
   
   'test overriding setProperty': ->
     Model = WingmanObject.extend
+      name: null
+      
       setProperty: (key, value) ->
         @_super key, "#{value} set by Model"
     
-    model = Model.create name: 'Yoshi'
+    model = Model.create()
+    model.name = 'Yoshi'
     @assertEqual 'Yoshi set by Model', model.name
