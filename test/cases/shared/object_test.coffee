@@ -142,32 +142,51 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'I am a dog', Dog.create().identify()
   
   'test include': ->
+    Loader =
+      getProgress: -> "#{@percentage}%"
+      percentage: 85
+    
+    App = WingmanObject.extend()
+    App.include Loader
+    
+    @assertEqual '85%', App.progress
+  
+  'test including two modules': ->
+    Loader = getProgress: -> '85%'
+    Controller = control: -> 'I rule!'
+    
+    App = WingmanObject.extend()
+    App.include Loader, Controller
+    
+    @assertEqual '85%', App.progress
+    @assertEqual 'I rule!', App.control()
+  
+  'test prototype include': ->
     Walker =
       position: 0
       walk: -> @position += 2
       getLegs: -> '||'
     
-    Person = WingmanObject.extend
-      include: Walker
+    Person = WingmanObject.extend()
+    Person.prototype.include Walker
     
     person = Person.create()
     person.walk()
     
     @assertEqual 2, person.position
     @assertEqual '||', person.legs
-    @refute person.include
   
-  'test including two modules': ->
+  'test prototype including two modules': ->
     Walker = { walk: -> true }
     Seer = { see: -> true }
     
-    Person = WingmanObject.extend
-      include: [Walker, Seer]
+    Person = WingmanObject.extend()
+    Person.prototype.include Walker, Seer
     
     person = Person.create()
     @assert person.walk()
     @assert person.see()
-    
+  
   'test getter': ->
     Person = WingmanObject.extend
       getFullName: -> [@firstName, @lastName].join ' '
@@ -297,19 +316,20 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 10000, callbackValues[2]
   
   'test unobserve': ->
-    Person = WingmanObject.extend
-      name: null
+    person = WingmanObject.create name: null
     
-    person = new Person
-    callbackRan = false
-    callback = -> callbackRan = true
+    callbackValues = []
+    callback1 = -> callbackValues.push 'a'
+    callback2 = -> callbackValues.push 'b'
     
-    person.observe 'name', callback
-    person.unobserve 'name', callback
+    person.observe 'name', callback1
+    person.observe 'name', callback2
+    person.unobserve 'name', callback1
     
     person.name = 'Rasmus'
     
-    @assert !callbackRan
+    @assertEqual 1, callbackValues.length
+    @assertEqual 'b', callbackValues[0]
   
   'test getting non existing nested property': ->
     person = WingmanObject.create()
@@ -337,23 +357,23 @@ module.exports = class ObjectTest extends Janitor.TestCase
     region2 = Region.create country: sweden
     
     city = City.create region: region1
-  
+    
     newNames = []
     oldNames = []
     city.observe 'region.country.name', (newName, oldName) ->
       newNames.push newName
       oldNames.push oldName
-  
+    
     denmark.name = 'Denmark test'
     region1.country = england
     denmark.name = 'Denmark test2'
     city.region = region2
-  
+    
     @assertEqual 3, newNames.length
     @assertEqual 'Denmark test', newNames[0]
     @assertEqual 'England', newNames[1]
     @assertEqual 'Sweden', newNames[2]
-  
+    
     @assertEqual 3, oldNames.length
     @assertEqual 'Denmark', oldNames[0]
     @assertEqual 'Denmark test', oldNames[1]
@@ -451,7 +471,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     
     context.shared.currentUser.notifications.push 'Hello'
     @assertEqual 'Hello', added[0]
-    
+  
   'test observe array property remove': ->
     country = WingmanObject.create cities: null
     country.cities = ['London', 'Manchester']
@@ -462,66 +482,6 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 'London', removedValueFromCallback
     @assertEqual 'Manchester', country.cities[0]
     @assertEqual 1, country.cities.length  
-    
-  'test property dependencies': ->
-    Person = WingmanObject.extend
-      firstName: null
-      lastName: null
-      propertyDependencies:
-        fullName: ['firstName', 'lastName']
-      
-      getFullName: -> [@firstName, @lastName].join ' '
-    
-    person = Person.create()
-    callbackValues = []
-    person.observe 'fullName', (newValue) -> callbackValues.push newValue
-    person.set firstName: 'Rasmus', lastName: 'Nielsen'
-    
-    @assertEqual 'Rasmus Nielsen', callbackValues[callbackValues.length-1]
-    
-    # TODO:
-    #@assertEqual 1, callbackValues.length
-    #@assertEqual 'Rasmus Nielsen', callbackValues[0]
-  
-  'test property dependencies with single depending property': ->
-    Country = WingmanObject.extend
-      countryCode: null
-      
-      NAMES:
-        dk: 'Denmark'
-        se: 'Sweden'
-      propertyDependencies:
-        countryName: 'countryCode'
-      
-      getCountryName: -> @NAMES[@countryCode]
-    
-    country = Country.create()
-    result = undefined
-    country.observe 'countryName', (newValue) -> result = newValue
-    country.countryCode = 'dk'
-    
-    @assertEqual 'Denmark', result
-  
-  'test observation of computed property that is reevaluated but not changed': ->
-    Person = WingmanObject.extend
-      car: null
-      propertyDependencies:
-        isHappy: 'car'
-    
-      getIsHappy: -> @car == 'Batmobile'
-    
-    person = Person.create()
-    callbackValues = []
-    person.observe 'isHappy', (value) -> callbackValues.push value
-    person.car = 'Lada'
-    person.car = 'Toyota'
-    person.car = 'Batmobile'
-    person.car = 'Volkswagen'
-    
-    @assertEqual 3, callbackValues.length
-    @assertEqual false, callbackValues[0]
-    @assertEqual true, callbackValues[1]
-    @assertEqual false, callbackValues[2]
   
   'test observe once': ->
     context = WingmanObject.create name: null
@@ -543,16 +503,77 @@ module.exports = class ObjectTest extends Janitor.TestCase
     context.name = 'Rasmus'
     @assert callbackFired
   
+  'test property dependencies': ->
+    Person = WingmanObject.extend
+      firstName: null
+      lastName: null
+      
+      getFullName: -> [@firstName, @lastName].join ' '
+    
+    Person.addPropertyDependencies
+      fullName: ['firstName', 'lastName']
+    
+    person = Person.create()
+    callbackValues = []
+    person.observe 'fullName', (newValue) -> callbackValues.push newValue
+    person.set firstName: 'Rasmus', lastName: 'Nielsen'
+    
+    @assertEqual 'Rasmus Nielsen', callbackValues[callbackValues.length-1]
+    
+    # TODO:
+    #@assertEqual 1, callbackValues.length
+    #@assertEqual 'Rasmus Nielsen', callbackValues[0]
+  
+  'test property dependencies with single depending property': ->
+    Country = WingmanObject.extend
+      countryCode: null
+      
+      NAMES:
+        dk: 'Denmark'
+        se: 'Sweden'
+      
+      getCountryName: -> @NAMES[@countryCode]
+    
+    Country.addPropertyDependencies countryName: 'countryCode'
+    
+    country = Country.create()
+    result = undefined
+    country.observe 'countryName', (newValue) -> result = newValue
+    country.countryCode = 'dk'
+    
+    @assertEqual 'Denmark', result
+  
+  'test observation of computed property that is reevaluated but not changed': ->
+    Person = WingmanObject.extend
+      car: null
+    
+      getIsHappy: -> @car == 'Batmobile'
+    
+    Person.addPropertyDependencies isHappy: 'car'
+    
+    person = Person.create()
+    callbackValues = []
+    person.observe 'isHappy', (value) -> callbackValues.push value
+    person.car = 'Lada'
+    person.car = 'Toyota'
+    person.car = 'Batmobile'
+    person.car = 'Volkswagen'
+    
+    @assertEqual 3, callbackValues.length
+    @assertEqual false, callbackValues[0]
+    @assertEqual true, callbackValues[1]
+    @assertEqual false, callbackValues[2]
+  
   'test nested property dependencies': ->
     session = WingmanObject.create
       cake: null
     
     View = WingmanObject.extend
       session: null
-      propertyDependencies:
-        isHappy: 'session.cake'
       
       getIsHappy: -> !!@get('session.cake')
+    
+    View.addPropertyDependencies isHappy: 'session.cake'
     
     view = View.create()
     callbackValue = undefined
@@ -568,13 +589,12 @@ module.exports = class ObjectTest extends Janitor.TestCase
         UK: 'England'
         SE: 'Sweden'
       
-      propertyDependencies:
-        name: ['code']
-      
       code: null
       
       getName: ->
         @CODES[@get('code')]
+    
+    Country.addPropertyDependencies name: 'code'
     
     Region = WingmanObject.extend
       country: null
@@ -606,13 +626,11 @@ module.exports = class ObjectTest extends Janitor.TestCase
   
   'test property depending on enumerable': ->
     Person = WingmanObject.extend
-      propertyDependencies:
-        fullName: 'names'
-      
       names: null
-      
       getFullName: ->
         @names.join ' ' if @names
+    
+    Person.addPropertyDependencies fullName: 'names'
     
     person = Person.create names: []
     
@@ -636,17 +654,13 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Parent = WingmanObject.extend
       currentUser: null
       
-      propertyDependencies:
-        loggedIn: 'currentUser'
-      
       getLoggedIn: ->
         !!@get('currentUser')
     
-    Child = Parent.extend
-      propertyDependencies:
-        something: 'loggedIn'
-      
-      getSomething: ->
+    Parent.addPropertyDependencies loggedIn: 'currentUser'
+    
+    Child = Parent.extend getSomething: ->
+    Child.addPropertyDependencies something: 'loggedIn'
     
     child = Child.create()
     
@@ -657,19 +671,16 @@ module.exports = class ObjectTest extends Janitor.TestCase
   
   'test childrens property dependencies doesnt affect parents': ->
     Parent = WingmanObject.extend
-      propertyDependencies:
-        loggedIn: 'currentUser'
-      
       currentUser: null
       
       loggedIn: ->
         !!@currentUser
     
-    Child = Parent.extend
-      propertyDependencies:
-        something: 'loggedIn'
-      
-      something: ->
+    Parent.addPropertyDependencies loggedIn: 'currentUser'
+    
+    Child = Parent.extend something: ->
+    Child.addPropertyDependencies something: 'loggedIn'
+    
     
     parent = Parent.create()
     parentCallbackFired = false

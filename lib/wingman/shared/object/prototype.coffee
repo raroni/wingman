@@ -1,43 +1,14 @@
 WingmanObject = require '../object'
-Properties = require '../object/properties'
 Events = require '../events'
+Properties = require '../object/properties'
 
-module.exports =
+observationCallbacks = []
+observations = []
+
+Prototype =
   initialize: ->
     @initPropertyDependencies() if @constructor.propertyDependencies
   
-  get: (chainAsString) ->
-    chain = chainAsString.split '.'
-    if chain.length == 1
-      @[chain[0]]
-    else
-      nestedPropertyName = chain.shift()
-      nestedProperty = @[nestedPropertyName]
-      if nestedProperty
-        nestedProperty.get chain.join('.')
-      else
-        undefined
-  
-  set: (hash) ->
-    @[key] = value for key, value of hash
-  
-  setProperty: (key, value) ->
-    properties = Properties.findOrCreate @
-    oldValue = properties[key]
-    properties[key] = convertIfNecessary value
-    @triggerPropertyChange key, oldValue
-  
-  getProperty: (key) ->
-    properties = Properties.findOrCreate @
-    properties[key]
-  
-  triggerPropertyChange: (propertyName, oldValue) ->
-    newValue = @[propertyName]
-    @previousProperties = {} unless @hasOwnProperty 'previousProperties'
-    if !@previousProperties.hasOwnProperty(propertyName) || @previousProperties[propertyName] != newValue
-      @trigger "change:#{propertyName}", newValue, oldValue
-      @previousProperties[propertyName] = newValue
-
   observe: (chainAsString, args...) ->
     # Beware, all ye who enter, for here be dragons!
     callback = args.pop()
@@ -51,8 +22,7 @@ module.exports =
     property = @[chain[0]]
     
     observeNested = (p) =>
-      p.observe chainExceptFirstAsString, type, (newValue, oldValue) ->
-        callback newValue, oldValue
+      p.observe chainExceptFirstAsString, type, callback
     
     observeEnumerable = (property) ->
       property.bind type, callback
@@ -65,7 +35,7 @@ module.exports =
     
     checkProperty property if property
     
-    @observeProperty chain[0], 'change', (newValue, oldValue) ->
+    observation = (newValue, oldValue) ->
       checkProperty newValue
       
       callbackValues = { new: newValue, old: oldValue }
@@ -81,14 +51,32 @@ module.exports =
           oldValue.unbind type, callback
       
       callback callbackValues.new, callbackValues.old if type == 'change'
+    
+    observations.push observation
+    observationCallbacks.push callback
+    
+    @observeProperty chain[0], 'change', observation
+  
+  triggerPropertyChange: (propertyName, oldValue) ->
+    newValue = @[propertyName]
+    @previousProperties = {} unless @hasOwnProperty 'previousProperties'
+    if !@previousProperties.hasOwnProperty(propertyName) || @previousProperties[propertyName] != newValue
+      @trigger "change:#{propertyName}", newValue, oldValue
+      @previousProperties[propertyName] = newValue
   
   observeProperty: (propertyName, type, callback) ->
     @bind "#{type}:#{propertyName}", callback
   
   unobserve: (propertyName, args...) ->
     callback = args.pop()
-    type = args.pop() || 'change'
-    @unbind "#{type}:#{propertyName}", callback
+    index = observationCallbacks.indexOf callback
+    if index != -1
+      observation = observations[index]
+      observations.splice index, 1
+      observationCallbacks.splice index, 1
+      
+      type = args.pop() || 'change'
+      @unbind "#{type}:#{propertyName}", observation
   
   initPropertyDependencies: ->
     for dependentPropertyKey, dependingPropertiesKeys of @constructor.propertyDependencies()
@@ -141,21 +129,10 @@ module.exports =
   createSubContext: ->
     Object.create @
 
+Prototype[key] = WingmanObject[key] for key in ['include', 'getProperty', 'setProperty', 'set', 'get']
+Prototype.include Events
+
+module.exports = Prototype
+
 isSerializable = (value) ->
   typeof(value) in ['number', 'string']
-
-convertIfNecessary = (value) ->
-  if Array.isArray(value)
-    WingmanObject.addProperties.call value, Events
-    
-    value.push = ->
-      Array.prototype.push.apply @, arguments
-      @trigger 'add', arguments['0']
-    
-    value.remove = (value) ->
-      index = @indexOf value
-      if index != -1
-        @splice index, 1
-        @trigger 'remove', value
-  
-  value
