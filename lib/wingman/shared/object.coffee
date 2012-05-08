@@ -37,7 +37,7 @@ merge = (obj, obj2) ->
 
 instantiate = (object, args) ->
   instance = Object.create object.prototype
-  instance.initialize.apply instance, args if instance.initialize
+  instance.initialize.apply instance, args
   instance
 
 convertIfNecessary = (value) ->
