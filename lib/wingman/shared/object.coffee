@@ -72,8 +72,8 @@ WingmanObject.include
     merge object, classProperties
     
     object.prototype = Object.create @prototype
-    object.prototype.include prototype if prototype
     object.prototype.constructor = object
+    object.prototype.include prototype if prototype
     
     object
 

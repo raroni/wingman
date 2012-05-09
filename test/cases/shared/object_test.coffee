@@ -2,8 +2,6 @@ Janitor = require 'janitor'
 WingmanObject = require '../../../lib/wingman/shared/object'
 
 module.exports = class ObjectTest extends Janitor.TestCase
-  @solo: true
-  
   'test simplest extend': ->
     object = WingmanObject.extend()
     instance = object.create()
@@ -826,3 +824,18 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assert puppy.isInstance()
     @refute Dog.prototype.isInstance()
     @refute Puppy.prototype.isInstance()
+  
+  'test isIstance used when extending': ->
+    callbackValues = []
+    Model = WingmanObject.extend
+      setProperty: (key, value) ->
+        callbackValues.push @isInstance()
+        @_super key, value
+    
+    User = Model.extend name: 'Rasmus'
+    user = User.create()
+    user.name = 'John'
+    
+    @assertEqual 2, callbackValues.length
+    @refute callbackValues[0]
+    @assert callbackValues[1]
