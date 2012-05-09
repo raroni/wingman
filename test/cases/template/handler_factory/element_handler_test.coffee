@@ -5,8 +5,6 @@ CustomAssertions = require '../../../custom_assertions'
 jsdom = require 'jsdom'
 
 module.exports = class ElementHandlerTest extends Janitor.TestCase
-  @solo: true
-  
   setup: ->
     Wingman.document = jsdom.jsdom()
     @parent = Wingman.document.createElement 'div'
