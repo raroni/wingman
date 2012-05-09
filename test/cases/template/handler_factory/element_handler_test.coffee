@@ -5,6 +5,8 @@ CustomAssertions = require '../../../custom_assertions'
 jsdom = require 'jsdom'
 
 module.exports = class ElementHandlerTest extends Janitor.TestCase
+  @solo: true
+  
   setup: ->
     Wingman.document = jsdom.jsdom()
     @parent = Wingman.document.createElement 'div'
@@ -21,7 +23,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
       children: []
       scope: @parent
       
-    element = ElementHandler.create { options }
+    element = ElementHandler.create options
     @assert element.el
     @assertEqual 'DIV', element.el.tagName
     @assertEqual @parent, element.el.parentNode
@@ -35,7 +37,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
       ]
       scope: @parent
     
-    element = ElementHandler.create { options }
+    element = ElementHandler.create options
     @assert element.el
     @assertEqual 'test', element.el.innerHTML
   
@@ -52,7 +54,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         ]
       ]
     
-    element = ElementHandler.create { options }
+    element = ElementHandler.create options
     @assert element.el
     @assertEqual 'DIV', element.el.tagName
     @assertEqual 1, element.el.childNodes.length
@@ -65,8 +67,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
       source: 'name'
       scope: @parent
     
-    context = Wingman.Object.create name: 'Rasmus'
-    element = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend name: null
+    context = Context.create()
+    context.name = 'Rasmus'
+    element = ElementHandler.create options, context
     @assertEqual 'Rasmus', element.el.innerHTML
   
   'test element with dynamic value and defered update': ->
@@ -75,11 +79,12 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
       source: 'name'
       scope: @parent
     
-    context = Wingman.Object.create name: 'John'
-    element = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend name: null
+    context = Context.create()
+    context.name = 'John'
+    element = ElementHandler.create options, context
     @assertEqual 'John', element.el.innerHTML
-    context.set name: 'Rasmus'
-    
+    context.name = 'Rasmus'
     @assertEqual 'Rasmus', element.el.innerHTML
   
   'test element with dynamic nested value and defered update': ->
@@ -88,9 +93,13 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
       source: 'user.name'
       scope: @parent
     
-    user = Wingman.Object.create name: 'John'
-    context = Wingman.Object.create { user }
-    element = ElementHandler.create { options, context }
+    User = Wingman.Object.extend name: null
+    user = User.create()
+    user.name = 'John'
+    Context = Wingman.Object.extend user: null
+    context = Context.create()
+    context.user = user
+    element = ElementHandler.create options, context
     
     @assertEqual 'John', element.el.innerHTML
     
@@ -110,7 +119,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           type: 'text'
           value: 'red'
     
-    element = ElementHandler.create { options }
+    element = ElementHandler.create options
     
     @assertEqual 'red', element.el.style.color
   
@@ -128,8 +137,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           value: 'color'
           isDynamic: true
     
-    context = Wingman.Object.create color: 'red'
-    handler = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend color: null
+    context = Context.create()
+    context.color = 'red'
+    handler = ElementHandler.create options, context
     @assertEqual 'red', handler.el.style.color
   
   'test deferred reset with element with single dynamic style': ->
@@ -146,8 +157,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           value: 'color'
           isDynamic: true
     
-    context = Wingman.Object.create color: 'red'
-    element = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend color: null
+    context = Context.create()
+    context.color = 'red'
+    element = ElementHandler.create options, context
     context.color = 'blue'
     @assertEqual 'blue', element.el.style.color
   
@@ -167,7 +180,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           type: 'text'
           value: '15px'
     
-    element = ElementHandler.create { options }
+    element = ElementHandler.create options
     
     @assertEqual 'red', element.el.style.color
     @assertEqual '15px', element.el.style.fontSize
@@ -186,8 +199,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           value: 'myFontSize'
           isDynamic: true
     
-    context = Wingman.Object.create myColor: 'red', myFontSize: '15px'
-    element = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend myColor: null, myFontSize: null
+    context = Context.create()
+    context.set myColor: 'red', myFontSize: '15px'
+    element = ElementHandler.create options, context
     
     @assertEqual 'red', element.el.style.color
     @assertEqual '15px', element.el.style.fontSize
@@ -205,7 +220,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         value: 'user'
       ]
     
-    element = ElementHandler.create { options }
+    element = ElementHandler.create options
     @assertEqual element.el.className, 'user'
   
   'test element with two static classes': ->
@@ -223,7 +238,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    element = ElementHandler.create { options }
+    element = ElementHandler.create options
     @assertDOMElementHasClass element.el, 'user'
     @assertDOMElementHasClass element.el, 'premium'
   
@@ -237,8 +252,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         isDynamic: true
       ]
     
-    context = Wingman.Object.create myAwesomeClass: 'user'
-    element = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend myAwesomeClass: null
+    context = Context.create()
+    context.myAwesomeClass = 'user'
+    element = ElementHandler.create options, context
     @assertDOMElementHasClass element.el, 'user'
   
   'test deferred reset with element with single dynamic class': ->
@@ -251,8 +268,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         isDynamic: true
       ]
     
-    context = Wingman.Object.create myAwesomeClass: 'user'
-    element = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend myAwesomeClass: null
+    context = Context.create()
+    context.myAwesomeClass = 'user'
+    element = ElementHandler.create options, context
     
     @assertEqual element.el.className, 'user'
     
@@ -269,8 +288,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         isDynamic: true
       ]
     
-    context = Wingman.Object.create myAwesomeClass: 'user'
-    element = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend myAwesomeClass: null
+    context = Context.create()
+    context.myAwesomeClass = 'user'
+    element = ElementHandler.create options, context
     
     @assertEqual element.el.className, 'user'
     
@@ -294,8 +315,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = Wingman.Object.create myAwesomeClass: 'user', mySuperbClass: 'user'
-    element = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend myAwesomeClass: null, mySuperbClass: null
+    context = Context.create()
+    context.set myAwesomeClass: 'user', mySuperbClass: 'user'
+    element = ElementHandler.create options, context
     
     @assertEqual element.el.className, 'user'
   
@@ -316,8 +339,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = Wingman.Object.create myAwesomeClass: 'user', mySuperbClass: 'user'
-    element = ElementHandler.create { options, context }
+    Context = Wingman.Object.extend myAwesomeClass: null, mySuperbClass: null
+    context = Context.create()
+    context.set myAwesomeClass: 'user', mySuperbClass: 'user'
+    element = ElementHandler.create options, context
     context.myAwesomeClass = 'premium'
     
     @assertDOMElementHasClass element.el, 'user'
@@ -335,7 +360,7 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           type: 'text'
           value: 'Email...'
     
-    element = ElementHandler.create({ options }).el
+    element = ElementHandler.create(options).el
     @assertEqual 'email', element.getAttribute('name')
     @assertEqual 'Email...', element.getAttribute('placeholder')
   
@@ -349,12 +374,14 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
           value: 'mySrc'
           isDynamic: true
     
-    context = Wingman.Object.create mySrc: 'funny_pic.png'
-    element = ElementHandler.create({ options, context }).el
+    Context = Wingman.Object.extend mySrc: null
+    context = Context.create()
+    context.mySrc = 'funny_pic.png'
+    element = ElementHandler.create(options, context).el
     
     @assertEqual 'funny_pic.png', element.getAttribute('src')
-    context.set mySrc: 'funny_pic2.png'
     
+    context.mySrc = 'funny_pic2.png'
     @assertEqual 'funny_pic2.png', element.getAttribute('src')
   
   'test dynamic and static class': ->
@@ -373,8 +400,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = Wingman.Object.create selectedCls: 'selected'
-    element = ElementHandler.create({ options, context }).el
+    Context = Wingman.Object.extend selectedCls: null
+    context = Context.create()
+    context.selectedCls = 'selected'
+    element = ElementHandler.create(options, context).el
     
     @assertDOMElementHasClass element, 'user'
     @assertDOMElementHasClass element, 'selected'
@@ -395,8 +424,10 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = Wingman.Object.create selectedCls: undefined
-    element = ElementHandler.create({ options, context }).el
+    Context = Wingman.Object.extend selectedCls: null
+    context = Context.create()
+    context.selectedCls = undefined
+    element = ElementHandler.create(options, context).el
     
     element = @parent.childNodes[0]
     @assertEqual 'user', element.className
@@ -417,10 +448,12 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = Wingman.Object.create selectedCls: 'selected'
-    element = ElementHandler.create({ options, context }).el
+    Context = Wingman.Object.extend selectedCls: null
+    context = Context.create()
+    context.selectedCls = 'selected'
+    element = ElementHandler.create(options, context).el
     
-    context.set selectedCls: undefined
+    context.selectedCls = undefined
     @assertEqual 'user', element.className
   
   'test passing element': ->
@@ -429,6 +462,6 @@ module.exports = class ElementHandlerTest extends Janitor.TestCase
       el: element
       children: []
     
-    handler = ElementHandler.create { options }
+    handler = ElementHandler.create options
     @assert handler.el
     @assertEqual element, handler.el
