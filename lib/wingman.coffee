@@ -19,4 +19,8 @@ exports.Module = require('./wingman/shared/module')
 exports.Events = require('./wingman/shared/events')
 
 exports.store = ->
-  @_store ||= new exports.Store
+  if @_store
+    @_store
+  else
+    @_store = exports.Store.create()
+    @_store

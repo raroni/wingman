@@ -1,28 +1,28 @@
-Module = require './../shared/module'
+WingmanObject = require './../shared/object'
 Events = require './../shared/events'
 Scope = require './scope'
 
-module.exports = class Collection extends Module
-  @include Events
+module.exports = WingmanObject.extend
+  include: Events
   
-  constructor: ->
+  initialize: ->
     @models = {}
   
   add: (model) ->
-    throw new Error('Model must have ID to be stored.') unless model.get('id')
+    throw new Error('Model must have ID to be stored.') unless model.id
     if @exists model
-      @update @models[model.get('id')], model
+      @update @models[model.id], model
     else
       @insert model
   
   insert: (model) ->
     @models[model.get('id')] = model
     @trigger 'add', model
-    model.bind 'flush', @remove
+    model.bind 'flush', @remove, @
   
   update: (model, model2) ->
     for key, value of model2.toJSON()
-      model.setProperty key, value unless key == 'id'
+      model[key] = value unless key == 'id'
   
   find: (id) ->
     @models[id]
@@ -30,9 +30,9 @@ module.exports = class Collection extends Module
   count: ->
     Object.keys(@models).length
   
-  remove: (model) =>
-    delete @models[model.get('id')]
-    model.unbind @remove
+  remove: (model) ->
+    delete @models[model.id]
+    model.unbind @remove, @
     @trigger 'remove', model
   
   exists: (model) ->
@@ -42,7 +42,7 @@ module.exports = class Collection extends Module
     callback(value) for key, value of @models
   
   scoped: (params) ->
-    new Scope @, params
+    Scope.create @, params
   
   flush: ->
     @forEach (model) -> model.flush()

@@ -12,21 +12,25 @@ DummyCollection = WingmanObject.extend
 module.exports = class StoreTest extends Janitor.TestCase
   setup: ->
     @store = Store.create collectionClass: DummyCollection
+    @SomeModel = WingmanObject.extend
+      id: null
+      initialize: (hash) ->
+        @[key] = value for key, value of hash
+      
+      flush: -> @trigger 'flush', @
   
   'test collection caching': ->
-    User = WingmanObject.extend()
-    @assertEqual @store.collection(User), @store.collection(User)
+    @assertEqual @store.collection(@SomeModel), @store.collection(@SomeModel)
   
   'test flush': ->
-    User = WingmanObject.extend()
     Notification = WingmanObject.extend()
     
-    usersCollection = @store.collection User
-    usersCollection.add 1
-    usersCollection.add 2
+    usersCollection = @store.collection @SomeModel
+    usersCollection.add @SomeModel.create(id: 1)
+    usersCollection.add @SomeModel.create(id: 2)
     
     notificationsCollection = @store.collection Notification
-    notificationsCollection.add 1
+    notificationsCollection.add @SomeModel.create(id: 3)
     
     @assertEqual 2, usersCollection.count()
     @assertEqual 1, notificationsCollection.count()

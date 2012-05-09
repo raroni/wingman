@@ -1,12 +1,13 @@
 Wingman = require '../../../wingman'
 
-module.exports = class
-  constructor: (@options) ->
+module.exports = Wingman.Object.extend
+  initialize: (hash) ->
+    @url = hash.url
   
   create: (model, options = {}) ->
     Wingman.request
       type: 'POST'
-      url: @options.url
+      url: @url
       data: model.dirtyStaticProperties()
       error: options.error
       success: options.success
@@ -14,7 +15,7 @@ module.exports = class
   update: (model, options = {}) ->
     Wingman.request
       type: 'PUT'
-      url: "#{@options.url}/#{model.get('id')}"
+      url: "#{@url}/#{model.get('id')}"
       data: model.dirtyStaticProperties()
       error: options.error
       success: options.success
@@ -22,15 +23,15 @@ module.exports = class
   load: (args...) ->
     if args.length == 2
       options = args[1]
-      options.url = [@options.url, args[0]].join '/'
+      options.url = [@url, args[0]].join '/'
     else
       options = args[0]
-      options.url = @options.url
+      options.url = @url
     
     options.type = 'GET'
     Wingman.request options
   
   delete: (id) ->
     Wingman.request
-      url: [@options.url, id].join('/')
+      url: [@url, id].join('/')
       type: 'DELETE'

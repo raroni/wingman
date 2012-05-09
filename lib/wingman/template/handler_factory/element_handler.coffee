@@ -1,9 +1,7 @@
 WingmanObject = require '../../shared/object'
 Elementary = require '../../shared/elementary'
 
-module.exports = WingmanObject.extend
-  include: Elementary
-  
+ElementHandler = WingmanObject.extend
   initialize: ->
     @setupDomElement()
     @setupStyles() if @options.styles
@@ -69,6 +67,10 @@ module.exports = WingmanObject.extend
       options = { scope: @el }
       options[key] = value for key, value of child
       HandlerFactory.create options, @context
+
+ElementHandler.include Elementary
+
+module.exports = ElementHandler
 
 Wingman = require '../../../wingman'
 HandlerFactory = require '../handler_factory'

@@ -3,6 +3,9 @@ Wingman = require '../../../wingman'
 module.exports = Wingman.Object.extend
   autoSave: true
   
+  initialize: (options) ->
+    @namespace = options.namespace
+  
   create: (model, options) ->
     model.id = @generateId()
     Wingman.localStorage.setItem @key(model.id), JSON.stringify(model.toJSON())

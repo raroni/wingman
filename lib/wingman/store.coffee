@@ -8,7 +8,11 @@ module.exports = WingmanObject.extend
     @classes = []
   
   collection: (klass) ->
-    @collections[@classId(klass)] ||= @collectionClass.create(klass)
+    if @collections[@classId(klass)]
+      @collections[@classId(klass)]
+    else
+      @collections[@classId(klass)] = @collectionClass.create()
+      @collections[@classId(klass)]
   
   flush: ->
     collection.flush() for klass, collection of @collections

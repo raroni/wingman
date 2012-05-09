@@ -5,7 +5,8 @@ Wingman = require '../../../.'
 JSDomWindowPopStateDecorator = require '../../jsdom_window_pop_state_decorator'
 jsdom = require 'jsdom'
 
-DummyController = Wingman.Object.extend include: Navigator
+DummyController = Wingman.Object.extend()
+DummyController.prototype.include Navigator
 
 module.exports = class NavigatorTest extends Janitor.TestCase
   setup: ->

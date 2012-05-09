@@ -4,9 +4,10 @@ Elementary = require '../../../lib/wingman/shared/elementary'
 WingmanObject = require '../../../lib/wingman/shared/object'
 
 DummyObject = WingmanObject.extend
-  include: Elementary
   initialize: ->
     @el = document.createElement 'div'
+
+DummyObject.prototype.include Elementary
 
 module.exports = class extends Janitor.TestCase
   setup: ->

@@ -4,7 +4,8 @@ Events = require '../../../lib/wingman/shared/events'
 
 module.exports = class extends Janitor.TestCase
   'test trigger': ->
-    klass = WingmanObject.extend include: Events
+    klass = WingmanObject.extend()
+    klass.include Events
     instance = klass.create()
     triggered = triggered2 = false
     
@@ -17,7 +18,8 @@ module.exports = class extends Janitor.TestCase
     @assert triggered2
   
   'test trigger arguments': ->
-    klass = WingmanObject.extend include: Events
+    klass = WingmanObject.extend()
+    klass.include Events
     instance = klass.create()
     
     receivedArg = false
@@ -27,7 +29,8 @@ module.exports = class extends Janitor.TestCase
     @assertEqual 'works?', receivedArg
   
   'test unbind': ->
-    klass = WingmanObject.extend include: Events
+    klass = WingmanObject.extend()
+    klass.include Events
     
     instance = klass.create()
     triggered = false
@@ -42,7 +45,8 @@ module.exports = class extends Janitor.TestCase
       x: 20
       doubleX: -> @x *= 2
     
-    klass = WingmanObject.extend include: Events
+    klass = WingmanObject.extend()
+    klass.include Events
     instance = klass.create()
     instance.bind 'something', module.doubleX, module
     
@@ -57,7 +61,8 @@ module.exports = class extends Janitor.TestCase
       myNumber: 20
       registerNumber: -> callbackValues.push @myNumber
     
-    klass = WingmanObject.extend include: Events
+    klass = WingmanObject.extend()
+    klass.include Events
     instance = klass.create()
     instance.bind 'something', module.registerNumber, module
     instance.bind 'something', module.registerNumber

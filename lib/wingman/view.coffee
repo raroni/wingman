@@ -15,7 +15,6 @@ STYLE_NAMES = [
 ]
 
 View = Wingman.Object.extend
-  include: Elementary
   children: null
   
   initialize: ->
@@ -122,5 +121,7 @@ View.parseEvent = (key, trigger) ->
     type
     trigger
   }
+
+View.include Elementary
 
 module.exports = View

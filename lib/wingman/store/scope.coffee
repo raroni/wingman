@@ -1,16 +1,13 @@
-Module = require './../shared/module'
+WingmanObject = require './../shared/object'
 Events = require './../shared/events'
 
-module.exports = class Scope extends Module
-  @include Events
-  
-  constructor: (collection, @params) ->
-
+Scope = WingmanObject.extend
+  initialize: (@collection, @params) ->
     @models = {}
-    collection.forEach (model) => @check model
-    collection.bind 'add', @listen
+    @collection.forEach (model) => @check model
+    @collection.bind 'add', @listen, @
   
-  listen: (model) =>
+  listen: (model) ->
     @check model
     
     # If of the relevant properties changes, we need to do a check.
@@ -18,7 +15,7 @@ module.exports = class Scope extends Module
       model.observe key, => @check(model)
   
   # Check whether a model should be removed from or added to the scope.
-  check: (model) =>
+  check: (model) ->
     if @shouldBeAdded(model)
       @add model
     else if @shouldBeRemoved(model)
@@ -31,11 +28,11 @@ module.exports = class Scope extends Module
     !@matches(model) && @exists(model)
   
   add: (model) ->
-    throw new Error('Model must have ID to be stored.') unless model.get('id')
-    throw new Error("#{model.constructor.name} model with ID #{model.get('id')} already in scope.") if @exists(model)
-    @models[model.get('id')] = model
+    throw new Error('Model must have ID to be stored.') unless model.id
+    throw new Error("#{model.constructor.name} model with ID #{model.id} already in scope.") if @exists(model)
+    @models[model.id] = model
     @trigger 'add', model
-    model.bind 'destroy', @remove
+    model.bind 'destroy', @remove, @
   
   matches: (model) ->
     Object.keys(@params).every (key) =>
@@ -47,13 +44,18 @@ module.exports = class Scope extends Module
   find: (id) ->
     @models[id] || throw new Error 'Model not found in scope.'
   
-  remove: (model) =>
-    delete @models[model.get('id')]
-    model.unbind 'destroy', @remove
+  remove: (model) ->
+    delete @models[model.id]
+    model.unbind 'destroy', @remove, @
     @trigger 'remove', model
   
   exists: (model) ->
-    !!@models[model.get('id')]
+    !!@models[model.id]
   
   forEach: (callback) ->
     callback value for key, value of @models
+
+Scope.prototype.include Events
+
+module.exports = Scope
+

@@ -10,7 +10,7 @@ Prototype =
     @initPropertyDependencies() if @constructor.propertyDependencies
   
   isInstance: ->
-    Object.getPrototypeOf(@) == @constructor.prototype
+    @ instanceof @constructor
   
   observe: (chainAsString, args...) ->
     # Beware, all ye who enter, for here be dragons!

@@ -1,14 +1,24 @@
 Fleck = require 'fleck'
-Module = require './../shared/module'
+Wingman = require '../../wingman'
 Events = require './../shared/events'
 
-module.exports = class HasManyAssociation extends Module
-  @include Events
+HasManyAssociation = Wingman.Object.extend
+  initialize: (@model, @associatedClass) ->
+    # TODO: tidy up with #synchronize or #synchronizeOnce?
+    if @model.id
+      @setupScope()
+    else
+      @model.observeOnce 'id', @setupScope.bind(@)
   
-  constructor: (@model, @associatedClass) ->
-    @model.observeOnce 'id', @setupScope
+  foreignKey: ->
+    result = undefined
+    @associatedClass.belongsToNames.some (belongsToName) =>
+      klassName = Fleck.upperCamelize belongsToName
+      klass = Wingman.global[klassName]
+      result = "#{belongsToName}Id" if klass == @model.constructor
+    result
   
-  setupScope: =>
+  setupScope: ->
     @scope = @associatedClass.scoped @scopeOptions()
     @scope.forEach (model) => @trigger 'add', model
     @scope.bind 'add', (args...) => @trigger 'add', args...
@@ -18,9 +28,6 @@ module.exports = class HasManyAssociation extends Module
     options = {}
     options[@foreignKey()] = @model.get 'id'
     options
-  
-  foreignKey: ->
-    Fleck.camelize(Fleck.underscore(@model.constructor.name)) + 'Id'
   
   count: ->
     if @scope
@@ -32,7 +39,7 @@ module.exports = class HasManyAssociation extends Module
     foreignId = @model.get 'id'
     throw new Error "Parent's ID must be set to use HasManyAssociation#build." unless foreignId
     hash[@foreignKey()] = foreignId
-    new @associatedClass hash
+    @associatedClass.create hash
   
   build: (arrayOrHash) ->
     if Array.isArray(arrayOrHash)
@@ -50,3 +57,7 @@ module.exports = class HasManyAssociation extends Module
       models
     else
       []
+
+HasManyAssociation.include Events
+
+module.exports = HasManyAssociation

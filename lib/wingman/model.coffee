@@ -3,60 +3,42 @@ StorageAdapter = require './model/storage_adapter'
 HasManyAssociation = require './model/has_many_association'
 Fleck = require 'fleck'
 
-module.exports = class Model extends Wingman.Object
-  @extend StorageAdapter
+Prototype =
+  id: null
   
-  @collection: ->
-    Wingman.store().collection @
-  
-  @count: ->
-    @collection().count()
-  
-  @load: (args...) ->
-    if typeof(args[0]) == 'number'
-      @loadOne args[0], args[1]
-    else
-      @loadMany args[0]
-  
-  @hasMany: (name) ->
-    (@hasManyNames ||= []).push name
-  
-  @loadOne: (id, callback) ->
-    @storageAdapter().load id, success: (hash) =>
-      model = new @ hash
-      callback model if callback
-
-  @loadMany: (callback) ->
-    @storageAdapter().load success: (array) =>
-      models = []
-      for modelData in array
-        model = new @ modelData
-        models.push model
-      callback models if callback
-  
-  @scoped: (params) ->
-    @collection().scoped params
-  
-  @find: (id) ->
-    @collection().find id
-  
-  constructor: (properties, options) ->
-    @storageAdapter = @constructor.storageAdapter()
-    @dirtyStaticPropertyNames = []
+  initialize: (hash) ->
     @setupHasManyAssociations() if @constructor.hasManyNames
-    @observeOnce 'id', =>
-      @constructor.collection().add @
-    @set properties
+      
+    @[key] = value for key, value of hash
+    collectionAdd = => @constructor.collection().add @
+    
+    # TODO: tidy up with #synchronize or #synchronizeOnce?
+    if @id
+      collectionAdd()
+    else
+      @observeOnce 'id', collectionAdd
+    
+    @_super()
+  
+  setupBelongsToAssociations: ->
+    @setupBelongsToAssociation belongsToName for belongsToName in @constructor.belongsToNames
+  
+  getStorageAdapter: ->
+    @constructor.storageAdapter()
   
   setupHasManyAssociations: ->
-    for hasManyName in @constructor.hasManyNames
-      klassName = Fleck.camelize(Fleck.singularize(Fleck.underscore(hasManyName)), true)
-      
-      klass = Wingman.global[klassName]
-      association = new HasManyAssociation @, klass
-      @setProperty hasManyName, association
-      association.bind 'add', (model) => @trigger "add:#{hasManyName}", model
-      association.bind 'remove', (model) => @trigger "remove:#{hasManyName}", model
+    @setupHasManyAssociation hasManyName for hasManyName in @constructor.hasManyNames
+  
+  setupHasManyAssociation: (hasManyName) ->
+    klassName = Fleck.camelize(Fleck.singularize(Fleck.underscore(hasManyName)), true)
+    
+    klass = Wingman.global[klassName]
+    association = HasManyAssociation.create @, klass
+    
+    @[hasManyName] = association
+    
+    association.bind 'add', (model) => @trigger "add:#{hasManyName}", model
+    association.bind 'remove', (model) => @trigger "remove:#{hasManyName}", model
   
   save: (options = {}) ->
     operation = if @isPersisted() then 'update' else 'create'
@@ -91,22 +73,72 @@ module.exports = class Model extends Wingman.Object
   dirtyStaticProperties: ->
     @toJSON only: @dirtyStaticPropertyNames
   
-  set: (hash) ->
-    super hash
-  
   setProperty: (propertyName, values) ->
     throw new Error 'You cannot change the ID of a model when set.' if propertyName == 'id' && @get('id')
-    
-    if @get(propertyName) instanceof HasManyAssociation
-      @get(propertyName).build values
+    if @[propertyName] instanceof HasManyAssociation
+      @[propertyName].build values
     else
-      @dirtyStaticPropertyNames.push propertyName
-      super propertyName, values
-      @save() if @storageAdapter.autoSave
+      @_super propertyName, values
+      if propertyName != 'storage'
+        @dirtyStaticPropertyNames.push propertyName
+        @save() if @isInstance() && @storageAdapter.autoSave
+  
+  getDirtyStaticPropertyNames: ->
+    @_dirtyStaticPropertyNames = []  unless @hasOwnProperty '_dirtyStaticPropertyNames'
+    @_dirtyStaticPropertyNames
   
   isPersisted: ->
     !!@get('id')
   
   isDirty: ->
     @dirtyStaticPropertyNames.length != 0
+
+ClassProperties =
+  collection: ->
+    Wingman.store().collection @
   
+  count: ->
+    @collection().count()
+  
+  load: (args...) ->
+    if typeof(args[0]) == 'number'
+      @loadOne args[0], args[1]
+    else
+      @loadMany args[0]
+  
+  hasMany: (name) ->
+    (@hasManyNames ||= []).push name
+    @registerProperties name
+  
+  belongsTo: (name) ->
+    (@belongsToNames ||= []).push name
+    @registerProperties name, name + 'Id'
+  
+  registerProperties: (args...) ->
+    hash = {}
+    hash[propertyName] = null for propertyName in args
+    @prototype.include hash
+  
+  loadOne: (id, callback) ->
+    @storageAdapter().load id, success: (hash) =>
+      model = @create hash
+      callback model if callback
+  
+  loadMany: (callback) ->
+    @storageAdapter().load success: (array) =>
+      models = []
+      for modelData in array
+        model = @create modelData
+        models.push model
+      callback models if callback
+  
+  scoped: (params) ->
+    @collection().scoped params
+  
+  find: (id) ->
+    @collection().find id
+
+Model = Wingman.Object.extend Prototype, ClassProperties
+Model.include StorageAdapter
+
+module.exports = Model
