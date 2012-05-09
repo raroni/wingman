@@ -815,3 +815,14 @@ module.exports = class ObjectTest extends Janitor.TestCase
     model = Model.create()
     model.name = 'Yoshi'
     @assertEqual 'Yoshi set by Model', model.name
+  
+  'test isInstance': ->
+    Dog = WingmanObject.extend()
+    dog = Dog.create()
+    Puppy = Dog.extend()
+    puppy = Puppy.create()
+    
+    @assert dog.isInstance()
+    @assert puppy.isInstance()
+    @refute Dog.prototype.isInstance()
+    @refute Puppy.prototype.isInstance()

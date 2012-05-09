@@ -9,6 +9,9 @@ Prototype =
   initialize: ->
     @initPropertyDependencies() if @constructor.propertyDependencies
   
+  isInstance: ->
+    Object.getPrototypeOf(@) == @constructor.prototype
+  
   observe: (chainAsString, args...) ->
     # Beware, all ye who enter, for here be dragons!
     callback = args.pop()
