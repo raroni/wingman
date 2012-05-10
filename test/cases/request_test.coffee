@@ -4,7 +4,7 @@ Wingman.document = require('jsdom').jsdom()
 sinon = require 'sinon'
 jsdom = require 'jsdom'
 
-module.exports = class extends Janitor.TestCase
+module.exports = class RequestTest extends Janitor.TestCase
   setup: ->
     Wingman.document = jsdom.jsdom()
     Wingman.window = Wingman.document.createWindow()
@@ -15,14 +15,14 @@ module.exports = class extends Janitor.TestCase
   
   'test host addition': ->
     Wingman.request.realRequest = sinon.spy()
-    class FunkySocks extends Wingman.Application
+    FunkySocks = Wingman.Application.extend
       host: 'funkysocks.net'
     
-    class FunkySocks.RootController extends Wingman.Controller
-    class FunkySocks.RootView extends Wingman.View
+    FunkySocks.RootController = Wingman.Controller.extend()
+    FunkySocks.RootView = Wingman.View.extend
       templateSource: '<div>test</div>'
     
-    new FunkySocks el: Wingman.document.createElement('div')
+    FunkySocks.create el: Wingman.document.createElement('div')
     
     Wingman.request url: '/users'
     
