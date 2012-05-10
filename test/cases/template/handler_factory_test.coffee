@@ -43,7 +43,9 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
         source: 'user'
       ]
     
-    context = Wingman.Object.create users: ['Rasmus', 'John']
+    Context = Wingman.Object.extend(users: null).extend()
+    context = Context.create()
+    context.users = ['Rasmus', 'John']
     HandlerFactory.create options, context
     
     @assertEqual 2, element.childNodes.length
