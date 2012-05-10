@@ -104,12 +104,12 @@ WingmanObject.include
   
   propertyDependencies: ->
     properties = Properties.findOrCreate @
-    if properties.propertyDependencies
-      total = {}
-      merge total, properties.propertyDependencies
-      parent = Object.getPrototypeOf(@prototype).constructor
-      merge total, parent.propertyDependencies() if parent
-      total
+    parent = Object.getPrototypeOf(@prototype).constructor
+    
+    total = {}
+    merge total, properties.propertyDependencies if properties.propertyDependencies
+    merge total, parent.propertyDependencies() if parent.propertyDependencies?
+    total
 
 Prototype = require './object/prototype'
 WingmanObject.prototype = Prototype

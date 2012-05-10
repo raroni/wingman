@@ -2,6 +2,8 @@ Janitor = require 'janitor'
 WingmanObject = require '../../../lib/wingman/shared/object'
 
 module.exports = class ObjectTest extends Janitor.TestCase
+  @solo: true
+  
   'test simplest extend': ->
     Constructor = WingmanObject.extend()
     instance = new Constructor
@@ -699,6 +701,20 @@ module.exports = class ObjectTest extends Janitor.TestCase
     callbackFired = false
     child.observe 'something', -> callbackFired = true
     child.currentUser = 'yogi'
+    @assert callbackFired
+  
+  'test property dependency inheritance when child has no dependencies': ->
+    MyApp = WingmanObject.extend
+      userId: null
+      getLoggedIn: -> !!@userId
+    
+    MyApp.addPropertyDependencies loggedIn: 'userId'
+    
+    ChildApp = MyApp.extend()
+    childApp = new ChildApp
+    callbackFired = false
+    childApp.observe 'loggedIn', -> callbackFired = true
+    childApp.userId = 1
     @assert callbackFired
   
   'test childrens property dependencies doesnt affect parents': ->
