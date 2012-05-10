@@ -13,7 +13,7 @@ class ViewWithTemplateSource extends Wingman.View
   templateSource: '<div>test</div>'
 
 class ControllerWithView extends Wingman.Controller
-  constructor: (options = {}) ->
+  initialize: (options = {}) ->
     options.view = new ViewWithTemplateSource parent: { el: Wingman.document.createElement('div') }
     super options
 
@@ -29,229 +29,198 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     delete Wingman.window
   
   'test most basic application': ->
-    class MyApp extends Wingman.Application
-    class MyApp.RootView extends Wingman.View
+    MyApp = Wingman.Application.extend()
+    MyApp.RootView = Wingman.View.extend
       templateSource: '<div>Hi</div>'
     
-    app = new MyApp el: Wingman.document.createElement('div')
+    app = MyApp.create el: Wingman.document.createElement('div')
     @assertEqual '<div>Hi</div>', app.el.innerHTML
   
   'test simple child view': ->
-    class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
-    class MyApp.UserController extends Wingman.Controller
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.UserController = Wingman.Controller.extend()
     
-    class MyApp.RootView extends Wingman.View
+    MyApp.RootView = Wingman.View.extend
       templateSource: "{view 'user'}"
     
-    class MyApp.UserView extends Wingman.View
+    MyApp.UserView = Wingman.View.extend
       templateSource: '<div>stubbing the source</div>'
     
     rootEl = Wingman.document.createElement 'div'
-    app = new MyApp el: rootEl
+    app = MyApp.create el: rootEl
     @assert rootEl.innerHTML.match('stubbing the source')
   
   'test access to state': ->
-    class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
-    class MyApp.RootView extends Wingman.View
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = Wingman.View.extend
       templateSource: "{view 'user'}"
-    class MyApp.UserController extends Wingman.Controller
-      ready: ->
-        @get('state').set controllerGreeting: 'Controller says hello'
     
-    class MyApp.UserView extends ViewWithTemplateSource
+    MyApp.UserController = Wingman.Controller.extend
       ready: ->
-        @get('state').set viewGreeting: 'View says hello'
+        @state.controllerGreeting = 'Controller says hello'
+    
+    MyApp.UserView = ViewWithTemplateSource.extend
+      ready: ->
+        @state.viewGreeting = 'View says hello'
     
     rootEl = Wingman.document.createElement 'div'
-    app = new MyApp el: rootEl
+    app = MyApp.create el: rootEl
     
     @assertEqual 'View says hello', app.get('state.viewGreeting')
     @assertEqual 'Controller says hello', app.get('state.controllerGreeting')
   
   'test singleton instance': ->
-    class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
-    class MyApp.RootView extends ViewWithTemplateSource
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
     
     @assert !Wingman.Application.instance
-    new MyApp el: Wingman.document.createElement 'div'
+    MyApp.create el: Wingman.document.createElement 'div'
     @assert Wingman.Application.instance
   
   'test instantiation of two apps': ->
-    class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
-    class MyApp.RootView extends ViewWithTemplateSource
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
     
     appOptions = { el: Wingman.document.createElement('div') }
-    new MyApp appOptions
-    @assertThrows -> new App appOptions
+    MyApp.create appOptions
+    
+    routine = -> MyApp.create appOptions
+    check = (e) -> e.message == "You cannot instantiate two Wingman apps at the same time."
+    
+    @assertThrows routine, check
   
   'test reading config params on applications instance': ->
-    class MyApp extends Wingman.Application
+    MyApp = Wingman.Application.extend
       host: 'test-host.com'
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
     
-    new MyApp el: Wingman.document.createElement('div')
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
+    
+    MyApp.create el: Wingman.document.createElement('div')
     
     @assertEqual 'test-host.com', Wingman.Application.instance?.host
   
   'test application ready callback': ->
     callbackFired = false
     
-    class MyApp extends Wingman.Application
+    MyApp = Wingman.Application.extend
       ready: -> callbackFired = true
     
-    class MyApp.RootController extends Wingman.Controller
-    class MyApp.RootView extends ViewWithTemplateSource
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
     
-    app = new MyApp el: Wingman.document.createElement('div')
+    app = MyApp.create el: Wingman.document.createElement('div')
     @assert callbackFired
   
   'test root controller callback': ->
     callbackFired = false
     
-    class MyApp extends Wingman.Application
-    class MyApp.RootView extends ViewWithTemplateSource
-    class MyApp.RootController extends Wingman.Controller
+    MyApp = Wingman.Application.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
+    MyApp.RootController = Wingman.Controller.extend
       ready: ->
         callbackFired = true
     
-    new MyApp el: Wingman.document.createElement('div')
+    MyApp.create el: Wingman.document.createElement('div')
     @assert callbackFired
   
   'test navigate and shared path': ->
-    class MyApp extends Wingman.Application
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
     
-    app = new MyApp el: Wingman.document.createElement 'div'
+    app = MyApp.create el: Wingman.document.createElement 'div'
     app.navigate 'user'
     @assertEqual 'user', app.get('path')
   
   'test navigation options': ->
-    class MyApp extends Wingman.Application
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
-  
-    app = new MyApp el: Wingman.document.createElement 'div'
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
+    
+    app = MyApp.create el: Wingman.document.createElement 'div'
     app.navigate 'user', level: 2
-    @assertEqual 'user', app.get('path')
-    @assertEqual 2, app.get('navigationOptions.level')
+    @assertEqual 'user', app.path
+    @assertEqual 2, app.navigationOptions.level
   
   'test initial path': ->
-    MyApp = class extends Wingman.Application
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
     
     Wingman.window.document.location.pathname = '/user'
-    app = new MyApp el: Wingman.document.createElement('div')
-    @assertEqual 'user', app.get('path')
+    app = MyApp.create el: Wingman.document.createElement('div')
+    @assertEqual 'user', app.path
   
   'test backing through history': ->
-    class MyApp extends Wingman.Application
-    MyApp.RootController = class extends Wingman.Controller
-    MyApp.RootView = class extends ViewWithTemplateSource
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
   
-    app = new MyApp el: Wingman.document.createElement 'div'
+    app = MyApp.create el: Wingman.document.createElement 'div'
     app.navigate 'user'
     app.navigate 'home'
     app.back()
-    @assertEqual 'user', app.get('path')
+    @assertEqual 'user', app.path
     @assertEqual '/user', Wingman.window.location.pathname
   
   'test controller getting served correct view': ->
     mainViewFromController = undefined
     
-    class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
-    class MyApp.RootView extends Wingman.View
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = Wingman.View.extend
       templateSource: "{view 'main'}"
     
-    class MyApp.MainController extends Wingman.Controller
+    MyApp.MainController = Wingman.Controller.extend
       ready: ->
         mainViewFromController = @view
       
-    class MyApp.MainView extends ViewWithTemplateSource
+    MyApp.MainView = ViewWithTemplateSource.extend()
     
-    app = new MyApp el: Wingman.document.createElement('div')
+    app = MyApp.create()
     @assert mainViewFromController instanceof MyApp.MainView
   
   'test nested controller getting served correct view': ->
     viewFromMainController = undefined
     
-    class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
-    class MyApp.MainController extends ControllerWithView
-    class MyApp.MainController.UserController extends Wingman.Controller
-      ready: -> viewFromMainController = @view
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.MainController = ControllerWithView.extend()
+    MyApp.MainController.UserController = Wingman.Controller.extend
+      ready: ->
+        viewFromMainController = @view
     
-    class MyApp.RootView extends Wingman.View
+    MyApp.RootView = Wingman.View.extend
       templateSource: "{view 'main'}"
     
-    class MyApp.MainView extends Wingman.View
+    MyApp.MainView = Wingman.View.extend
       templateSource: "{view 'user'}"
     
-    class MyApp.MainView.UserView extends ViewWithTemplateSource
+    MyApp.MainView.UserView = ViewWithTemplateSource.extend()
     
-    app = new MyApp el: Wingman.document.createElement('div')
+    app = MyApp.create el: Wingman.document.createElement('div')
     @assert viewFromMainController instanceof MyApp.MainView.UserView
   
   'test passing correct view classes': ->
-    class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
-    class MyApp.RootView extends ViewWithTemplateSource
-    class MyApp.MainView extends ViewWithTemplateSource
+    MyApp = Wingman.Application.extend()
+    MyApp.RootController = Wingman.Controller.extend()
+    MyApp.RootView = ViewWithTemplateSource.extend()
+    MyApp.MainView = ViewWithTemplateSource.extend()
     rootViewSiblings = MyApp.rootViewSiblings()
     
     @assert rootViewSiblings.MainView
     @assert !rootViewSiblings.RootController
     @assert !rootViewSiblings.RootView
   
-  'test view depending on properties of state': ->
-    callbackFired = false
-    
-    class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
-    class MyApp.RootView extends ViewWithTemplateSource
-      @propertyDependencies
-        someMethod: 'state.test'
-      
-      someMethod: ->
-        callbackFired = true
-    
-    app = new MyApp el: Wingman.document.createElement('div')
-    app.get('state').set test: 'something'
-    @assert callbackFired
-    
-  'test controller depending on properties of shared': ->
-    callbackFired = false
-    
-    class MyApp extends Wingman.Application
-    class MyApp.RootController extends Wingman.Controller
-      @propertyDependencies
-        someMethod: 'state.test'
-      
-      someMethod: ->
-        callbackFired = true
-    
-    class MyApp.RootView extends ViewWithTemplateSource
-    
-    app = new MyApp el: Wingman.document.createElement('div')
-    app.get('state').set test: 'something'
-    @assert callbackFired
-  
-  'test view without corresponding controller': ->
-    class MyApp extends Wingman.Application
-    class MyApp.RootView extends ViewWithTemplateSource
-    @refuteThrows -> new MyApp el: Wingman.document.createElement('div')
-  
   'test using document.body as default parent': ->
-    class MyApp extends Wingman.Application
-    class MyApp.RootView extends Wingman.View
+    MyApp = Wingman.Application.extend()
+    MyApp.RootView = Wingman.View.extend
       templateSource: '<div>hello</div>'
     
-    new MyApp
+    MyApp.create()
     @assertEqual '<div>hello</div>', Wingman.document.body.innerHTML
