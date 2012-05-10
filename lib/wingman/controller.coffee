@@ -1,14 +1,14 @@
 Wingman = require '../wingman'
 Navigator = require './shared/navigator'
 
-module.exports = class extends Wingman.Object
-  @include Navigator
+Controller = Wingman.Object.extend
+  state: null
   
-  constructor: (view) ->
-    @set view: view
-    @set state: view.state
+  initialize: (view) ->
+    @view = view
+    @state = view.state
     @setupBindings()
-    super()
+    @_super()
     @ready?()
   
   setupBindings: ->
@@ -18,3 +18,7 @@ module.exports = class extends Wingman.Object
     # When Function#bind is fully supported (not supported on iOS5 for instance) we can do this
     # @get('view').bind eventName, @[methodName].bind(@)
     @get('view').bind eventName, (args...) => @[methodName] args...
+
+Controller.prototype.include Navigator
+
+module.exports = Controller

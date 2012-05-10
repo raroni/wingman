@@ -2,13 +2,13 @@ Janitor = require 'janitor'
 Wingman = require '../../.'
 jsdom = require 'jsdom'
 
-class DummyView extends Wingman.View
+DummyView = Wingman.View.extend
   templateSource: '<div>test</div>'
 
-class ControllerWithView extends Wingman.Controller
-  constructor: (options = {}) ->
-    options.view = new DummyView parent: { el: Wingman.document.createElement('div') }
-    super options
+ControllerWithView = Wingman.Controller.extend
+  initialize: (options = {}) ->
+    options.view = DummyView.create parent: { el: Wingman.document.createElement('div') }
+    @_super options
 
 module.exports = class ControllerTest extends Janitor.TestCase
   setup: ->
@@ -19,60 +19,61 @@ module.exports = class ControllerTest extends Janitor.TestCase
   
   'test ready callback': ->
     callbackFired = false
-    DummyController = class extends ControllerWithView
+    DummyController = ControllerWithView.extend
       ready: ->
         callbackFired = true
       
-    DummyView = class extends Wingman.View
+    DummyView = Wingman.View.extend
       templateSource: '<div>test</div>'
       
-    dummyView = new DummyView parent: { el: Wingman.document.createElement('div') }
-    dummyController = new DummyController view: dummyView
+    dummyView = DummyView.create parent: { el: Wingman.document.createElement('div') }
+    dummyController = DummyController.create view: dummyView
     
     @assert callbackFired
   
   'test property dependencies': ->
     callbackFired = false
     
-    class MainView extends Wingman.View
-    class MainController extends Wingman.Controller
-      @propertyDependencies
-        someMethod: 'state.test'
-      
-      someMethod: ->
-        callbackFired = true
+    MainView = Wingman.View.extend()
+    MainController = Wingman.Controller.extend
+      someMethod: -> 'my value'
     
-    state = new Wingman.Object
-    view = new MainView { state }
-    controller = new MainController view
+    MainController.addPropertyDependencies
+      someMethod: 'state.test'
     
-    state.set test: 'something'
+    state = Wingman.Object.extend(test: null).create()
+    view = MainView.create { state }
+    controller = MainController.create view
+    
+    controller.observe 'someMethod', -> callbackFired = true
+    
+    state.test = 'something'
     
     @assert callbackFired
   
   'test bindings': ->
     numberFromSave = false
     
-    class MainView extends Wingman.View
-    class MainController extends Wingman.Controller
+    MainView = Wingman.View.extend()
+    MainController = Wingman.Controller.extend
       bindings:
         playerClicked: 'save'
       
       save: (number) ->
         numberFromSave = number
     
-    view = new MainView
-    controller = new MainController view
+    view = MainView.create()
+    controller = MainController.create view
     view.trigger 'playerClicked', 123
     @assertEqual 123, numberFromSave
   
   'test methods depending on app property not being called upon initialization': ->
     called = false
-    class MainController extends Wingman.Controller
-      @propertyDependencies
-        something: 'app.loggedIn'
-
+    MainController = Wingman.Controller.extend
       something: -> called = true
-
-    view = new MainController app: {}
+    
+    MainController.addPropertyDependencies
+      something: 'app.loggedIn'
+    
+    view = MainController.create app: {}
     @assert !called
