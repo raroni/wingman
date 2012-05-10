@@ -18,7 +18,7 @@ Application = Wingman.Object.extend
     @ready?()
   
   buildView: ->
-    view = @constructor.RootView.create parent: @, el: @el, state: @state, childClasses: @constructor.rootViewSiblings()
+    view = new @constructor.RootView parent: @, el: @el, state: @state, childClasses: @constructor.rootViewSiblings()
     view.bind 'descendantCreated', (view) => @trigger 'viewCreated', view
     @trigger 'viewCreated', view
     view.render()
@@ -28,11 +28,11 @@ Application = Wingman.Object.extend
     @_state ||= @createState()
   
   createState: ->
-    Wingman.Object.create()
+    new Wingman.Object
   
   buildController: (view) ->
     Controller = @controllerClassForView view
-    Controller.create view if Controller
+    new Controller view if Controller
   
   controllerClassForView: (view) ->
     return @constructor.RootController if view.path().length == 0

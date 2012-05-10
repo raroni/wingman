@@ -12,9 +12,9 @@ MAP =
   text: TextHandler
 
 exports.create = (options, context) ->
-  klass = MAP[options.type]
-  if klass
+  Constructor = MAP[options.type]
+  if Constructor
     delete options.type
-    klass.create options, context
+    new Constructor options, context
   else
     throw new Error "Cannot create unknown node type (#{options.type})!"

@@ -20,8 +20,8 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     MainView.UserView = Wingman.View.extend
       templateSource: '<div>I am the user view</div>'
     
-    mainView = MainView.create()
-    ChildViewHandler.create options, mainView
+    mainView = new MainView
+    new ChildViewHandler options, mainView
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
   'test passing value from context': ->
@@ -34,14 +34,14 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     MainView.UserView = Wingman.View.extend
       templateSource: null
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.set
       user:
         name: 'Rasmus'
       width: 100
       height: 200
     
-    handler = ChildViewHandler.create options, mainView
+    handler = new ChildViewHandler options, mainView
     view = handler.view
     @assertEqual 'Rasmus', view.user.name
     @assertEqual 200, view.height
@@ -60,9 +60,9 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       getLeft: ->
         "#{@user.level*10}px"
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.user = { level: 3 }
-    ChildViewHandler.create options, mainView
+    new ChildViewHandler options, mainView
     @assertEqual '30px', @parent.childNodes[0].style.left
   
   'test remove': ->
@@ -74,8 +74,8 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     MainView.UserView = Wingman.View.extend
       templateSource: '<div>I am the user view</div>'
     
-    mainView = MainView.create()
-    handler = ChildViewHandler.create options, mainView
+    mainView = new MainView
+    handler = new ChildViewHandler options, mainView
     
     @assertEqual 1, @parent.childNodes.length
     
@@ -93,6 +93,6 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     MainView.UserView = Wingman.View.extend
       templateSource: null
     
-    mainView = MainView.create()
-    handler = ChildViewHandler.create options, mainView
+    mainView = new MainView
+    handler = new ChildViewHandler options, mainView
     @assert handler.view instanceof MainView.UserView

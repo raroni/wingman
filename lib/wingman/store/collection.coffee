@@ -42,7 +42,7 @@ module.exports = WingmanObject.extend
     callback(value) for key, value of @models
   
   scoped: (params) ->
-    Scope.create @, params
+    new Scope @, params
   
   flush: ->
     @forEach (model) -> model.flush()

@@ -22,5 +22,5 @@ exports.store = ->
   if @_store
     @_store
   else
-    @_store = exports.Store.create()
+    @_store = new exports.Store
     @_store

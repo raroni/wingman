@@ -7,7 +7,7 @@ DummyView = Wingman.View.extend
 
 ControllerWithView = Wingman.Controller.extend
   initialize: (options = {}) ->
-    options.view = DummyView.create parent: { el: Wingman.document.createElement('div') }
+    options.view = new DummyView parent: { el: Wingman.document.createElement('div') }
     @_super options
 
 module.exports = class ControllerTest extends Janitor.TestCase
@@ -26,8 +26,8 @@ module.exports = class ControllerTest extends Janitor.TestCase
     DummyView = Wingman.View.extend
       templateSource: '<div>test</div>'
       
-    dummyView = DummyView.create parent: { el: Wingman.document.createElement('div') }
-    dummyController = DummyController.create view: dummyView
+    dummyView = new DummyView parent: { el: Wingman.document.createElement('div') }
+    dummyController = new DummyController view: dummyView
     
     @assert callbackFired
   
@@ -41,9 +41,10 @@ module.exports = class ControllerTest extends Janitor.TestCase
     MainController.addPropertyDependencies
       someMethod: 'state.test'
     
-    state = Wingman.Object.extend(test: null).create()
-    view = MainView.create { state }
-    controller = MainController.create view
+    State = Wingman.Object.extend test: null
+    state = new State
+    view = new MainView { state }
+    controller = new MainController view
     
     controller.observe 'someMethod', -> callbackFired = true
     
@@ -62,8 +63,8 @@ module.exports = class ControllerTest extends Janitor.TestCase
       save: (number) ->
         numberFromSave = number
     
-    view = MainView.create()
-    controller = MainController.create view
+    view = new MainView
+    controller = new MainController view
     view.trigger 'playerClicked', 123
     @assertEqual 123, numberFromSave
   
@@ -75,5 +76,5 @@ module.exports = class ControllerTest extends Janitor.TestCase
     MainController.addPropertyDependencies
       something: 'app.loggedIn'
     
-    view = MainController.create app: {}
+    view = new MainController app: {}
     @assert !called

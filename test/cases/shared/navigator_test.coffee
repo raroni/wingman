@@ -11,8 +11,8 @@ DummyController.prototype.include Navigator
 module.exports = class NavigatorTest extends Janitor.TestCase
   setup: ->
     Wingman.document = jsdom.jsdom()
-    Wingman.window = JSDomWindowPopStateDecorator.create(Wingman.document.createWindow())
-    @controller = DummyController.create()
+    Wingman.window = JSDomWindowPopStateDecorator.create Wingman.document.createWindow()
+    @controller = new DummyController
   
   teardown: ->
     delete Wingman.document

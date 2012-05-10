@@ -35,11 +35,6 @@ addProperty = (key, value) ->
 merge = (obj, obj2) ->
   obj[key] = value for key, value of obj2
 
-instantiate = (object, args) ->
-  instance = Object.create object.prototype
-  instance.initialize.apply instance, args
-  instance
-
 convertIfNecessary = (value) ->
   if Array.isArray(value)
     addProperties.call value, Events
@@ -63,11 +58,11 @@ WingmanObject.include = (args...) ->
   addProperties.call @, module for module in args
 
 WingmanObject.include
-  create: (args...) ->
-    instantiate this, args
-
   extend: (prototype, classProperties) ->
     object = ->
+      @initialize.apply @, arguments if @initialize
+      undefined
+    
     merge object, @
     merge object, classProperties
     

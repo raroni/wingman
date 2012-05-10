@@ -9,7 +9,7 @@ Wingman.View.templateSources = {
   'main': '<div>stubbing the source</div>'
 }
 
-class ViewWithTemplateSource extends Wingman.View
+ViewWithTemplateSource = Wingman.View.extend
   templateSource: '<div>test</div>'
 
 class ControllerWithView extends Wingman.Controller
@@ -33,7 +33,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootView = Wingman.View.extend
       templateSource: '<div>Hi</div>'
     
-    app = MyApp.create el: Wingman.document.createElement('div')
+    app = new MyApp el: Wingman.document.createElement('div')
     @assertEqual '<div>Hi</div>', app.el.innerHTML
   
   'test simple child view': ->
@@ -48,7 +48,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
       templateSource: '<div>stubbing the source</div>'
     
     rootEl = Wingman.document.createElement 'div'
-    app = MyApp.create el: rootEl
+    app = new MyApp el: rootEl
     @assert rootEl.innerHTML.match('stubbing the source')
   
   'test access to state': ->
@@ -66,7 +66,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
         @state.viewGreeting = 'View says hello'
     
     rootEl = Wingman.document.createElement 'div'
-    app = MyApp.create el: rootEl
+    app = new MyApp el: rootEl
     
     @assertEqual 'View says hello', app.get('state.viewGreeting')
     @assertEqual 'Controller says hello', app.get('state.controllerGreeting')
@@ -77,7 +77,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootView = ViewWithTemplateSource.extend()
     
     @assert !Wingman.Application.instance
-    MyApp.create el: Wingman.document.createElement 'div'
+    new MyApp el: Wingman.document.createElement 'div'
     @assert Wingman.Application.instance
   
   'test instantiation of two apps': ->
@@ -86,9 +86,9 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootView = ViewWithTemplateSource.extend()
     
     appOptions = { el: Wingman.document.createElement('div') }
-    MyApp.create appOptions
+    new MyApp appOptions
     
-    routine = -> MyApp.create appOptions
+    routine = -> new MyApp appOptions
     check = (e) -> e.message == "You cannot instantiate two Wingman apps at the same time."
     
     @assertThrows routine, check
@@ -100,7 +100,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootController = Wingman.Controller.extend()
     MyApp.RootView = ViewWithTemplateSource.extend()
     
-    MyApp.create el: Wingman.document.createElement('div')
+    new MyApp el: Wingman.document.createElement('div')
     
     @assertEqual 'test-host.com', Wingman.Application.instance?.host
   
@@ -113,7 +113,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootController = Wingman.Controller.extend()
     MyApp.RootView = ViewWithTemplateSource.extend()
     
-    app = MyApp.create el: Wingman.document.createElement('div')
+    app = new MyApp el: Wingman.document.createElement('div')
     @assert callbackFired
   
   'test root controller callback': ->
@@ -125,7 +125,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
       ready: ->
         callbackFired = true
     
-    MyApp.create el: Wingman.document.createElement('div')
+    new MyApp el: Wingman.document.createElement('div')
     @assert callbackFired
   
   'test navigate and shared path': ->
@@ -133,7 +133,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootController = Wingman.Controller.extend()
     MyApp.RootView = ViewWithTemplateSource.extend()
     
-    app = MyApp.create el: Wingman.document.createElement 'div'
+    app = new MyApp
     app.navigate 'user'
     @assertEqual 'user', app.get('path')
   
@@ -142,7 +142,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootController = Wingman.Controller.extend()
     MyApp.RootView = ViewWithTemplateSource.extend()
     
-    app = MyApp.create el: Wingman.document.createElement 'div'
+    app = new MyApp
     app.navigate 'user', level: 2
     @assertEqual 'user', app.path
     @assertEqual 2, app.navigationOptions.level
@@ -153,7 +153,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootView = ViewWithTemplateSource.extend()
     
     Wingman.window.document.location.pathname = '/user'
-    app = MyApp.create el: Wingman.document.createElement('div')
+    app = new MyApp el: Wingman.document.createElement('div')
     @assertEqual 'user', app.path
   
   'test backing through history': ->
@@ -161,7 +161,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootController = Wingman.Controller.extend()
     MyApp.RootView = ViewWithTemplateSource.extend()
   
-    app = MyApp.create el: Wingman.document.createElement 'div'
+    app = new MyApp
     app.navigate 'user'
     app.navigate 'home'
     app.back()
@@ -182,7 +182,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
       
     MyApp.MainView = ViewWithTemplateSource.extend()
     
-    app = MyApp.create()
+    app = new MyApp
     @assert mainViewFromController instanceof MyApp.MainView
   
   'test nested controller getting served correct view': ->
@@ -203,7 +203,7 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     
     MyApp.MainView.UserView = ViewWithTemplateSource.extend()
     
-    app = MyApp.create el: Wingman.document.createElement('div')
+    app = new MyApp el: Wingman.document.createElement('div')
     @assert viewFromMainController instanceof MyApp.MainView.UserView
   
   'test passing correct view classes': ->
@@ -222,5 +222,5 @@ module.exports = class ApplicationTest extends Janitor.TestCase
     MyApp.RootView = Wingman.View.extend
       templateSource: '<div>hello</div>'
     
-    MyApp.create()
+    new MyApp
     @assertEqual '<div>hello</div>', Wingman.document.body.innerHTML

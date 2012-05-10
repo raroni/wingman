@@ -181,7 +181,7 @@ Parser = WingmanObject.extend
         node.attributes[key] = buildText value
 
 Parser.parse = (source) ->
-  parser = @create source
+  parser = new @ source
   parser.execute()
   parser.tree
 

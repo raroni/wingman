@@ -21,4 +21,4 @@ module.exports =
     klass = @storageTypes[@storage.type]
     options = {}
     options[key] = value for key, value of @storage when key != 'type'
-    klass.create options
+    new klass options

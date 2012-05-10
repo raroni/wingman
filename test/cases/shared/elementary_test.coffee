@@ -11,7 +11,7 @@ DummyObject.prototype.include Elementary
 
 module.exports = class extends Janitor.TestCase
   setup: ->
-    @dummyObject = DummyObject.create()
+    @dummyObject = new DummyObject
   
   'test css property name convertion from dom to css notation': ->
     @assertEqual 'fontSize', Elementary.convertCssPropertyFromDomToCssNotation 'font-size'

@@ -13,9 +13,9 @@ module.exports = class RestTest extends Janitor.TestCase
   'test succesful create': ->
     Wingman.request.realRequest = sinon.spy()
     
-    user = DummyUser.create()
+    user = new DummyUser
     user._dirtyStaticProperties = { name: 'Rasmus', age: 25 }
-    storage = RestStorage.create url: '/users'
+    storage = new RestStorage url: '/users'
     
     storage.create user
     
@@ -30,8 +30,8 @@ module.exports = class RestTest extends Janitor.TestCase
     Wingman.request.realRequest = (options) ->
       options.success()
     
-    user = DummyUser.create()
-    storage = RestStorage.create url: '/users'
+    user = new DummyUser
+    storage = new RestStorage url: '/users'
     
     callbackFired = false
     storage.create user, success: -> callbackFired = true
@@ -48,10 +48,10 @@ module.exports = class RestTest extends Janitor.TestCase
       successHash[key] = value for key, value of options.data
       options.success successHash
   
-    user = DummyUser.create()
+    user = new DummyUser
     user.set id: 1
     user._dirtyStaticProperties = { name: 'Rasmus', age: 25 }
-    storage = RestStorage.create url: '/users'
+    storage = new RestStorage url: '/users'
     
     hashFromCallback = undefined
     storage.update user, success: (hash) -> hashFromCallback = hash
@@ -63,8 +63,8 @@ module.exports = class RestTest extends Janitor.TestCase
     Wingman.request.realRequest = (options) ->
       options.success()
     
-    user = DummyUser.create()
-    storage = RestStorage.create url: '/users'
+    user = new DummyUser
+    storage = new RestStorage url: '/users'
     
     callbackFired = false
     storage.update user, success: -> callbackFired = true
@@ -74,7 +74,7 @@ module.exports = class RestTest extends Janitor.TestCase
     Wingman.request.realRequest = (options) ->
       options.success name: 'Rasmus' if options.url == '/users/21' && options.type == 'GET'
     
-    storage = RestStorage.create url: '/users'
+    storage = new RestStorage url: '/users'
     nameFromCallback = undefined
     storage.load 21, success: (hash) ->
       nameFromCallback = hash.name
@@ -88,7 +88,7 @@ module.exports = class RestTest extends Janitor.TestCase
       data = [car1, car2]
       options.success data if options.url == '/cars' && options.type == 'GET'
     
-    storage = RestStorage.create url: '/cars'
+    storage = new RestStorage url: '/cars'
     arrayFromCallback = undefined
     storage.load success: (array) ->
       arrayFromCallback = array
@@ -102,7 +102,7 @@ module.exports = class RestTest extends Janitor.TestCase
     Wingman.request.realRequest = (options) ->
       correctRequest = options.url == '/cars/1' && options.type == 'DELETE'
     
-    storage = RestStorage.create url: '/cars'
+    storage = new RestStorage url: '/cars'
     storage.delete 1
     
     @assert correctRequest

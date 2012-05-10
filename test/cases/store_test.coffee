@@ -11,7 +11,7 @@ DummyCollection = WingmanObject.extend
 
 module.exports = class StoreTest extends Janitor.TestCase
   setup: ->
-    @store = Store.create collectionClass: DummyCollection
+    @store = new Store collectionClass: DummyCollection
     @SomeModel = WingmanObject.extend
       id: null
       initialize: (hash) ->
@@ -26,11 +26,11 @@ module.exports = class StoreTest extends Janitor.TestCase
     Notification = WingmanObject.extend()
     
     usersCollection = @store.collection @SomeModel
-    usersCollection.add @SomeModel.create(id: 1)
-    usersCollection.add @SomeModel.create(id: 2)
+    usersCollection.add new @SomeModel(id: 1)
+    usersCollection.add new @SomeModel(id: 2)
     
     notificationsCollection = @store.collection Notification
-    notificationsCollection.add @SomeModel.create(id: 3)
+    notificationsCollection.add new @SomeModel(id: 3)
     
     @assertEqual 2, usersCollection.count()
     @assertEqual 1, notificationsCollection.count()

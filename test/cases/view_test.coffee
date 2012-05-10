@@ -23,7 +23,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     View.templateSources.main = '<div>hello</div>'
     MainView = View.extend templateName: 'main'
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'hello', view.el.childNodes[0].innerHTML
@@ -33,7 +33,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       templateSource: '<div>hello</div>'
       className: 'my-user-class'
     
-    view = UserView.create()
+    view = new UserView
     view.render()
     @assertEqual 'my-user-class', view.el.className
   
@@ -43,7 +43,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       templateName: 'simple_with_dynamic_values'
       myName: null
     
-    view = SimpleWithDynamicValuesView.create()
+    view = new SimpleWithDynamicValuesView
     view.render()
     view.myName = 'Razda'
     @assertEqual 1, view.el.childNodes.length
@@ -71,7 +71,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       events:
         'click .user': 'userClicked'
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     clicked = false
     view.bind 'userClicked', -> clicked = true
@@ -86,7 +86,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       events:
         'click .outer': 'outerClicked'
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     clicked = false
     view.bind 'outerClicked', -> clicked = true
@@ -104,7 +104,7 @@ module.exports = class ViewTest extends Janitor.TestCase
         eventFromCallback = event
       templateSource: '<div><a>BOING</a></div>'
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     
     clickElement view.el.childNodes[0].childNodes[0]
@@ -122,7 +122,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       somethingHappenedArguments: ->
         ['a', 'b']
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     a = b = null
     view.bind 'somethingHappened', (x,y) ->
@@ -141,7 +141,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView.UserView.NameView = ViewWithTemplateSource.extend()
     MainView.UserView.NameView.FirstView = ViewWithTemplateSource.extend()
     
-    main = MainView.create()
+    main = new MainView
     user = main.createChild 'user'
     name = user.createChild 'name'
     first = name.createChild 'first'
@@ -157,8 +157,8 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView.UserView = ViewWithTemplateSource.extend()
     MainView.UserView.NameView = ViewWithTemplateSource.extend()
     
-    state = Wingman.Object.create()
-    view = MainView.create { state }
+    state = new Wingman.Object()
+    view = new MainView { state }
     @assertEqual state, view.createChild('user').createChild('name').state
   
   'test access to parent': ->
@@ -166,7 +166,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView.UserView = ViewWithTemplateSource.extend()
     MainView.UserView.NameView = ViewWithTemplateSource.extend()
     
-    view = MainView.create()
+    view = new MainView
     @assert view.createChild('user').createChild('name').parent.parent instanceof MainView
   
   'test ready callback': ->
@@ -174,7 +174,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = ViewWithTemplateSource.extend
       ready: -> callbackFired = true
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     @assert callbackFired
   
@@ -182,7 +182,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = Wingman.View.extend templateSource: "{view 'user'}"
     MainView.UserView = ViewWithTemplateSource.extend()
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     childView = view.children[0]
     @assert childView instanceof MainView.UserView
@@ -192,7 +192,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = ViewWithTemplateSource.extend()
     MainView.UserView = ViewWithTemplateSource.extend()
     
-    view = MainView.create()
+    view = new MainView
     childView = view.createChild 'user'
     @assert childView instanceof MainView.UserView
     @assert view, childView.parent
@@ -201,7 +201,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = ViewWithTemplateSource.extend()
     MainView.UserView = ViewWithTemplateSource.extend()
     
-    view = MainView.create()
+    view = new MainView
     childView = view.createChild 'user', properties: { user: 'Rasmus' }
     @assertEqual 'Rasmus', childView.get('user')
   
@@ -210,7 +210,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView.UserView = ViewWithTemplateSource.extend()
     MainView.StatusView = ViewWithTemplateSource.extend()
     
-    view = MainView.create()
+    view = new MainView
     @assertEqual 0, view.children.length
     
     userView = view.createChild 'user'
@@ -229,7 +229,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = ViewWithTemplateSource.extend()
     MainView.UserView = ViewWithTemplateSource.extend()
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     childView = view.createChild 'user'
     @assert !childView.el.innerHTML
@@ -238,7 +238,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = ViewWithTemplateSource.extend()
     MainView.UserView = ViewWithTemplateSource.extend()
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     childView = view.createChild 'user', render: true
     @assert childView.el.innerHTML
@@ -247,7 +247,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = ViewWithTemplateSource.extend()
     MainView.UserNameView = ViewWithTemplateSource.extend()
     
-    view = MainView.create()
+    view = new MainView
     childView = view.createChild 'userName'
     @assert childView instanceof MainView.UserNameView
     @assert view, childView.parent
@@ -257,7 +257,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView.UserView = ViewWithTemplateSource.extend()
     MainView.UserView.NameView = ViewWithTemplateSource.extend()
     
-    main = MainView.create()
+    main = new MainView
     callbackValues = []
     main.bind 'descendantCreated', (view) -> callbackValues.push view
     user = main.createChild 'user'
@@ -271,7 +271,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = ViewWithTemplateSource.extend()
     MainView.UserView = ViewWithTemplateSource.extend()
     
-    main = MainView.create()
+    main = new MainView
     callbackValue = undefined
     main.bind 'descendantCreated', (view) -> callbackValue = view.get('user')
     user = main.createChild 'user', properties: { user: 'Ras' }
@@ -280,7 +280,7 @@ module.exports = class ViewTest extends Janitor.TestCase
   
   'test custom tag': ->
     MainView = ViewWithTemplateSource.extend tag: 'tr'
-    mainView = MainView.create()
+    mainView = new MainView
     @assertEqual 'TR', mainView.el.tagName
   
   'test custom template name': ->
@@ -290,7 +290,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = Wingman.View.extend
       templateName: 'my_custom_name'
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.render()
     @assertEqual 'hi', mainView.el.childNodes[0].innerHTML
   
@@ -298,7 +298,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = Wingman.View.extend
       templateSource: '<div>hello</div>'
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.render()
     @assertEqual 'hello', mainView.el.childNodes[0].innerHTML
   
@@ -306,7 +306,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = Wingman.View.extend
       templateSource: null
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.render()
     @assertEqual 0, mainView.el.childNodes.length
     
@@ -317,10 +317,10 @@ module.exports = class ViewTest extends Janitor.TestCase
     SubView = Wingman.View.extend
       templateSource: 'hello there'
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.render()
     
-    subView = SubView.create()
+    subView = new SubView
     subView.render()
     
     mainView.append subView
@@ -332,7 +332,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       templateSource: null
       left: '10px'
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     @assertEqual "10px", view.el.style.left
   
@@ -343,7 +343,7 @@ module.exports = class ViewTest extends Janitor.TestCase
       getBackgroundImage: ->
         "url('/something.jpg')"
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     @assertEqual "url('/something.jpg')", view.el.style.backgroundImage
   
@@ -357,7 +357,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView.addPropertyDependencies
       backgroundImage: 'myCode'
     
-    view = MainView.create()
+    view = new MainView
     view.render()
     @assertEqual "url('/1.jpg')", view.el.style.backgroundImage
     view.myCode = 2
@@ -371,7 +371,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     MyViews.NameView = Wingman.View.extend
       templateSource: null
     
-    view = MainView.create childClasses: MyViews
+    view = new MainView childClasses: MyViews
     nameView = view.createChild 'name'
     @assert nameView instanceof MyViews.NameView
   
@@ -384,11 +384,11 @@ module.exports = class ViewTest extends Janitor.TestCase
     NameView.addPropertyDependencies
       something: 'app.loggedIn'
     
-    view = NameView.create app: Wingman.Object.create()
+    view = new NameView app: new Wingman.Object()
     @assert !called
   
   'test sub context and descendantCreated event': ->
-    view = Wingman.View.create()
+    view = new Wingman.View()
     subContext = view.createSubContext()
     callbackFired = true
     view.bind 'descendantCreated', -> callbackFired = true

@@ -260,7 +260,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
     MainView.UserView = Wingman.View.extend
       templateSource: '<div>tester</div>'
     
-    context = MainView.create()
+    context = new MainView
     template @parent, context
     
     @assertEqual 2, @parent.childNodes.length
@@ -291,7 +291,7 @@ module.exports = class TemplateTest extends Janitor.TestCase
     MainView.UserView = Wingman.View.extend
       templateSource: '<div>{user}</div>'
     
-    mainView = MainView.create()
+    mainView = new MainView
     template = Wingman.Template.compile mainView.get('templateSource')
     template @parent, mainView
     mainView.users = ['Rasmus', 'John']
@@ -353,6 +353,6 @@ setupContext = (hash) ->
   properties[key] = null for key, value of hash
 
   Context = Wingman.Object.extend properties
-  context = Context.create()
+  context = new Context
   context[key] = value for key, value of hash
   context

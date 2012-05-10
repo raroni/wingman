@@ -11,7 +11,7 @@ module.exports = WingmanObject.extend
     if @collections[@classId(klass)]
       @collections[@classId(klass)]
     else
-      @collections[@classId(klass)] = @collectionClass.create()
+      @collections[@classId(klass)] = new @collectionClass
       @collections[@classId(klass)]
   
   flush: ->

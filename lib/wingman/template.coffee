@@ -10,7 +10,7 @@ Template = WingmanObject.extend
     HandlerFactory.create options, context
 
 Template.compile = (source) ->
-  template = @create source
+  template = new @ source
   (el, context) ->
     template.evaluate el, context
 

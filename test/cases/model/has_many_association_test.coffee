@@ -15,29 +15,29 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     delete Wingman.global
   
   'test count': ->
-    user = @User.create()
-    association = HasManyAssociation.create user, @Notification
+    user = new @User()
+    association = new HasManyAssociation user, @Notification
     user.id = 1
     
-    @Notification.create id: 1, userId: 1, text: 'Hello'
-    @Notification.create id: 2, userId: 1, text: 'Bonsoir'
-    @Notification.create id: 3, userId: 2, text: 'Goddag'
+    new @Notification id: 1, userId: 1, text: 'Hello'
+    new @Notification id: 2, userId: 1, text: 'Bonsoir'
+    new @Notification id: 3, userId: 2, text: 'Goddag'
     
     @assertEqual 2, association.count()
     
   'test count for association with model without an ID': ->
-    user = @User.create()
-    association = HasManyAssociation.create user, @Notification
+    user = new @User()
+    association = new HasManyAssociation user, @Notification
     @assertEqual 0, association.count()
   
   'test for each': ->
-    user = @User.create()
-    association = HasManyAssociation.create user, @Notification
+    user = new @User()
+    association = new HasManyAssociation user, @Notification
     user.id = 1
     
-    @Notification.create id: 1, userId: 1, text: 'Hello'
-    @Notification.create id: 2, userId: 1, text: 'Bonsoir'
-    @Notification.create id: 3, userId: 2, text: 'Goddag'
+    new @Notification id: 1, userId: 1, text: 'Hello'
+    new @Notification id: 2, userId: 1, text: 'Bonsoir'
+    new @Notification id: 3, userId: 2, text: 'Goddag'
     
     valuesFromForEachCallback = []
     association.forEach (model) ->
@@ -48,16 +48,16 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     @assertEqual 'Bonsoir', valuesFromForEachCallback[1].get('text')
   
   'test for each on model without an ID': ->
-    user = @User.create()
-    association = HasManyAssociation.create user, @Notification
+    user = new @User()
+    association = new HasManyAssociation user, @Notification
     
     callbackFired = false
     association.forEach -> callbackFired = true
     @assert !callbackFired
   
   'test build by hash': ->
-    user = @User.create id: 13
-    association = HasManyAssociation.create user, @Notification
+    user = new @User id: 13
+    association = new HasManyAssociation user, @Notification
     
     notification = association.build id: 1, title: 'YO'
     
@@ -66,8 +66,8 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     @assertEqual 13, @Notification.find(1).get('userId')
   
   'test build by array': ->
-    user = @User.create id: 13
-    association = HasManyAssociation.create user, @Notification
+    user = new @User id: 13
+    association = new HasManyAssociation user, @Notification
     
     notifications = association.build [
       { id: 1, title: 'YO' },
@@ -82,20 +82,20 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     @assertEqual 13, @Notification.find(2).get('userId')
   
   'test add event': ->
-    user = @User.create()
-    association = HasManyAssociation.create user, @Notification
+    user = new @User()
+    association = new HasManyAssociation user, @Notification
     user.id = 27
     valueFromCallback = undefined
     association.bind 'add', (model) -> valueFromCallback = model
     
-    notification = @Notification.create id: 1, userId: 27, text: 'Hello'
+    notification = new @Notification id: 1, userId: 27, text: 'Hello'
     
     @assertEqual notification, valueFromCallback
   
   'test add event for models added prior to model getting an ID': ->
-    user = @User.create()
-    association = HasManyAssociation.create user, @Notification
-    notification = @Notification.create id: 1, userId: 27, text: 'Hello'
+    user = new @User()
+    association = new HasManyAssociation user, @Notification
+    notification = new @Notification id: 1, userId: 27, text: 'Hello'
     
     valueFromCallback = undefined
     association.bind 'add', (model) -> valueFromCallback = model
@@ -106,13 +106,13 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
   
   'test remove event': ->
     Wingman.request.realRequest = ->
-    user = @User.create()
-    association = HasManyAssociation.create user, @Notification
+    user = new @User()
+    association = new HasManyAssociation user, @Notification
     user.id = 27
     valueFromCallback = undefined
     association.bind 'remove', (model) -> valueFromCallback = model
     
-    notification = @Notification.create id: 1, userId: 27, text: 'Hello'
+    notification = new @Notification id: 1, userId: 27, text: 'Hello'
     notification.destroy()
     
     @assertEqual notification, valueFromCallback

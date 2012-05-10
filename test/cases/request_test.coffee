@@ -22,7 +22,7 @@ module.exports = class RequestTest extends Janitor.TestCase
     FunkySocks.RootView = Wingman.View.extend
       templateSource: '<div>test</div>'
     
-    FunkySocks.create el: Wingman.document.createElement('div')
+    new FunkySocks el: Wingman.document.createElement('div')
     
     Wingman.request url: '/users'
     

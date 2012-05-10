@@ -16,21 +16,21 @@ module.exports = class ModelTest extends Janitor.TestCase
   'test persistense check': ->
     User = Wingman.Model.extend()
     
-    user = User.create name: 'Rasmus', id: 1
+    user = new User name: 'Rasmus', id: 1
     @assert user.isPersisted()
     
-    user = User.create name: 'Rasmus'
+    user = new User name: 'Rasmus'
     @assert !user.isPersisted()
     
   'test setting default storage adapter': ->
     User = Wingman.Model.extend()
-    user = User.create()
+    user = new User
     @assert user.storageAdapter instanceof RestStorage
   
   'test dirty properties': ->
     User = Wingman.Model.extend name: null, age: null
    
-    user = User.create name: 'Rasmus', age: 25
+    user = new User name: 'Rasmus', age: 25
     
     dirty = user.dirtyStaticProperties()
     
@@ -57,7 +57,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     Wingman.request.realRequest = sinon.spy()
     
-    user = User.create name: 'Rasmus', age: 25
+    user = new User name: 'Rasmus', age: 25
     user.save()
     
     firstArgument = Wingman.request.realRequest.args[0][0]
@@ -75,7 +75,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     Wingman.request.realRequest = sinon.spy()
     
-    user = User.create id: 1, name: 'Rasmus', age: 25
+    user = new User id: 1, name: 'Rasmus', age: 25
     user.clean()
     user.name = 'Rasmus RN'
     user.save()
@@ -95,7 +95,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     Wingman.request.realRequest = (options) ->
       options.success id: 123, gender: 'm'
     
-    user = User.create name: 'Rasmus', age: 25
+    user = new User name: 'Rasmus', age: 25
     user.save()
     
     @assertEqual 123, user.id
@@ -112,7 +112,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     callbackCalled = false
     
-    user = User.create name: 'Rasmus', age: 25
+    user = new User name: 'Rasmus', age: 25
     user.save
       success: ->
         callbackCalled = true
@@ -130,7 +130,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     callbackCalled = false
     
-    user = User.create name: 'Rasmus', age: 25
+    user = new User name: 'Rasmus', age: 25
     user.save
       error: ->
         callbackCalled = true
@@ -143,7 +143,7 @@ module.exports = class ModelTest extends Janitor.TestCase
         type: 'local'
         namespace: 'users'
     
-    user = User.create name: 'Rasmus'
+    user = new User name: 'Rasmus'
     @assert !user.isDirty()
     user.set name: 'John'
     @assert !user.isDirty()
@@ -156,7 +156,7 @@ module.exports = class ModelTest extends Janitor.TestCase
         type: 'local'
         namespace: 'sessions'
     
-    session = Session.create id: 1, name: 'Rasmus'
+    session = new Session id: 1, name: 'Rasmus'
     session.load()
     @assertEqual 27, session.userId
     
@@ -255,7 +255,7 @@ module.exports = class ModelTest extends Janitor.TestCase
         type: 'rest'
         url: '/cars'
       
-    car = Car.create id: 1, name: 'Toyota'
+    car = new Car id: 1, name: 'Toyota'
     
     callbackValues = []
     car.bind 'destroy', (model) -> callbackValues.push model
@@ -297,7 +297,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     Wingman.global.Notification = Wingman.Model.extend()
     
-    user = User.create()
+    user = new User
     @assertEqual Wingman.global.Notification, user.notifications.associatedClass
   
   'test initialization of has many association with a two word name': ->
@@ -306,7 +306,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     Wingman.global.ForumTopic = Wingman.Model.extend()
     
-    user = User.create()
+    user = new User
     @assertEqual Wingman.global.ForumTopic, user.forumTopics.associatedClass
   
   'test has many association count': ->
@@ -321,11 +321,11 @@ module.exports = class ModelTest extends Janitor.TestCase
     Wingman.global.Notification = Notification = Wingman.Model.extend()
     Notification.belongsTo 'user'
     
-    user = User.create()
+    user = new User
     user.save()
     
-    Notification.create(userId: 1).save() for [1..2]
-    Notification.create(userId: 2).save()
+    new Notification(userId: 1).save() for [1..2]
+    new Notification(userId: 2).save()
     
     @assertEqual 2, user.notifications.count()
   
@@ -341,18 +341,19 @@ module.exports = class ModelTest extends Janitor.TestCase
     Wingman.global.Notification = Notification = Wingman.Model.extend()
     Notification.belongsTo 'user'
     
-    context = Wingman.Object.extend(user: null).create()
+    Context = Wingman.Object.extend user: null
+    context = new Context
     callbackValues = []
     context.observe 'user.notifications', 'add', (model) -> callbackValues.push model
     
-    user = User.create()
+    user = new User
     user.save()
     context.user = user
     
     notifications = [
-      Notification.create(userId: 1)
-      Notification.create(userId: 2)
-      Notification.create(userId: 1)
+      new Notification(userId: 1)
+      new Notification(userId: 2)
+      new Notification(userId: 1)
     ]
     notification.save() for notification in notifications
     
@@ -367,7 +368,7 @@ module.exports = class ModelTest extends Janitor.TestCase
     Wingman.global.Notification = Notification = Wingman.Model.extend()
     Notification.belongsTo 'user'
     
-    user = User.create id: 1, name: 'Rasmus', notifications: [ { id: 1, title: 'yeah' }, { id: 2, title: 'something else' } ]
+    user = new User id: 1, name: 'Rasmus', notifications: [ { id: 1, title: 'yeah' }, { id: 2, title: 'something else' } ]
     @assertEqual 2, Notification.count()
     @assertEqual 2, user.notifications.count()
   
@@ -383,34 +384,34 @@ module.exports = class ModelTest extends Janitor.TestCase
     Wingman.global.Notification = Notification = Wingman.Model.extend()
     Notification.belongsTo 'user'
     
-    user = User.create()
+    user = new User
     user.save()
     
-    Notification.create(userId: 1).save() for [1..2]
-    Notification.create(userId: 2).save()
+    new Notification(userId: 1).save() for [1..2]
+    new Notification(userId: 2).save()
     
     @assert !user.toJSON().notifications
   
   'test store add': ->
     User = Wingman.Model.extend()
-    user = User.create()
+    user = new User
     @assertEqual 0, User.collection().count()
     user.id = 1
     @assertEqual 1, User.collection().count()
   
   'test find': ->
     User = Wingman.Model.extend name: 'Ras'
-    user = User.create id: 1, name: 'Ras'
+    user = new User id: 1, name: 'Ras'
     @assertEqual 'Ras', User.find(1).name
   
   'test exception when attempting to change id': ->
     User = Wingman.Model.extend()
-    user = User.create id: 1
+    user = new User id: 1
     @assertThrows -> user.id = 2
   
   'test flush': ->
     User = Wingman.Model.extend()
-    user = User.create id: 1
+    user = new User id: 1
     callbackFired = false
     user.bind 'flush', -> callbackFired = true
     user.flush()

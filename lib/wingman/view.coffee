@@ -47,9 +47,9 @@ Prototype =
   
   createChild: (name, options) ->
     className = Fleck.camelize(Fleck.underscore(name), true) + 'View'
-    klass = @get('childClasses')[className]
+    Child = @get('childClasses')[className]
     
-    child = klass.create parent: @, state: @get('state')
+    child = new Child parent: @, state: @get('state')
     child.set options.properties if options?.properties
     
     @get('children').push child

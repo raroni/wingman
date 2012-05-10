@@ -44,7 +44,7 @@ module.exports = class HandlerFactoryTest extends Janitor.TestCase
       ]
     
     Context = Wingman.Object.extend(users: null).extend()
-    context = Context.create()
+    context = new Context
     context.users = ['Rasmus', 'John']
     HandlerFactory.create options, context
     

@@ -23,7 +23,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     
     context = setupContext users: ['Rasmus', 'John']
     
-    ForBlockHandler.create options, context
+    new ForBlockHandler options, context
     
     childElements = @parent.childNodes
     @assertEqual 2, childElements.length
@@ -52,7 +52,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     
     context = setupContext users: ['Rasmus', 'John']
   
-    ForBlockHandler.create options, context
+    new ForBlockHandler options, context
     
     childElements = @parent.childNodes
     @assertEqual 4, childElements.length
@@ -71,13 +71,14 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
         source: 'notification'
       ]
     
-    context = Wingman.Object.extend(user: null).create()
+    Context = Wingman.Object.extend user: null
+    context = new Context
     User = Wingman.Object.extend notifications: null
-    user = User.create()
+    user = new User
     user.notifications = ['Hello', 'Hi']
     context.user = user
     
-    ForBlockHandler.create options, context
+    new ForBlockHandler options, context
     
     childElements = @parent.childNodes
     @assertEqual 2, childElements.length
@@ -95,7 +96,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
       ]
     
     context = setupContext users: ['Rasmus', 'John']
-    ForBlockHandler.create options, context
+    new ForBlockHandler options, context
     
     childElements = @parent.childNodes
     @assertEqual 2, childElements.length
@@ -115,11 +116,11 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     
     
     Context = Wingman.Object.extend users: null
-    context = Context.create()
+    context = new Context
     context.users = ['Rasmus', 'John']
     
     context = setupContext users: ['Rasmus', 'John']
-    ForBlockHandler.create options, context
+    new ForBlockHandler options, context
     
     childElements = @parent.childNodes
     @assertEqual 2, childElements.length
@@ -138,7 +139,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     
     context = setupContext users: ['Rasmus', 'John']
   
-    ForBlockHandler.create options, context
+    new ForBlockHandler options, context
     
     @assertEqual 2, @parent.childNodes.length
     context.users = ['Oliver']
@@ -156,7 +157,7 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
       ]
     
     context = setupContext users: null
-    ForBlockHandler.create options, context
+    new ForBlockHandler options, context
     
     childElements = @parent.childNodes
     @assertEqual 0, childElements.length
@@ -180,9 +181,9 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     MainView.SubView = Wingman.View.extend
       templateSource: 'Hello'
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.users = ['Luigi', 'Yoshi']
-    ForBlockHandler.create options, mainView
+    new ForBlockHandler options, mainView
     @assertEqual 'Hello', @parent.childNodes[0].innerHTML
     @assertEqual 'Hello', @parent.childNodes[1].innerHTML
   
@@ -201,11 +202,11 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     MainView.SubView = Wingman.View.extend
       templateSource: 'Hello'
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.users = ['Luigi', 'Yoshi']
     callbackFired = false
     mainView.bind 'descendantCreated', -> callbackFired = true
-    ForBlockHandler.create options, mainView
+    new ForBlockHandler options, mainView
     @assert callbackFired
   
   'test child view where name equals singular of source': ->
@@ -223,9 +224,9 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     MainView.UserView = Wingman.View.extend
       templateSource: '{user}'
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.users = ['Luigi', 'Yoshi']
-    ForBlockHandler.create options, mainView
+    new ForBlockHandler options, mainView
     @assertEqual 'Luigi', @parent.childNodes[0].innerHTML
     @assertEqual 'Yoshi', @parent.childNodes[1].innerHTML
   
@@ -246,9 +247,9 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     MainView.UserView = Wingman.View.extend
       templateSource: '{user}'
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.users = ['Luigi', 'Yoshi']
-    ForBlockHandler.create options, mainView
+    new ForBlockHandler options, mainView
     @assertEqual 'Luigi', @parent.childNodes[0].innerHTML
     @assertEqual 'Yoshi', @parent.childNodes[1].innerHTML
   
@@ -272,13 +273,13 @@ module.exports = class ForBlockHandlerTest extends Janitor.TestCase
     User = Wingman.Model.extend
       getMyMethod: -> 'secret'
     
-    user1 = User.create name: 'Thelma'
-    user2 = User.create name: 'Louise'
+    user1 = new User name: 'Thelma'
+    user2 = new User name: 'Louise'
     users = [user1, user2]
     
-    mainView = MainView.create()
+    mainView = new MainView
     mainView.users = users
-    ForBlockHandler.create options, mainView
+    new ForBlockHandler options, mainView
     @assertEqual 'Thelma', @parent.childNodes[0].innerHTML
     @assertEqual 'Louise', @parent.childNodes[1].innerHTML
 
@@ -287,6 +288,6 @@ setupContext = (hash) ->
   properties[key] = null for key, value of hash
   
   Context = Wingman.Object.extend properties
-  context = Context.create()
+  context = new Context
   context[key] = value for key, value of hash
   context

@@ -12,8 +12,8 @@ User = Wingman.Object.extend
 
 module.exports = class LocalStorageTest extends Janitor.TestCase
   'test create': ->
-    user = User.create name: 'Rasmus', age: 25
-    storage = LocalStorage.create namespace: 'users'
+    user = new User name: 'Rasmus', age: 25
+    storage = new LocalStorage namespace: 'users'
     storage.create user
     
     data = JSON.parse Wingman.localStorage.getItem("users.#{user.id}")
@@ -25,9 +25,9 @@ module.exports = class LocalStorageTest extends Janitor.TestCase
   'test load': ->
     Wingman.localStorage.setItem "users.1", JSON.stringify({ name: 'Rasmus', age: 25 })
     
-    user = User.create()
+    user = new User
     user.id = 1
-    storage = LocalStorage.create namespace: 'users'
+    storage = new LocalStorage namespace: 'users'
     storage.load user.id, success: (hash) => user.set hash
     
     @assertEqual 'Rasmus', user.name
@@ -36,8 +36,8 @@ module.exports = class LocalStorageTest extends Janitor.TestCase
   'test update': ->
     Wingman.localStorage.setItem "users.1", JSON.stringify({ name: 'Rasmus', age: 25 })
     
-    user = User.create id: 1
-    storage = LocalStorage.create namespace: 'users'
+    user = new User id: 1
+    storage = new LocalStorage namespace: 'users'
     storage.load user.id, success: (hash) => user.set hash
     
     user.name = 'Razdaman'
@@ -47,18 +47,18 @@ module.exports = class LocalStorageTest extends Janitor.TestCase
     @assertEqual 'Razdaman', data.name
   
   'test updating when manually setting id': ->
-    user = User.create id: 1, name: 'RAS'
-    storage = LocalStorage.create namespace: 'users'
+    user = new User id: 1, name: 'RAS'
+    storage = new LocalStorage namespace: 'users'
     storage.update user
     data = JSON.parse Wingman.localStorage.getItem("users.1")
     @assertEqual 'RAS', data.name
   
   'test updating already exisiting entry': ->
-    user = User.create id: 1, name: 'RAS', age: 25
-    storage = LocalStorage.create namespace: 'users'
+    user = new User id: 1, name: 'RAS', age: 25
+    storage = new LocalStorage namespace: 'users'
     storage.update user
     
-    user = User.create()
+    user = new User
     user.set id: 1, name: 'RAS'
     storage.update user
     
@@ -68,8 +68,8 @@ module.exports = class LocalStorageTest extends Janitor.TestCase
     @assertEqual 25, ageFromCallback
   
   'test delete': ->
-    user = User.create name: 'Rasmus', age: 25
-    storage = LocalStorage.create namespace: 'users'
+    user = new User name: 'Rasmus', age: 25
+    storage = new LocalStorage namespace: 'users'
     storage.create user
     storage.delete user.id
     

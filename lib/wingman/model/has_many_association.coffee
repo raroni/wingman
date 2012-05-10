@@ -39,7 +39,7 @@ HasManyAssociation = Wingman.Object.extend
     foreignId = @model.get 'id'
     throw new Error "Parent's ID must be set to use HasManyAssociation#build." unless foreignId
     hash[@foreignKey()] = foreignId
-    @associatedClass.create hash
+    new @associatedClass hash
   
   build: (arrayOrHash) ->
     if Array.isArray(arrayOrHash)

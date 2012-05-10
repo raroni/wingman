@@ -33,7 +33,7 @@ Prototype =
     klassName = Fleck.camelize(Fleck.singularize(Fleck.underscore(hasManyName)), true)
     
     klass = Wingman.global[klassName]
-    association = HasManyAssociation.create @, klass
+    association = new HasManyAssociation @, klass
     
     @[hasManyName] = association
     
@@ -121,14 +121,14 @@ ClassProperties =
   
   loadOne: (id, callback) ->
     @storageAdapter().load id, success: (hash) =>
-      model = @create hash
+      model = new @ hash
       callback model if callback
   
   loadMany: (callback) ->
     @storageAdapter().load success: (array) =>
       models = []
       for modelData in array
-        model = @create modelData
+        model = new @ modelData
         models.push model
       callback models if callback
   
