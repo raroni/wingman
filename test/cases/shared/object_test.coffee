@@ -37,8 +37,8 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 5, thor.lives
   
   'test property enumerating': ->
-    obj = WingmanObject.extend name: null, age: null
-    obj = WingmanObject.create()
+    klass = WingmanObject.extend name: null, age: null
+    obj = klass.create()
     obj.name = 'Rasmus'
     obj.age = 26
     result = {}
