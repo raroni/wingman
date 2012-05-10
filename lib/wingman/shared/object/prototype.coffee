@@ -126,9 +126,6 @@ Prototype =
     
     @observe chainAsString, observer
   
-  callSuper: (propertyName) ->
-    Object.getPrototypeOf(Object.getPrototypeOf(@))[propertyName].call @
-  
   createSubContext: ->
     Object.create @
 
