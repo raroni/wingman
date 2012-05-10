@@ -28,14 +28,14 @@ module.exports = class ViewTest extends Janitor.TestCase
     @assertEqual 1, view.el.childNodes.length
     @assertEqual 'hello', view.el.childNodes[0].innerHTML
   
-  # feature temporary disabled while converting to new Wingman.Object
-  #'test setting dom class': ->
-  #  class UserView extends View
-  #    templateSource: '<div>hello</div>'
-  #
-  #  view = UserView.create()
-  #  view.render()
-  #  @assertEqual 'user', view.el.className
+  'test setting dom class': ->
+    class UserView extends View
+      templateSource: '<div>hello</div>'
+      className: 'my-user-class'
+    
+    view = UserView.create()
+    view.render()
+    @assertEqual 'my-user-class', view.el.className
   
   'test simple template with dynamic values': ->
     View.templateSources['simple_with_dynamic_values'] = '<div>{myName}</div>'
