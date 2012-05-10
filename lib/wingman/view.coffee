@@ -14,10 +14,15 @@ STYLE_NAMES = [
   'height'
 ]
 
-View = Wingman.Object.extend
+Prototype =
   children: null
   
-  initialize: ->
+  initialize: (options) ->
+    @parent = options.parent if options?.parent
+    @el = options.el if options?.el
+    @state = options.state if options?.state
+    @childClasses = options.childClasses if options?.childClasses
+    
     @el ||= Wingman.document.createElement(@tag || 'div')
     @children = []
     @_super()
@@ -111,17 +116,19 @@ View = Wingman.Object.extend
     context.bind 'descendantCreated', (child) => @trigger 'descendantCreated', child
     context
 
-View.parseEvents = (eventsHash) ->
-  (@parseEvent(key, trigger) for key, trigger of eventsHash)
+ClassProperties =
+  parseEvents: (eventsHash) ->
+    (@parseEvent(key, trigger) for key, trigger of eventsHash)
+  
+  parseEvent: (key, trigger) ->
+    type = key.split(' ')[0]
+    {
+      selector: key.substring(type.length + 1)
+      type
+      trigger
+    }
 
-View.parseEvent = (key, trigger) ->
-  type = key.split(' ')[0]
-  {
-    selector: key.substring(type.length + 1)
-    type
-    trigger
-  }
-
-View.include Elementary
+View = Wingman.Object.extend null, ClassProperties
+View.prototype.include Elementary, Prototype
 
 module.exports = View

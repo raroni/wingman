@@ -211,19 +211,19 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView.StatusView = ViewWithTemplateSource.extend()
     
     view = MainView.create()
-    @assertEqual 0, view.get('children').length
+    @assertEqual 0, view.children.length
     
     userView = view.createChild 'user'
-    @assertEqual 1, view.get('children').length
+    @assertEqual 1, view.children.length
     
     statusView = view.createChild 'status'
-    @assertEqual 2, view.get('children').length
+    @assertEqual 2, view.children.length
     
     statusView.remove()
-    @assertEqual 1, view.get('children').length
+    @assertEqual 1, view.children.length
     
     userView.remove()
-    @assertEqual 0, view.get('children').length
+    @assertEqual 0, view.children.length
   
   'test manualle created child views are not rendered by default': ->
     MainView = ViewWithTemplateSource.extend()
@@ -352,11 +352,11 @@ module.exports = class ViewTest extends Janitor.TestCase
     MainView = Wingman.View.extend
       myCode: 1
       templateSource: null
-      propertyDependencies:
-        backgroundImage: 'myCode'
-      
       getBackgroundImage: ->
-        "url('/#{@get('myCode')}.jpg')"
+        "url('/#{@myCode}.jpg')"
+    
+    MainView.addPropertyDependencies
+      backgroundImage: 'myCode'
     
     view = MainView.create()
     view.render()
@@ -380,10 +380,10 @@ module.exports = class ViewTest extends Janitor.TestCase
     called = false
     NameView = Wingman.View.extend
       templateSource: null
-      propertyDependencies:
-        something: 'app.loggedIn'
-      
       something: -> called = true
+    
+    NameView.addPropertyDependencies
+      something: 'app.loggedIn'
     
     view = NameView.create app: Wingman.Object.create()
     @assert !called
