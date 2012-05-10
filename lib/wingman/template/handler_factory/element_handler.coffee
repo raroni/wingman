@@ -2,7 +2,7 @@ WingmanObject = require '../../shared/object'
 Elementary = require '../../shared/elementary'
 
 ElementHandler = WingmanObject.extend
-  initialize: ->
+  initialize: (@options, @context) ->
     @setupDomElement()
     @setupStyles() if @options.styles
     @setupClasses() if @options.classes
@@ -68,7 +68,7 @@ ElementHandler = WingmanObject.extend
       options[key] = value for key, value of child
       HandlerFactory.create options, @context
 
-ElementHandler.include Elementary
+ElementHandler.prototype.include Elementary
 
 module.exports = ElementHandler
 

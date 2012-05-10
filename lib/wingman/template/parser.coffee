@@ -19,7 +19,6 @@ buildText = (value) ->
 
 Parser = WingmanObject.extend
   initialize: (source) ->
-    console.log 'SOURCE:', source
     @scanner = new StringScanner trimSource(source)
     @tree = { children: [] }
     @currentScope = @tree

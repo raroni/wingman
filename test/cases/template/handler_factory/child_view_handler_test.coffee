@@ -21,7 +21,7 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       templateSource: '<div>I am the user view</div>'
     
     mainView = MainView.create()
-    ChildViewHandler.create { options, context: mainView }
+    ChildViewHandler.create options, mainView
     @assertEqual '<div>I am the user view</div>', @parent.childNodes[0].innerHTML
   
   'test passing value from context': ->
@@ -41,7 +41,7 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       width: 100
       height: 200
     
-    handler = ChildViewHandler.create { options, context: mainView }
+    handler = ChildViewHandler.create options, mainView
     view = handler.view
     @assertEqual 'Rasmus', view.user.name
     @assertEqual 200, view.height
@@ -62,7 +62,7 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
     
     mainView = MainView.create()
     mainView.user = { level: 3 }
-    ChildViewHandler.create { options, context: mainView }
+    ChildViewHandler.create options, mainView
     @assertEqual '30px', @parent.childNodes[0].style.left
   
   'test remove': ->
@@ -75,7 +75,7 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       templateSource: '<div>I am the user view</div>'
     
     mainView = MainView.create()
-    handler = ChildViewHandler.create { options, context: mainView }
+    handler = ChildViewHandler.create options, mainView
     
     @assertEqual 1, @parent.childNodes.length
     
@@ -94,5 +94,5 @@ module.exports = class ChildViewHandlerTest extends Janitor.TestCase
       templateSource: null
     
     mainView = MainView.create()
-    handler = ChildViewHandler.create { options, context: mainView }
+    handler = ChildViewHandler.create options, mainView
     @assert handler.view instanceof MainView.UserView

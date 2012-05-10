@@ -34,8 +34,10 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
         }
       ]
     
-    context = Wingman.Object.create something: true
-    ConditionalHandler.create { options, context }
+    Context = Wingman.Object.extend something: null
+    context = Context.create()
+    context.something = true
+    ConditionalHandler.create options, context
     
     childNodes = @parent.childNodes
     @assertEqual 2, childNodes.length
@@ -75,8 +77,10 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
         ]
       ]
     
-    context = Wingman.Object.create early: true
-    ConditionalHandler.create { options, context }
+    Context = Wingman.Object.extend early: null
+    context = Context.create()
+    context.early = true
+    ConditionalHandler.create options, context
     
     childNodes = @parent.childNodes
     @assertEqual 2, childNodes.length

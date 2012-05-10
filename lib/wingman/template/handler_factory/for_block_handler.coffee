@@ -3,7 +3,7 @@ Fleck = require 'fleck'
 HandlerFactory = require '../handler_factory'
 
 module.exports = WingmanObject.extend
-  initialize: ->
+  initialize: (@options, @context) ->
     @handlers = {}
     @addAll() if @source()
     @context.observe @options.source, @rebuild.bind(@)

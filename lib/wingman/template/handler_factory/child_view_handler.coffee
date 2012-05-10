@@ -1,7 +1,7 @@
 WingmanObject = require '../../shared/object'
 
 module.exports = WingmanObject.extend
-  initialize: ->
+  initialize: (@options, @context) ->
     @view = @context.createChild @viewName(), @viewOptions()
     @options.scope.appendChild @view.el
   

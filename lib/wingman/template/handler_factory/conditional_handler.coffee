@@ -2,7 +2,7 @@ WingmanObject = require '../../shared/object'
 HandlerFactory = require '../handler_factory'
 
 module.exports = WingmanObject.extend
-  initialize: ->
+  initialize: (@options, @context) ->
     @handlers = []
     @context.observe @options.source, @update.bind(@)
     @update @context[@options.source]

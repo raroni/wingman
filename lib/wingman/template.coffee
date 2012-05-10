@@ -1,8 +1,8 @@
 WingmanObject = require './shared/object'
 
 Template = WingmanObject.extend
-  initialize: ->
-    @tree = Parser.parse @source
+  initialize: (source) ->
+    @tree = Parser.parse source
   
   evaluate: (el, context) ->
     options = { el, type: 'element' }
@@ -10,7 +10,7 @@ Template = WingmanObject.extend
     HandlerFactory.create options, context
 
 Template.compile = (source) ->
-  template = @create { source }
+  template = @create source
   (el, context) ->
     template.evaluate el, context
 

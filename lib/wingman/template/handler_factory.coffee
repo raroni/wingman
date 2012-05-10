@@ -15,6 +15,6 @@ exports.create = (options, context) ->
   klass = MAP[options.type]
   if klass
     delete options.type
-    klass.create { options, context }
+    klass.create options, context
   else
     throw new Error "Cannot create unknown node type (#{options.type})!"
