@@ -315,7 +315,6 @@ module.exports = class ViewTest extends Janitor.TestCase
       templateSource: null
     
     SubView = Wingman.View.extend
-      tag: 'span'
       templateSource: 'hello there'
     
     mainView = MainView.create()
@@ -326,7 +325,7 @@ module.exports = class ViewTest extends Janitor.TestCase
     
     mainView.append subView
     
-    @assertEqual '<span>hello there</span>', mainView.el.innerHTML
+    @assertEqual '<div>hello there</div>', mainView.el.innerHTML
   
   'test style property': ->
     MainView = Wingman.View.extend
