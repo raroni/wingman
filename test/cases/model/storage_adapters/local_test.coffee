@@ -7,6 +7,8 @@ User = Wingman.Object.extend
   id: null
   name: null
   age: null
+  initialize: (hash) ->
+    @[key] = value for key, value of hash
 
 module.exports = class LocalStorageTest extends Janitor.TestCase
   'test create': ->
