@@ -89,3 +89,30 @@ module.exports = class ConditionalHandlerTest extends Janitor.TestCase
     context.early = false
     @assertEqual 1, childNodes.length
     @assertEqual 'good evening', childNodes[0].innerHTML
+  
+  'test if with nested source': ->
+    options =
+      scope: @parent
+      source: 'innerContext.someValue'
+      trueChildren: [
+        {
+          type: 'element'
+          tag: 'span'
+          children: [ type: 'text' ]
+        }
+      ]
+    
+    InnerContext = Wingman.Object.extend someValue: null
+    innerContext = new InnerContext
+    innerContext.someValue = true
+    
+    Context = Wingman.Object.extend innerContext: null
+    context = new Context
+    context.innerContext = innerContext
+    
+    new ConditionalHandler options, context
+    
+    childNodes = @parent.childNodes
+    @assertEqual 1, childNodes.length
+    context.innerContext.someValue = false
+    @assertEqual 0, childNodes.length

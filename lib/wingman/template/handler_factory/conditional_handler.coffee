@@ -5,7 +5,7 @@ module.exports = WingmanObject.extend
   initialize: (@options, @context) ->
     @handlers = []
     @context.observe @options.source, @update.bind(@)
-    @update @context[@options.source]
+    @update @context.get(@options.source)
   
   add: (currentValue) ->
     children = (currentValue && @options.trueChildren) || @options.falseChildren
