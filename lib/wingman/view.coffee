@@ -36,7 +36,7 @@ Prototype =
       template = Wingman.Template.compile @templateSource
       template @el, @
     
-    @addClass @className
+    @addClass @className if @className
     
     @setupListeners()
     @setupStyles()
