@@ -31,12 +31,13 @@ Prototype =
       property.bind type, callback
     
     checkProperty = (property) ->
-      if nested
-        observeNested property
-      else if type != 'change'
-        observeEnumerable property
+      if property
+        if nested
+          observeNested property
+        else if type != 'change'
+          observeEnumerable property
     
-    checkProperty property if property
+    checkProperty property
     
     observation = (newValue, oldValue) ->
       checkProperty newValue

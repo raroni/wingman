@@ -320,6 +320,18 @@ module.exports = class ObjectTest extends Janitor.TestCase
     @assertEqual 200000, callbackValues[1]
     @assertEqual 10000, callbackValues[2]
   
+  'test reseting property that is a part of a nested observe': ->
+    User = WingmanObject.extend name: null
+    user = new User
+    user.name = 'Ras'
+    
+    View = WingmanObject.extend user: null
+    view = new View
+    view.user = user
+    
+    view.observe 'user.name', ->
+    @refuteThrows -> view.user = null
+  
   'test unobserve': ->
     Person = WingmanObject.extend name: null
     person = new Person
