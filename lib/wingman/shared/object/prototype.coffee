@@ -1,6 +1,5 @@
 WingmanObject = require '../object'
 Events = require '../events'
-Properties = require '../object/properties'
 
 observationCallbacks = []
 observations = []
@@ -109,15 +108,18 @@ Prototype =
   
   toJSON: (options = {}) ->
     json = {}
-    properties = Properties.find @
-    options.only = [options.only] if options.only && !Array.isArray options.only
     
-    for propertyName, propertyValue of properties
-      shouldBeIncluded = (
-        (!options.only || (propertyName in options.only)) &&
-        isSerializable(propertyValue)
-      )
-      json[propertyName] = propertyValue if shouldBeIncluded
+    if @staticPropertyNames
+      options.only = [options.only] if options.only && !Array.isArray options.only
+    
+      for propertyName in @staticPropertyNames
+        propertyValue = @[propertyName]
+        shouldBeIncluded = (
+          (!options.only || (propertyName in options.only)) &&
+          isSerializable(propertyValue)
+        )
+        json[propertyName] = propertyValue if shouldBeIncluded
+    
     json
   
   observeOnce: (chainAsString, callback) ->

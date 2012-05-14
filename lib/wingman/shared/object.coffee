@@ -1,5 +1,3 @@
-Properties = require './object/properties'
-
 addProperties = (hash) ->
   addProperty.call @, key, value for key, value of hash
 
@@ -26,6 +24,8 @@ addProperty = (key, value) ->
   else if key of @
     @[key] = value
   else
+    @staticPropertyNames = [] unless @hasOwnProperty 'staticPropertyNames'
+    @staticPropertyNames.push key
     Object.defineProperty @, key,
       get: -> @getProperty key
       set: (value) -> @setProperty key, value
@@ -88,14 +88,12 @@ WingmanObject.include
         undefined
   
   setProperty: (key, value) ->
-    properties = Properties.findOrCreate @
-    oldValue = properties[key] if @triggerPropertyChange
-    properties[key] = convertIfNecessary value
+    oldValue = @["_#{key}"] if @triggerPropertyChange
+    @["_#{key}"] = convertIfNecessary value
     @triggerPropertyChange key, oldValue if @triggerPropertyChange
   
   getProperty: (key) ->
-    properties = Properties.findOrCreate @
-    properties[key]
+    @["_#{key}"]
   
   addPropertyDependencies: (hash) ->
     @prototype.propertyDependencies = {} unless @prototype.hasOwnProperty 'propertyDependencies'

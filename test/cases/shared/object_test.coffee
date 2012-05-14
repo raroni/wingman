@@ -757,7 +757,6 @@ module.exports = class ObjectTest extends Janitor.TestCase
     country = new Country 'dk', 'eu'
     
     json = country.toJSON()
-    
     @assertEqual 'dk', json.code
     @assertEqual 'eu', json.region
     @assertEqual 2, Object.keys(json).length
