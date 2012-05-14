@@ -25,7 +25,7 @@ Prototype =
     
     @el ||= Wingman.document.createElement(@tag || 'div')
     @children = []
-    @_super()
+    View._super.initialize.call @
   
   name: ->
     withoutView = @constructor.name.replace ///View$///, ''
@@ -114,7 +114,7 @@ Prototype =
     @observe name, (newValue) => @setStyle name, newValue
   
   createSubContext: ->
-    context = @_super()
+    context = View._super.createSubContext.call @
     context.bind 'descendantCreated', (child) => @trigger 'descendantCreated', child
     context
 

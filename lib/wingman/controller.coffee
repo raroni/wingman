@@ -8,7 +8,7 @@ Controller = Wingman.Object.extend
     @view = view
     @state = view.state
     @setupBindings()
-    @_super()
+    Controller._super.initialize.call @
     @ready?()
   
   setupBindings: ->

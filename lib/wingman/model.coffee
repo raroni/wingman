@@ -18,7 +18,7 @@ Prototype =
     else
       @observeOnce 'id', collectionAdd
     
-    @_super()
+    Model._super.initialize.call @
   
   setupBelongsToAssociations: ->
     @setupBelongsToAssociation belongsToName for belongsToName in @constructor.belongsToNames
@@ -78,7 +78,7 @@ Prototype =
     if @[propertyName] instanceof HasManyAssociation
       @[propertyName].build values
     else
-      @_super propertyName, values
+      Model._super.setProperty.call @, propertyName, values
       if propertyName != 'storage'
         @dirtyStaticPropertyNames.push propertyName
         @save() if @isInstance() && @storageAdapter.autoSave

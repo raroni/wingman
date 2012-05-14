@@ -116,31 +116,15 @@ module.exports = class ObjectTest extends Janitor.TestCase
       color: 'white'
       
       giveBirth: ->
-        @_super 'Snoopy Junior'
+        Snoopy._super.giveBirth.call @, 'Snoopy Junior'
     
     snoopy = new Snoopy
     puppy = snoopy.giveBirth()
     
+    @assertEqual Dog.prototype, Snoopy._super
     @assert puppy instanceof Dog
     @assertEqual 'white', puppy.color
     @assertEqual 'Snoopy Junior', puppy.name
-  
-  'test preserving correct super across several methods': ->
-    Animal = WingmanObject.extend
-      identify: -> "I am a #{@name}"
-    
-    Dog = Animal.extend
-      name: 'dog'
-      
-      identify: ->
-        @someOtherMethod()
-        @_super()
-      
-      someOtherMethod: ->
-        'just testing'
-    
-    dog = new Dog
-    @assertEqual 'I am a dog', dog.identify()
   
   'test include': ->
     Loader =
@@ -626,7 +610,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
       code: null
       
       initialize: (@code) ->
-        @_super()
+        Country._super.initialize.call @
       
       getName: ->
         @CODES[@get('code')]
@@ -669,7 +653,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
       
       initialize: ->
         @names = []
-        @_super()
+        Person._super.initialize.call @
       
       getFullName: ->
         @names.join ' ' if @names
@@ -836,7 +820,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
       name: null
       
       setProperty: (key, value) ->
-        @_super key, "#{value} set by Model"
+        Model._super.setProperty.call @, key, "#{value} set by Model"
     
     model = new Model
     model.name = 'Yoshi'
@@ -858,7 +842,7 @@ module.exports = class ObjectTest extends Janitor.TestCase
     Model = WingmanObject.extend
       setProperty: (key, value) ->
         callbackValues.push @isInstance()
-        @_super key, value
+        Model._super.setProperty.call @, key, value
     
     User = Model.extend name: 'Rasmus'
     user = new User

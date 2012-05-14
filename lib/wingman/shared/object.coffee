@@ -10,18 +10,7 @@ addProperty = (key, value) ->
       set: (value) ->
         Object.defineProperty @, propertyName, { value }
       enumerable: true
-  else if typeof(value) == 'function'
-    klass = @ # rename to prototype?
-    @[key] = ->
-      oldSuper = @_super
-      @_super = Object.getPrototypeOf(klass)[key]
-      result = value.apply @, arguments
-      if oldSuper
-        @_super = oldSuper
-      else
-        delete @_super
-      result
-  else if key of @
+  else if typeof(value) == 'function' || key of @
     @[key] = value
   else
     @staticPropertyNames = [] unless @hasOwnProperty 'staticPropertyNames'
@@ -65,6 +54,8 @@ WingmanObject.include
     
     merge object, @
     merge object, classProperties
+    
+    object._super = @prototype
     
     object.prototype = Object.create @prototype
     object.prototype.constructor = object

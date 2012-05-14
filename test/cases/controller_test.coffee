@@ -8,7 +8,7 @@ DummyView = Wingman.View.extend
 ControllerWithView = Wingman.Controller.extend
   initialize: (options = {}) ->
     options.view = new DummyView parent: { el: Wingman.document.createElement('div') }
-    @_super options
+    ControllerWithView._super.initialize.call @, options
 
 module.exports = class ControllerTest extends Janitor.TestCase
   setup: ->
