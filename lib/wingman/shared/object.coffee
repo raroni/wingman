@@ -98,16 +98,14 @@ WingmanObject.include
     properties[key]
   
   addPropertyDependencies: (hash) ->
-    properties = Properties.findOrCreate @
-    properties.propertyDependencies ||= {}
-    merge properties.propertyDependencies, hash
+    @prototype.propertyDependencies = {} unless @prototype.hasOwnProperty 'propertyDependencies'
+    merge @prototype.propertyDependencies, hash
   
   propertyDependencies: ->
-    properties = Properties.findOrCreate @
     parent = Object.getPrototypeOf(@prototype).constructor
     
     total = {}
-    merge total, properties.propertyDependencies if properties.propertyDependencies
+    merge total, @prototype.propertyDependencies if @prototype.propertyDependencies
     merge total, parent.propertyDependencies() if parent.propertyDependencies?
     total
 
