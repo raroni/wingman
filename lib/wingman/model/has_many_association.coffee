@@ -13,7 +13,7 @@ HasManyAssociation = Wingman.Object.extend
   foreignKey: ->
     result = undefined
     @associatedClass.belongsToNames.some (belongsToName) =>
-      klassName = Fleck.upperCamelize belongsToName
+      klassName = Fleck.upperCamelize Fleck.underscore(belongsToName)
       klass = Wingman.global[klassName]
       result = "#{belongsToName}Id" if klass == @model.constructor
     result

@@ -116,3 +116,18 @@ module.exports = class HasManyAssociationTest extends Janitor.TestCase
     notification.destroy()
     
     @assertEqual notification, valueFromCallback
+  
+  'test foreign key': ->
+    user = new @User
+    association = new HasManyAssociation user, @Notification
+    @assertEqual 'userId', association.foreignKey()
+  
+  'test foreign key with two letter model name': ->
+    BlogPost = Wingman.global.BlogPost = Wingman.Model.extend()
+    
+    BlogPostComment = Wingman.global.BlogPostComment = Wingman.Model.extend()
+    BlogPostComment.belongsTo 'blogPost'
+    
+    blogPost = new BlogPost
+    association = new HasManyAssociation blogPost, BlogPostComment
+    @assertEqual 'blogPostId', association.foreignKey()
