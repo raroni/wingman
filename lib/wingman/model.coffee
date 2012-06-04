@@ -20,9 +20,6 @@ Prototype =
     
     Model._super.initialize.call @
   
-  setupBelongsToAssociations: ->
-    @setupBelongsToAssociation belongsToName for belongsToName in @constructor.belongsToNames
-  
   getStorageAdapter: ->
     @constructor.storageAdapter()
   
@@ -30,9 +27,7 @@ Prototype =
     @setupHasManyAssociation hasManyName for hasManyName in @constructor.hasManyNames
   
   setupHasManyAssociation: (hasManyName) ->
-    klassName = Fleck.camelize(Fleck.singularize(Fleck.underscore(hasManyName)), true)
-    
-    klass = Wingman.global[klassName]
+    klass = associationNameToConstructor hasManyName
     association = new HasManyAssociation @, klass
     
     @[hasManyName] = association
@@ -107,12 +102,23 @@ ClassProperties =
       @loadMany args[0]
   
   hasMany: (name) ->
-    (@hasManyNames ||= []).push name
     @registerProperties name
+    (@hasManyNames ||= []).push name
   
   belongsTo: (name) ->
     (@belongsToNames ||= []).push name
-    @registerProperties name, name + 'Id'
+    foreignKey = name + 'Id'
+    methodName = 'get' + Fleck.upperCamelize(Fleck.underscore(name))
+    
+    hash = {}
+    hash[foreignKey] = null
+    
+    constructor = null
+    hash[methodName] = ->
+      constructor ||= associationNameToConstructor name
+      constructor.find @[foreignKey]
+    
+    @prototype.include hash
   
   registerProperties: (args...) ->
     hash = {}
@@ -137,6 +143,10 @@ ClassProperties =
   
   find: (id) ->
     @collection().find id
+
+associationNameToConstructor = (name) ->
+  klassName = Fleck.camelize(Fleck.singularize(Fleck.underscore(name)), true)
+  Wingman.global[klassName]
 
 Model = Wingman.Object.extend Prototype, ClassProperties
 Model.include StorageAdapter

@@ -392,6 +392,30 @@ module.exports = class ModelTest extends Janitor.TestCase
     
     @assert !user.toJSON().notifications
   
+  'test single letter belongs to association': ->
+    Company = Wingman.global.Company = Wingman.Model.extend()
+    Company.hasMany 'employees'
+    
+    Employee = Wingman.global.Employee = Wingman.Model.extend()
+    Employee.belongsTo 'company'
+    
+    company = new Company id: 2
+    employee = new Employee id: 1, companyId: 2
+    
+    @assertEqual company, employee.company
+  
+  'test two letter belongs to association': ->
+    BlogPost = Wingman.global.BlogPost = Wingman.Model.extend()
+    BlogPost.hasMany 'blogPostComments'
+    
+    BlogPostComment = Wingman.global.BlogPostComment = Wingman.Model.extend()
+    BlogPostComment.belongsTo 'blogPost'
+    
+    blogPost = new BlogPost id: 2
+    blogPostComment = new BlogPostComment id: 1, blogPostId: 2
+    
+    @assertEqual blogPost, blogPostComment.blogPost
+  
   'test store add': ->
     User = Wingman.Model.extend()
     user = new User
