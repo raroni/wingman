@@ -11,7 +11,8 @@ STYLE_NAMES = [
   'top'
   'bottom'
   'width'
-  'height'
+  'height',
+  'zIndex'
 ]
 
 Prototype =
