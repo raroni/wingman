@@ -104,6 +104,7 @@ Prototype =
   
   remove: ->
     Elementary.remove.call @ if @el.parentNode
+    @removed?()
     @trigger 'remove'
   
   setupStyles: ->

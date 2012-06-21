@@ -394,3 +394,12 @@ module.exports = class ViewTest extends Janitor.TestCase
     view.bind 'descendantCreated', -> callbackFired = true
     subContext.trigger 'descendantCreated'
     @assert callbackFired
+  
+  'test removed callback': ->
+    callbackFired = false
+    MyView = Wingman.View.extend
+      removed: -> callbackFired = true
+    
+    view = new MyView()
+    view.remove()
+    @assert callbackFired
